@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Entorno virtual
+.venv/
+
+# Variables sensibles
+.env
+
+# Django
+*.log
+db.sqlite3
+
+# PyCharm
+.idea/
+
+# Archivos temporales
+.pytest_cache/
