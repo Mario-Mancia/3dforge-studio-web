@@ -63,7 +63,12 @@ class Cotizacion(DocumentoImportes):
         errores = {}
         if self.codigo:
             self.codigo = self.codigo.strip().upper()
-        if self.fecha_vencimiento and self.fecha_emision and self.fecha_vencimiento < self.fecha_emision:
+        if (
+                self.fecha_vencimiento
+                and self.fecha_emision
+                and self.fecha_vencimiento < self.fecha_emision
+                and self.estado != EstadoCotizacion.VENCIDA
+        ):
             errores["fecha_vencimiento"] = "El vencimiento no puede ser anterior a la emisión."
         if self.estado in (EstadoCotizacion.ENVIADA, EstadoCotizacion.ACEPTADA):
             if not self.fecha_vencimiento:

@@ -130,7 +130,6 @@ MAILERS = {
         "BACKEND": "django.core.mail.backends.console.EmailBackend",
     },
 }
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-responder@3dforge.studio")
 
 LOGIN_URL = "guest:acceso"
 LOGIN_REDIRECT_URL = "customer:panel"
@@ -204,19 +203,40 @@ LOGOUT_REDIRECT_URL = "guest:inicio"
 AXES_LOCKOUT_TEMPLATE = "errors/bloqueado.html"
 IMAGEN_MAX_BYTES = 2 * 1024 * 1024
 
+
+# --------------------------------------------------------------------------
+# CONFIGURACIÓN DE CORREO ELECTRÓNICO
+# --------------------------------------------------------------------------
+
 if os.getenv("MAIL_HOST"):
     MAILERS = {
         "default": {
             "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
             "OPTIONS": {
-                "host": os.environ["MAIL_HOST"],
+                "host": os.getenv("MAIL_HOST"),
                 "port": int(os.getenv("MAIL_PORT", "587")),
-                "use_tls": os.getenv("MAIL_USE_TLS", "True") == "True",
                 "username": os.getenv("MAIL_USER", ""),
                 "password": os.getenv("MAIL_PASSWORD", ""),
+                "use_tls": os.getenv("MAIL_USE_TLS", "True") == "True",
+                "use_ssl": False,
             },
         },
     }
+else:
+    MAILERS = {
+        "default": {
+            "BACKEND": "django.core.mail.backends.console.EmailBackend",
+        },
+    }
+
+DEFAULT_FROM_EMAIL = os.getenv(
+    "DEFAULT_FROM_EMAIL",
+    os.getenv("MAIL_USER", "no-responder@3dforge.studio"),
+)
+
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+
 # <<< fases-0-3
 
 # >>> fase-4
