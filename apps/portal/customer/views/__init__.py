@@ -1,5 +1,6 @@
-from .panel import PanelView
-from .tienda import TiendaView
+from .cotizaciones import CotizacionAccionView, CotizacionArchivoView, CotizacionDetalleView, CotizacionesView
 from .cotizar import CotizarView
-from .pedidos import PedidosView
 from .cuenta import CuentaView
+from .panel import PanelView
+from .pedidos import PedidosView
+from .tienda import TiendaView

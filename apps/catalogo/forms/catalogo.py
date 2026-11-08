@@ -1,11 +1,10 @@
 from django import forms
+from django.conf import settings
 from django.core.exceptions import ValidationError
 
 from apps.catalogo.models import CategoriaServicio, Producto, Servicio
 from apps.catalogo.services.catalogo import eliminar_imagen, guardar_imagen
 from apps.core.constants import FORMATOS_IMAGEN, MAX_IMAGEN_BYTES
-
-from django.conf import settings
 
 FORMATOS_PILLOW = {"JPEG", "PNG", "WEBP"}
 
@@ -43,12 +42,19 @@ class ProductoForm(forms.ModelForm):
         producto = super().save(commit=False)
         archivo = self.cleaned_data.get("imagen_archivo")
         anterior = producto.imagen
+        nueva = None
         if archivo:
-            producto.imagen = guardar_imagen(archivo)
+            nueva = guardar_imagen(archivo)
+            producto.imagen = nueva
         elif self.cleaned_data.get("quitar_imagen"):
             producto.imagen = None
         if commit:
-            producto.save()
+            try:
+                producto.save()
+            except Exception:
+                if nueva:
+                    eliminar_imagen(nueva)
+                raise
             if anterior and anterior != producto.imagen:
                 eliminar_imagen(anterior)
         return producto

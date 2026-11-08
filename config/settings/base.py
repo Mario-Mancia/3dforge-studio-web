@@ -218,3 +218,9 @@ if os.getenv("MAIL_HOST"):
         },
     }
 # <<< fases-0-3
+
+# >>> fase-4
+PRIVATE_MEDIA_ROOT = Path(os.getenv("PRIVATE_MEDIA_ROOT", str(BASE_DIR / "private_media")))
+COTIZACION_VIGENCIA_DIAS = int(os.getenv("COTIZACION_VIGENCIA_DIAS", "15"))
+COTIZACION_MAX_ARCHIVOS = 5
+# <<< fase-4

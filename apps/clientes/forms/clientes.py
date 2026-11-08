@@ -1,6 +1,6 @@
 from django import forms
 
-from apps.clientes.models import Cliente
+from apps.clientes.models import Cliente, TipoCliente
 
 
 class PerfilClienteForm(forms.ModelForm):
@@ -22,3 +22,9 @@ class PerfilClienteForm(forms.ModelForm):
             "direccion": "Dirección",
             "telefono": "Teléfono",
         }
+
+    def clean(self):
+        datos = super().clean()
+        if datos.get("tipo_cliente") == TipoCliente.PERSONA:
+            datos["nombre_empresa"] = None
+        return datos

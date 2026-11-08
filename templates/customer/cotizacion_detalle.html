@@ -1,0 +1,49 @@
+{% extends "layouts/customer.html" %}
+
+{% block titulo %}Cotización {{ cotizacion.codigo }}{% endblock %}
+
+{% block contenido %}
+<p><a href="{% url 'customer:cotizaciones' %}">&larr; Mis cotizaciones</a></p>
+<h1>Cotización {{ cotizacion.codigo }}</h1>
+<p>Estado: <strong>{{ cotizacion.get_estado_display }}</strong></p>
+{% if cotizacion.estado == "SOLICITADA" or cotizacion.estado == "BORRADOR" %}
+<p><em>Los importes son preliminares y se confirmarán tras la revisión.</em></p>
+{% endif %}
+{% if cotizacion.solicitud %}<h2>Su solicitud</h2><p>{{ cotizacion.solicitud|linebreaksbr }}</p>{% endif %}
+
+<div class="tabla-scroll">
+<table>
+  <thead><tr><th>Servicio</th><th>Descripción</th><th>Cantidad</th><th>Precio unitario</th><th>Descuento</th><th>Subtotal</th></tr></thead>
+  <tbody>
+  {% for d in cotizacion.detalles.all %}
+    <tr>
+      <td>{{ d.servicio.nombre }}</td>
+      <td>{{ d.descripcion }}{% if d.especificaciones %}<br><small>{% for clave, valor in d.especificaciones.items %}{{ clave|capfirst }}: {{ valor }}{% if not forloop.last %} · {% endif %}{% endfor %}</small>{% endif %}</td>
+      <td>{{ d.cantidad|floatformat:2 }}</td>
+      <td>${{ d.precio_unitario|floatformat:2 }}</td>
+      <td>${{ d.descuento|floatformat:2 }}</td>
+      <td>${{ d.subtotal|floatformat:2 }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<p>Subtotal: ${{ cotizacion.subtotal|floatformat:2 }} · Descuento: ${{ cotizacion.descuento|floatformat:2 }} · Impuesto: ${{ cotizacion.impuesto|floatformat:2 }} · <strong>Total: ${{ cotizacion.total|floatformat:2 }}</strong></p>
+{% if cotizacion.plazo_entrega_dias %}<p>Plazo estimado de entrega: {{ cotizacion.plazo_entrega_dias }} días.</p>{% endif %}
+{% if cotizacion.fecha_vencimiento %}<p>Válida hasta: {{ cotizacion.fecha_vencimiento|date:"d/m/Y H:i" }}</p>{% endif %}
+{% if cotizacion.observaciones %}<h2>Observaciones del equipo</h2><p>{{ cotizacion.observaciones|linebreaksbr }}</p>{% endif %}
+
+{% if cotizacion.archivos.all %}
+<h2>Archivos adjuntos</h2>
+<ul>
+  {% for a in cotizacion.archivos.all %}<li><a href="{% url 'customer:cotizacion_archivo' cotizacion.pk a.pk %}">{{ a.nombre_archivo }}</a> ({{ a.formato }})</li>{% endfor %}
+</ul>
+{% endif %}
+
+{% if cotizacion.estado == "ENVIADA" %}
+<form method="post" action="{% url 'customer:cotizacion_accion' cotizacion.pk 'aceptar' %}">{% csrf_token %}<button type="submit">Aceptar cotización</button></form>
+<form method="post" action="{% url 'customer:cotizacion_accion' cotizacion.pk 'rechazar' %}">{% csrf_token %}<button type="submit">Rechazar</button></form>
+{% elif cotizacion.estado == "SOLICITADA" %}
+<form method="post" action="{% url 'customer:cotizacion_accion' cotizacion.pk 'cancelar' %}">{% csrf_token %}<button type="submit">Cancelar solicitud</button></form>
+{% endif %}
+{% endblock %}

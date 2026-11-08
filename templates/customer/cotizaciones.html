@@ -1,0 +1,28 @@
+{% extends "layouts/customer.html" %}
+
+{% block titulo %}Mis cotizaciones{% endblock %}
+
+{% block contenido %}
+<h1>Mis cotizaciones</h1>
+<p><a class="boton" href="{% url 'customer:cotizar' %}">Solicitar cotización</a></p>
+{% if cotizaciones %}
+<div class="tabla-scroll">
+<table>
+  <thead><tr><th>Código</th><th>Fecha</th><th>Estado</th><th>Total</th></tr></thead>
+  <tbody>
+  {% for c in cotizaciones %}
+    <tr>
+      <td><a href="{% url 'customer:cotizacion' c.pk %}">{{ c.codigo }}</a></td>
+      <td>{{ c.fecha_emision|date:"d/m/Y" }}</td>
+      <td>{{ c.get_estado_display }}</td>
+      <td>${{ c.total|floatformat:2 }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% include "components/paginacion.html" %}
+{% else %}
+<p>Aún no ha solicitado cotizaciones.</p>
+{% endif %}
+{% endblock %}

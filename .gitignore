@@ -22,3 +22,6 @@ media/
 staticfiles/
 logs/
 *.propuesta
+private_media/
+
+.respaldo/

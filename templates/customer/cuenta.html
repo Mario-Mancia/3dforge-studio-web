@@ -13,7 +13,7 @@
 <p><a href="{% url 'account_change_password' %}">Cambiar contraseña</a></p>
 {% if actividad.cotizaciones %}
 <h2>Cotizaciones recientes</h2>
-<ul>{% for c in actividad.cotizaciones %}<li>{{ c.codigo }} - {{ c.get_estado_display }}</li>{% endfor %}</ul>
+<ul>{% for c in actividad.cotizaciones %}<li><a href="{% url 'customer:cotizacion' c.pk %}">{{ c.codigo }}</a> - {{ c.get_estado_display }}</li>{% endfor %}</ul>
 {% endif %}
 {% if actividad.encargos %}
 <h2>Encargos recientes</h2>

@@ -4,4 +4,32 @@
 
 {% block contenido %}
 <h1>Cotizaciones</h1>
+<form method="get" class="filtros">
+  <input type="search" name="q" value="{{ q }}" placeholder="Código o cliente" maxlength="100">
+  <select name="estado">
+    <option value="">Todos los estados</option>
+    {% for valor, etiqueta in estados %}<option value="{{ valor }}"{% if estado == valor %} selected{% endif %}>{{ etiqueta }}</option>{% endfor %}
+  </select>
+  <button type="submit">Filtrar</button>
+</form>
+<div class="tabla-scroll">
+<table>
+  <thead><tr><th>Código</th><th>Cliente</th><th>Fecha</th><th>Estado</th><th>Total</th><th>Responsable</th></tr></thead>
+  <tbody>
+  {% for c in cotizaciones %}
+    <tr>
+      <td><a href="{% url 'operator:cotizacion' c.pk %}">{{ c.codigo }}</a></td>
+      <td>{{ c.cliente }}</td>
+      <td>{{ c.fecha_emision|date:"d/m/Y" }}</td>
+      <td>{{ c.get_estado_display }}</td>
+      <td>${{ c.total|floatformat:2 }}</td>
+      <td>{{ c.usuario_responsable|default:"Sin asignar" }}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="6">Sin cotizaciones.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% include "components/paginacion.html" %}
 {% endblock %}

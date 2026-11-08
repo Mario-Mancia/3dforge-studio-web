@@ -4,4 +4,10 @@
 
 {% block contenido %}
 <h1>Solicitar cotización</h1>
+<p>Describa el trabajo que necesita. Un operador revisará su solicitud y le enviará una propuesta con precio y plazo.</p>
+<form method="post" enctype="multipart/form-data" novalidate>
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Enviar solicitud</button>
+</form>
 {% endblock %}

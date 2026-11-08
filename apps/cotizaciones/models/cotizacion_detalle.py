@@ -3,6 +3,7 @@ from django.db.models import Q
 
 from apps.core.constraints import no_negativos, restriccion
 from apps.core.models.documentos import DetalleImportes
+from apps.core.validators import validar_objeto_json
 
 
 class CotizacionDetalle(DetalleImportes):
@@ -19,6 +20,7 @@ class CotizacionDetalle(DetalleImportes):
         related_name="detalles_cotizacion",
     )
     descripcion = models.CharField(max_length=250)
+    especificaciones = models.JSONField(null=True, blank=True, validators=[validar_objeto_json])
 
     class Meta:
         db_table = "cotizaciones_detalles"

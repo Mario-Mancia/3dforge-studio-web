@@ -35,6 +35,7 @@ class Cotizacion(DocumentoImportes):
         related_name="cotizaciones_a_cargo",
     )
     codigo = models.CharField(max_length=30, unique=True, validators=[validar_codigo])
+    solicitud = models.TextField(null=True, blank=True)
     fecha_emision = models.DateTimeField(default=timezone.now)
     fecha_vencimiento = models.DateTimeField(null=True, blank=True)
     plazo_entrega_dias = models.PositiveSmallIntegerField(null=True, blank=True, validators=[MinValueValidator(1)])
@@ -42,7 +43,7 @@ class Cotizacion(DocumentoImportes):
     observaciones = models.TextField(null=True, blank=True)
     actualizado_en = models.DateTimeField(auto_now=True)
 
-    campos_texto_opcional = ("observaciones",)
+    campos_texto_opcional = ("solicitud", "observaciones")
 
     class Meta:
         db_table = "cotizaciones"
@@ -59,7 +60,15 @@ class Cotizacion(DocumentoImportes):
 
     def clean(self):
         super().clean()
+        errores = {}
         if self.codigo:
             self.codigo = self.codigo.strip().upper()
         if self.fecha_vencimiento and self.fecha_emision and self.fecha_vencimiento < self.fecha_emision:
-            raise ValidationError({"fecha_vencimiento": "El vencimiento no puede ser anterior a la emisión."})
+            errores["fecha_vencimiento"] = "El vencimiento no puede ser anterior a la emisión."
+        if self.estado in (EstadoCotizacion.ENVIADA, EstadoCotizacion.ACEPTADA):
+            if not self.fecha_vencimiento:
+                errores["fecha_vencimiento"] = "Una cotización enviada debe tener fecha de vencimiento."
+            if self.total is not None and self.total <= 0:
+                errores["total"] = "Una cotización enviada debe tener un total mayor que cero."
+        if errores:
+            raise ValidationError(errores)
