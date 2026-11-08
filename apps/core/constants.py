@@ -1,0 +1,6 @@
+from decimal import Decimal
+
+CENTAVO = Decimal("0.01")
+FORMATOS_ARCHIVO = ("STL", "OBJ", "3MF", "STEP", "PNG", "JPG", "PDF")
+MAX_ARCHIVO_BYTES = 52428800
+MAX_JSON_BYTES = 100000

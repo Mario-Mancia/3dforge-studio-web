@@ -1,0 +1,9 @@
+{% extends "layouts/base.html" %}
+
+{% block cuerpo %}
+{% include "components/navbar.html" %}
+<main>
+  {% block contenido %}{% endblock %}
+</main>
+{% include "components/footer.html" %}
+{% endblock %}

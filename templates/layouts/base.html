@@ -1,0 +1,16 @@
+{% load static %}<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}{% endblock %} | {{ negocio.nombre_negocio|default:"3DForge Studio" }}</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {% block estilos %}{% endblock %}
+</head>
+<body>
+  {% include "components/mensajes.html" %}
+  {% block cuerpo %}{% block contenido %}{% endblock %}{% endblock %}
+  <script src="{% static 'js/app.js' %}" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

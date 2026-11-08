@@ -17,3 +17,7 @@ db.sqlite3
 
 # Archivos temporales
 .pytest_cache/
+.respaldo/
+media/
+staticfiles/
+logs/
