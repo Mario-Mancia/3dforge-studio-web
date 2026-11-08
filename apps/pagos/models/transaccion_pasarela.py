@@ -5,11 +5,11 @@ from apps.core.validators import validar_objeto_json
 
 
 class TransaccionPasarela(ModeloValidado):
-    pago = models.OneToOneField(
+    pago = models.ForeignKey(
         "pagos.Pago",
         on_delete=models.PROTECT,
         db_column="id_pago",
-        related_name="transaccion",
+        related_name="transacciones",
     )
     proveedor = models.CharField(max_length=50)
     referencia_externa = models.CharField(max_length=150, unique=True, null=True, blank=True)

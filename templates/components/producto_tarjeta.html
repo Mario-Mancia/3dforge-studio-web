@@ -1,0 +1,6 @@
+<article class="tarjeta">
+  {% if producto.imagen %}<img src="{{ producto.imagen_url }}" alt="{{ producto.nombre }}" loading="lazy">{% else %}<div class="sin-imagen">Sin imagen</div>{% endif %}
+  <h3><a href="{% url 'guest:producto' producto.pk %}">{{ producto.nombre }}</a></h3>
+  <p class="precio">${{ producto.precio|floatformat:2 }}</p>
+  <p class="disp disp-{{ producto.disponibilidad_codigo }}">{{ producto.disponibilidad }}</p>
+</article>

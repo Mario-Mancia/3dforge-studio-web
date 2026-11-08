@@ -1,8 +1,12 @@
 {% extends "layouts/base.html" %}
 
 {% block cuerpo %}
-{% include "components/navbar.html" %}
-<main>
+{% if request.resolver_match.namespace == "administrator" %}
+{% include "components/nav_admin.html" %}
+{% else %}
+{% include "components/nav_operador.html" %}
+{% endif %}
+<main class="contenedor">
   {% block contenido %}{% endblock %}
 </main>
 {% include "components/footer.html" %}

@@ -182,3 +182,39 @@ LOGGING = {
     "handlers": {"console": {"class": "logging.StreamHandler"}},
     "root": {"handlers": ["console"], "level": os.getenv("DJANGO_LOG_LEVEL", "INFO")},
 }
+
+# >>> fases-0-3
+from decimal import Decimal
+
+TASA_IMPUESTO = Decimal(os.getenv("TASA_IMPUESTO", "0.13"))
+MONEDA = "USD"
+
+ACCOUNT_ADAPTER = "apps.usuarios.adapters.CuentaAdapter"
+SOCIALACCOUNT_ADAPTER = "apps.usuarios.adapters.SocialAdapter"
+ACCOUNT_FORMS = {"signup": "apps.usuarios.forms.registro.RegistroForm"}
+ACCOUNT_SESSION_REMEMBER = None
+ACCOUNT_LOGOUT_ON_GET = False
+ACCOUNT_PREVENT_ENUMERATION = True
+ACCOUNT_LOGOUT_REDIRECT_URL = "guest:inicio"
+
+LOGIN_URL = "guest:acceso"
+LOGIN_REDIRECT_URL = "redirigir"
+LOGOUT_REDIRECT_URL = "guest:inicio"
+
+AXES_LOCKOUT_TEMPLATE = "errors/bloqueado.html"
+IMAGEN_MAX_BYTES = 2 * 1024 * 1024
+
+if os.getenv("MAIL_HOST"):
+    MAILERS = {
+        "default": {
+            "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+            "OPTIONS": {
+                "host": os.environ["MAIL_HOST"],
+                "port": int(os.getenv("MAIL_PORT", "587")),
+                "use_tls": os.getenv("MAIL_USE_TLS", "True") == "True",
+                "username": os.getenv("MAIL_USER", ""),
+                "password": os.getenv("MAIL_PASSWORD", ""),
+            },
+        },
+    }
+# <<< fases-0-3

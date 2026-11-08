@@ -4,7 +4,7 @@ from django.utils import timezone
 
 from apps.core.models.base import ModeloValidado
 from apps.core.validators import validar_nombre_persona, validar_telefono
-from apps.usuarios.constants import ESTADO_ACTIVO, ESTADOS_BLOQUEADOS
+from apps.usuarios.constants import ESTADO_ACTIVO, ESTADO_INACTIVO, ESTADOS_BLOQUEADOS
 from apps.usuarios.managers import UsuarioManager
 
 
@@ -36,6 +36,10 @@ class Usuario(ModeloValidado, AbstractBaseUser, PermissionsMixin):
         verbose_name = "usuario"
         verbose_name_plural = "usuarios"
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._estado_inicial = self.__dict__.get("estado_id")
+
     def __str__(self):
         return self.correo
 
@@ -55,6 +59,15 @@ class Usuario(ModeloValidado, AbstractBaseUser, PermissionsMixin):
             self.correo = self.correo.strip().lower()
         if self.estado_id in ESTADOS_BLOQUEADOS:
             self.is_active = False
+        elif self.estado_id == ESTADO_ACTIVO:
+            if self._estado_inicial in ESTADOS_BLOQUEADOS:
+                self.is_active = True
+            elif not self.is_active:
+                self.estado_id = ESTADO_INACTIVO
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self._estado_inicial = self.estado_id
 
     def tiene_algun_rol(self, roles):
         if not (self.is_active and self.estado_id == ESTADO_ACTIVO):

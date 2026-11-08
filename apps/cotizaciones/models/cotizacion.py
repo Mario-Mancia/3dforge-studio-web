@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 
@@ -9,6 +10,7 @@ from apps.core.validators import validar_codigo
 
 
 class EstadoCotizacion(models.TextChoices):
+    SOLICITADA = "SOLICITADA", "Solicitada"
     BORRADOR = "BORRADOR", "Borrador"
     ENVIADA = "ENVIADA", "Enviada"
     ACEPTADA = "ACEPTADA", "Aceptada"
@@ -27,14 +29,18 @@ class Cotizacion(DocumentoImportes):
     usuario_responsable = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
         db_column="id_usuario_responsable",
         related_name="cotizaciones_a_cargo",
     )
     codigo = models.CharField(max_length=30, unique=True, validators=[validar_codigo])
     fecha_emision = models.DateTimeField(default=timezone.now)
     fecha_vencimiento = models.DateTimeField(null=True, blank=True)
-    estado = models.CharField(max_length=20, choices=EstadoCotizacion.choices, default=EstadoCotizacion.BORRADOR)
+    plazo_entrega_dias = models.PositiveSmallIntegerField(null=True, blank=True, validators=[MinValueValidator(1)])
+    estado = models.CharField(max_length=20, choices=EstadoCotizacion.choices, default=EstadoCotizacion.SOLICITADA)
     observaciones = models.TextField(null=True, blank=True)
+    actualizado_en = models.DateTimeField(auto_now=True)
 
     campos_texto_opcional = ("observaciones",)
 

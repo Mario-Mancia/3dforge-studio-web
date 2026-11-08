@@ -1,0 +1,22 @@
+{% extends "layouts/guest.html" %}
+{% load enlaces %}
+
+{% block titulo %}{{ producto.nombre }}{% endblock %}
+
+{% block contenido %}
+<p><a href="{% url 'guest:catalogo' %}">&larr; Volver a productos</a></p>
+<article class="detalle">
+  {% if producto.imagen %}<img src="{{ producto.imagen_url }}" alt="{{ producto.nombre }}">{% endif %}
+  <div>
+    <h1>{{ producto.nombre }}</h1>
+    <p class="precio">${{ producto.precio|floatformat:2 }}</p>
+    <p class="disp disp-{{ producto.disponibilidad_codigo }}">{{ producto.disponibilidad }}</p>
+    <p>{{ producto.descripcion|default:""|linebreaksbr }}</p>
+    <p>SKU: {{ producto.sku }}</p>
+    {% with mensaje="Hola, me interesa el producto: "|add:producto.nombre %}
+    {% whatsapp_url negocio.telefono mensaje as wa %}
+    {% if wa %}<a class="boton" href="{{ wa }}" target="_blank" rel="noopener">Consultar por WhatsApp</a>{% endif %}
+    {% endwith %}
+  </div>
+</article>
+{% endblock %}

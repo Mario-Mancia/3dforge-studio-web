@@ -4,4 +4,23 @@
 
 {% block contenido %}
 <h1>Servicios</h1>
+<nav class="filtros">
+  <a href="{% url 'guest:servicios' %}"{% if not categoria_actual %} class="activo"{% endif %}>Todos</a>
+  {% for categoria in categorias %}
+  <a href="?categoria={{ categoria.pk }}"{% if categoria_actual == categoria.pk %} class="activo"{% endif %}>{{ categoria.nombre }}</a>
+  {% endfor %}
+</nav>
+{% if servicios %}
+<div class="rejilla">
+  {% for servicio in servicios %}
+  <article class="tarjeta">
+    <h3><a href="{% url 'guest:servicio' servicio.pk %}">{{ servicio.nombre }}</a></h3>
+    <p>{{ servicio.categoria.nombre }}</p>
+    <p class="precio">Desde ${{ servicio.precio_base|floatformat:2 }}</p>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<p>No hay servicios disponibles por ahora.</p>
+{% endif %}
 {% endblock %}

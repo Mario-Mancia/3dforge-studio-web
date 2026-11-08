@@ -1,7 +1,37 @@
 {% extends "layouts/guest.html" %}
+{% load enlaces %}
 
 {% block titulo %}Inicio{% endblock %}
 
 {% block contenido %}
-<h1>Inicio</h1>
+<section class="hero">
+  <h1>{{ negocio.nombre_negocio|default:"3DForge Studio" }}</h1>
+  <p>Impresión, diseño y modelado 3D. Productos listos y trabajos a medida.</p>
+  <p>
+    <a class="boton" href="{% url 'guest:catalogo' %}">Ver productos</a>
+    <a class="boton secundario" href="{% url 'guest:servicios' %}">Ver servicios</a>
+    {% whatsapp_url negocio.telefono "Hola, quisiera más información." as wa %}
+    {% if wa %}<a class="boton secundario" href="{{ wa }}" target="_blank" rel="noopener">WhatsApp</a>{% endif %}
+  </p>
+</section>
+
+{% if productos %}
+<h2>Productos disponibles</h2>
+<div class="rejilla">
+  {% for producto in productos %}{% include "components/producto_tarjeta.html" %}{% endfor %}
+</div>
+{% endif %}
+
+{% if servicios %}
+<h2>Servicios</h2>
+<div class="rejilla">
+  {% for servicio in servicios %}
+  <article class="tarjeta">
+    <h3><a href="{% url 'guest:servicio' servicio.pk %}">{{ servicio.nombre }}</a></h3>
+    <p>{{ servicio.categoria.nombre }}</p>
+    <p class="precio">Desde ${{ servicio.precio_base|floatformat:2 }}</p>
+  </article>
+  {% endfor %}
+</div>
+{% endif %}
 {% endblock %}

@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 
-from apps.core.calculos import importes_coherentes
+from apps.core.calculos import importes_coherentes, linea_coherente
 from apps.core.fields import cantidad_decimal, dinero
 from apps.core.models.base import ModeloValidado
 
@@ -31,3 +31,8 @@ class DetalleImportes(ModeloValidado):
 
     class Meta:
         abstract = True
+
+    def clean(self):
+        super().clean()
+        if not linea_coherente(self.cantidad, self.precio_unitario, self.descuento, self.subtotal):
+            raise ValidationError({"subtotal": "El subtotal debe ser cantidad x precio unitario - descuento."})

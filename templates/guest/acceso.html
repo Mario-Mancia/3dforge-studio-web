@@ -1,7 +1,39 @@
 {% extends "layouts/guest.html" %}
+{% load socialaccount %}
 
 {% block titulo %}Acceso{% endblock %}
 
 {% block contenido %}
-<h1>Acceso</h1>
+<div class="acceso">
+  <section>
+    <h2>Ingresar</h2>
+    <form method="post" action="{% url 'account_login' %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ siguiente }}">
+      <p><label>Correo<br><input type="email" name="login" required autocomplete="email"></label></p>
+      <p><label>Contraseña<br><input type="password" name="password" required autocomplete="current-password"></label></p>
+      <p><label><input type="checkbox" name="remember"> Recordarme</label></p>
+      <button type="submit">Ingresar</button>
+    </form>
+    <p><a href="{% url 'account_reset_password' %}">¿Olvidó su contraseña?</a></p>
+    <form method="post" action="{% provider_login_url 'google' process='login' %}">
+      {% csrf_token %}
+      <button type="submit">Continuar con Google</button>
+    </form>
+  </section>
+  <section>
+    <h2>Crear cuenta de cliente</h2>
+    <form method="post" action="{% url 'account_signup' %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ siguiente }}">
+      <p><label>Nombres<br><input type="text" name="nombres" required maxlength="100"></label></p>
+      <p><label>Apellidos<br><input type="text" name="apellidos" required maxlength="100"></label></p>
+      <p><label>Correo<br><input type="email" name="email" required autocomplete="email"></label></p>
+      <p><label>Teléfono (opcional)<br><input type="tel" name="telefono" maxlength="25"></label></p>
+      <p><label>Contraseña<br><input type="password" name="password1" required autocomplete="new-password"></label></p>
+      <p><label>Confirmar contraseña<br><input type="password" name="password2" required autocomplete="new-password"></label></p>
+      <button type="submit">Registrarme</button>
+    </form>
+  </section>
+</div>
 {% endblock %}

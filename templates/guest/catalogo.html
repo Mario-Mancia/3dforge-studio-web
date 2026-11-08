@@ -1,7 +1,19 @@
 {% extends "layouts/guest.html" %}
 
-{% block titulo %}Catálogo{% endblock %}
+{% block titulo %}Productos{% endblock %}
 
 {% block contenido %}
-<h1>Catálogo</h1>
+<h1>Productos</h1>
+<form method="get" class="filtros">
+  <input type="search" name="q" value="{{ q }}" placeholder="Buscar por nombre o SKU" maxlength="100">
+  <button type="submit">Buscar</button>
+</form>
+{% if productos %}
+<div class="rejilla">
+  {% for producto in productos %}{% include "components/producto_tarjeta.html" %}{% endfor %}
+</div>
+{% include "components/paginacion.html" %}
+{% else %}
+<p>No hay productos disponibles por ahora.</p>
+{% endif %}
 {% endblock %}

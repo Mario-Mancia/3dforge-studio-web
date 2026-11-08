@@ -4,4 +4,35 @@
 
 {% block contenido %}
 <h1>Productos e inventario</h1>
+<p><a class="boton" href="{% url 'administrator:producto_crear' %}">Nuevo producto</a></p>
+<form method="get" class="filtros">
+  <input type="search" name="q" value="{{ q }}" placeholder="Buscar por nombre o SKU" maxlength="100">
+  <label><input type="checkbox" name="bajo" value="1"{% if bajo %} checked{% endif %}> Solo bajo stock</label>
+  <button type="submit">Filtrar</button>
+</form>
+<div class="tabla-scroll">
+<table>
+  <thead><tr><th>SKU</th><th>Nombre</th><th>Precio</th><th>Stock</th><th>Mínimo</th><th>Estado</th><th>Acciones</th></tr></thead>
+  <tbody>
+  {% for producto in productos %}
+    <tr>
+      <td>{{ producto.sku }}</td>
+      <td>{{ producto.nombre }}</td>
+      <td>${{ producto.precio|floatformat:2 }}</td>
+      <td>{{ producto.stock }}{% if producto.bajo_stock %} <span class="disp disp-ultimas">bajo</span>{% endif %}</td>
+      <td>{{ producto.stock_minimo }}</td>
+      <td>{% if producto.activo %}Activo{% else %}Inactivo{% endif %}</td>
+      <td>
+        <a href="{% url 'administrator:producto_editar' producto.pk %}">Editar</a>
+        <form method="post" action="{% url 'administrator:producto_activo' producto.pk %}">{% csrf_token %}<button type="submit">{% if producto.activo %}Desactivar{% else %}Activar{% endif %}</button></form>
+        <form method="post" action="{% url 'administrator:producto_stock' producto.pk %}">{% csrf_token %}<input type="number" name="delta" placeholder="±" required><button type="submit">Ajustar stock</button></form>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="7">Sin productos.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% include "components/paginacion.html" %}
 {% endblock %}

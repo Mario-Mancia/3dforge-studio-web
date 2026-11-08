@@ -77,3 +77,11 @@ def validar_objeto_json(valor):
         raise ValidationError("El objeto JSON no es serializable.", code="json_invalido")
     if longitud > MAX_JSON_BYTES:
         raise ValidationError("El objeto JSON es demasiado grande.", code="json_grande")
+
+# >>> fase-0-sku
+validar_sku = RegexValidator(
+    regex=r"^[A-Za-z0-9][A-Za-z0-9\-_.]{1,49}$",
+    message="El SKU solo admite letras, numeros, guion, guion bajo y punto (2 a 50 caracteres).",
+    code="sku_invalido",
+)
+# <<< fase-0-sku

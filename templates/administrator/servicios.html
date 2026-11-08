@@ -4,4 +4,37 @@
 
 {% block contenido %}
 <h1>Servicios y categorías</h1>
+<p>
+  <a class="boton" href="{% url 'administrator:servicio_crear' %}">Nuevo servicio</a>
+  <a class="boton secundario" href="{% url 'administrator:categoria_crear' %}">Nueva categoría</a>
+</p>
+<h2>Servicios</h2>
+<div class="tabla-scroll">
+<table>
+  <thead><tr><th>Categoría</th><th>Servicio</th><th>Precio base</th><th>Archivo</th><th>Estado</th><th>Acciones</th></tr></thead>
+  <tbody>
+  {% for servicio in servicios %}
+    <tr>
+      <td>{{ servicio.categoria.nombre }}</td>
+      <td>{{ servicio.nombre }}</td>
+      <td>${{ servicio.precio_base|floatformat:2 }}</td>
+      <td>{% if servicio.requiere_archivo %}Sí{% else %}No{% endif %}</td>
+      <td>{% if servicio.activo %}Activo{% else %}Inactivo{% endif %}</td>
+      <td>
+        <a href="{% url 'administrator:servicio_editar' servicio.pk %}">Editar</a>
+        <form method="post" action="{% url 'administrator:servicio_activo' servicio.pk %}">{% csrf_token %}<button type="submit">{% if servicio.activo %}Desactivar{% else %}Activar{% endif %}</button></form>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="6">Sin servicios.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<h2>Categorías</h2>
+<ul>
+  {% for categoria in categorias %}
+  <li>{{ categoria.nombre }} ({% if categoria.activo %}activa{% else %}inactiva{% endif %}) - <a href="{% url 'administrator:categoria_editar' categoria.pk %}">Editar</a></li>
+  {% endfor %}
+</ul>
 {% endblock %}
