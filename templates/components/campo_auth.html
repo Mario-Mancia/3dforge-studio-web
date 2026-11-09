@@ -1,0 +1,9 @@
+<div class="mb-3">
+  <label class="form-label" for="{{ id }}">{{ etiqueta }}</label>
+  <div class="input-group{% if errores %} has-validation{% endif %}">
+    <span class="input-group-text"><span class="material-symbols-rounded" aria-hidden="true">{{ icono }}</span></span>
+    <input type="{{ tipo }}" class="form-control{% if errores %} is-invalid{% endif %}" id="{{ id }}" name="{{ nombre }}" value="{{ valor|default:'' }}"{% if autocomplete %} autocomplete="{{ autocomplete }}"{% endif %}{% if requerido %} required{% endif %}{% if maximo %} maxlength="{{ maximo }}"{% endif %}{% if minimo %} minlength="{{ minimo }}"{% endif %}>
+    {% if tipo == "password" %}<button type="button" class="btn btn-icono toggle-password" data-objetivo="#{{ id }}" aria-label="Mostrar contraseña"><span class="material-symbols-rounded">visibility</span></button>{% endif %}
+    {% if errores %}<div class="invalid-feedback">{{ errores|join:" " }}</div>{% endif %}
+  </div>
+</div>

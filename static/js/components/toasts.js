@@ -2,10 +2,10 @@
     "use strict";
 
     var TIPOS = {
-        success: { clase: "text-bg-success", titulo: "Listo" },
-        error: { clase: "text-bg-danger", titulo: "Error" },
-        warning: { clase: "text-bg-warning", titulo: "Atención" },
-        info: { clase: "text-bg-info", titulo: "Información" }
+        success: { icono: "check_circle", titulo: "Listo" },
+        error: { icono: "error", titulo: "Error" },
+        warning: { icono: "warning", titulo: "Atención" },
+        info: { icono: "info", titulo: "Información" }
     };
 
     function contenedor() {
@@ -22,13 +22,16 @@
     }
 
     function mostrar(tipo, mensaje) {
-        var datos = TIPOS[tipo] || TIPOS.info;
-        var $toast = $('<div class="toast align-items-center border-0" role="alert"></div>').addClass(datos.clase);
-        var $cuerpo = $('<div class="toast-body"></div>')
+        var clave = TIPOS[tipo] ? tipo : "info";
+        var datos = TIPOS[clave];
+        var $toast = $('<div class="toast toast-md" role="alert" aria-live="assertive" aria-atomic="true"></div>').addClass("toast-" + clave);
+        var $icono = $('<span class="material-symbols-rounded toast-icono" aria-hidden="true"></span>').text(datos.icono);
+        var $texto = $('<div class="flex-grow-1"></div>')
             .append($('<strong class="d-block"></strong>').text(datos.titulo))
             .append($("<span></span>").text(mensaje));
-        var $cerrar = $('<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>');
-        $toast.append($('<div class="d-flex"></div>').append($cuerpo).append($cerrar));
+        var $cerrar = $('<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar"></button>');
+        $toast.append($('<div class="d-flex align-items-start gap-3 p-3"></div>').append($icono).append($texto).append($cerrar));
+        $toast.append('<div class="toast-progreso"></div>');
         contenedor().append($toast);
         $toast.on("hidden.bs.toast", function () { $toast.remove(); });
         activar($toast[0]);

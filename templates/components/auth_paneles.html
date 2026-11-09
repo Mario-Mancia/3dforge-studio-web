@@ -1,0 +1,69 @@
+{% load socialaccount %}
+<div class="auth-contenedor">
+  <div class="card auth-tarjeta">
+    <div class="card-body p-4 p-md-5">
+      <div class="text-center mb-4">
+        <span class="material-symbols-rounded icono-marca icono-grande" aria-hidden="true">deployed_code</span>
+        <h1 class="h4 mt-2 mb-1">Bienvenido a {{ negocio.nombre_negocio|default:"3DForge Studio" }}</h1>
+        <p class="text-body-secondary mb-0">Ingrese o cree su cuenta para comprar, cotizar y dar seguimiento a sus pedidos.</p>
+      </div>
+
+      <ul class="nav nav-pills nav-fill auth-pestanas mb-4" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link{% if pestana != 'registro' %} active{% endif %}" id="tab-login" data-bs-toggle="pill" data-bs-target="#panel-login" type="button" role="tab" aria-controls="panel-login" aria-selected="{% if pestana != 'registro' %}true{% else %}false{% endif %}"><span class="material-symbols-rounded">login</span>Ingresar</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link{% if pestana == 'registro' %} active{% endif %}" id="tab-registro" data-bs-toggle="pill" data-bs-target="#panel-registro" type="button" role="tab" aria-controls="panel-registro" aria-selected="{% if pestana == 'registro' %}true{% else %}false{% endif %}"><span class="material-symbols-rounded">person_add</span>Crear cuenta</button>
+        </li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane fade{% if pestana != 'registro' %} show active{% endif %}" id="panel-login" role="tabpanel" aria-labelledby="tab-login" tabindex="0">
+          <form method="post" action="{% url 'account_login' %}" id="form-ingreso">
+            {% csrf_token %}
+            {% if siguiente %}<input type="hidden" name="next" value="{{ siguiente }}">{% endif %}
+            {% if pestana == "login" and form.non_field_errors %}
+            <div class="alert alert-danger d-flex align-items-start gap-2" role="alert"><span class="material-symbols-rounded">error</span><div>{{ form.non_field_errors|join:" " }}</div></div>
+            {% endif %}
+            {% include "components/campo_auth.html" with etiqueta="Correo electrónico" nombre="login" id="login-correo" tipo="email" icono="mail" valor=form.login.value errores=form.login.errors autocomplete="email" requerido=True %}
+            {% include "components/campo_auth.html" with etiqueta="Contraseña" nombre="password" id="login-clave" tipo="password" icono="lock" errores=form.password.errors autocomplete="current-password" requerido=True %}
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div class="form-check mb-0"><input type="checkbox" class="form-check-input" id="login-recordar" name="remember"><label class="form-check-label" for="login-recordar">Recordarme</label></div>
+              <a href="{% url 'account_reset_password' %}">¿Olvidó su contraseña?</a>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 btn-lg">Ingresar</button>
+          </form>
+        </div>
+
+        <div class="tab-pane fade{% if pestana == 'registro' %} show active{% endif %}" id="panel-registro" role="tabpanel" aria-labelledby="tab-registro" tabindex="0">
+          <form method="post" action="{% url 'account_signup' %}" id="form-registro">
+            {% csrf_token %}
+            {% if siguiente %}<input type="hidden" name="next" value="{{ siguiente }}">{% endif %}
+            {% if pestana == "registro" and form.non_field_errors %}
+            <div class="alert alert-danger d-flex align-items-start gap-2" role="alert"><span class="material-symbols-rounded">error</span><div>{{ form.non_field_errors|join:" " }}</div></div>
+            {% endif %}
+            <div class="row g-2">
+              <div class="col-sm-6">{% include "components/campo_auth.html" with etiqueta="Nombres" nombre="nombres" id="reg-nombres" tipo="text" icono="badge" valor=form.nombres.value errores=form.nombres.errors requerido=True maximo=100 %}</div>
+              <div class="col-sm-6">{% include "components/campo_auth.html" with etiqueta="Apellidos" nombre="apellidos" id="reg-apellidos" tipo="text" icono="badge" valor=form.apellidos.value errores=form.apellidos.errors requerido=True maximo=100 %}</div>
+            </div>
+            {% include "components/campo_auth.html" with etiqueta="Correo electrónico" nombre="email" id="reg-correo" tipo="email" icono="mail" valor=form.email.value errores=form.email.errors autocomplete="email" requerido=True %}
+            {% include "components/campo_auth.html" with etiqueta="Teléfono (opcional)" nombre="telefono" id="reg-telefono" tipo="tel" icono="call" valor=form.telefono.value errores=form.telefono.errors maximo=25 %}
+            {% include "components/campo_auth.html" with etiqueta="Contraseña" nombre="password1" id="reg-clave1" tipo="password" icono="lock" errores=form.password1.errors autocomplete="new-password" requerido=True minimo=10 %}
+            {% include "components/campo_auth.html" with etiqueta="Confirmar contraseña" nombre="password2" id="reg-clave2" tipo="password" icono="lock_reset" errores=form.password2.errors autocomplete="new-password" requerido=True %}
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" id="reg-terminos" name="terminos" required>
+              <label class="form-check-label" for="reg-terminos">Acepto los <a href="{% url 'guest:terminos' %}" target="_blank" rel="noopener">términos y condiciones</a></label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 btn-lg">Crear cuenta</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="auth-separador">o continúe con</div>
+      <form method="post" action="{% provider_login_url 'google' process='login' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-secondary w-100"><span class="material-symbols-rounded">account_circle</span>Continuar con Google</button>
+      </form>
+    </div>
+  </div>
+</div>

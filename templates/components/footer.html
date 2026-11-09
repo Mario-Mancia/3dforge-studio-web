@@ -1,3 +1,13 @@
-<footer class="border-top py-3 mt-5 text-center text-body-secondary">
-  <small>{{ negocio.nombre_negocio|default:"3DForge Studio" }}{% if negocio.correo %} · {{ negocio.correo }}{% endif %}</small>
+<footer class="pie-pagina">
+  <div class="container-xxl py-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+    <div class="d-flex align-items-center gap-2">
+      <span class="material-symbols-rounded icono-marca" aria-hidden="true">deployed_code</span>
+      <span>{{ negocio.nombre_negocio|default:"3DForge Studio" }}{% if negocio.correo %} · {{ negocio.correo }}{% endif %}</span>
+    </div>
+    <nav class="d-flex flex-wrap justify-content-center gap-3 small" aria-label="Enlaces del pie de página">
+      <a href="{% url 'guest:catalogo' %}">Productos</a>
+      <a href="{% url 'guest:servicios' %}">Servicios</a>
+      <a href="{% url 'guest:terminos' %}">Términos y condiciones</a>
+    </nav>
+  </div>
 </footer>

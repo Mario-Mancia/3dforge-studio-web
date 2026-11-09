@@ -121,3 +121,24 @@ def progreso_valor(estado):
 def progreso_clase(estado):
     return f"w-{PROGRESO_ENCARGO.get(str(estado), 25)}"
 # <<< fase-9b
+
+# >>> ui-1
+ICONOS_TOAST = {"success": "check_circle", "error": "error", "warning": "warning", "info": "info"}
+
+
+@register.simple_tag(takes_context=True)
+def activo(context, *nombres):
+    coincidencia = getattr(context.get("request"), "resolver_match", None)
+    return "active" if coincidencia and coincidencia.view_name in nombres else ""
+
+
+@register.filter
+def tipo_toast(etiqueta):
+    etiqueta = str(etiqueta)
+    return etiqueta if etiqueta in ICONOS_TOAST else "info"
+
+
+@register.filter
+def icono_toast(etiqueta):
+    return ICONOS_TOAST[tipo_toast(etiqueta)]
+# <<< ui-1

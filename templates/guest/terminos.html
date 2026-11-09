@@ -1,0 +1,54 @@
+{% extends "layouts/guest.html" %}
+
+{% block titulo %}Términos y condiciones{% endblock %}
+
+{% block contenido %}
+{# Documento de referencia: revisar con asesoría legal antes de publicar. #}
+<article class="documento-legal">
+  <div class="heroe p-4 p-md-5 mb-4">
+    <span class="material-symbols-rounded icono-grande text-primary" aria-hidden="true">gavel</span>
+    <h1 class="h2 mt-2">Términos y condiciones de uso</h1>
+    <p class="mb-0 text-body-secondary">Última actualización: 9 de noviembre de 2026</p>
+  </div>
+
+  <h2>1. Aceptación</h2>
+  <p>Al crear una cuenta, navegar o utilizar la plataforma de {{ negocio.nombre_negocio|default:"3DForge Studio" }} usted acepta estos términos. Si no está de acuerdo, le pedimos no utilizar el sitio.</p>
+
+  <h2>2. Servicios y productos</h2>
+  <p>Ofrecemos impresión 3D, diseño, modelado, asesorías, prototipado y productos preimpresos. Las descripciones, imágenes y existencias son referenciales y pueden cambiar sin previo aviso.</p>
+
+  <h2>3. Cuenta de usuario</h2>
+  <ul>
+    <li>Debe proporcionar información veraz y mantenerla actualizada.</li>
+    <li>Es responsable de la confidencialidad de su contraseña y de la actividad de su cuenta.</li>
+    <li>Podemos suspender cuentas que incumplan estos términos o comprometan la seguridad de la plataforma.</li>
+  </ul>
+
+  <h2>4. Cotizaciones y pedidos</h2>
+  <p>Las cotizaciones tienen una vigencia limitada indicada en cada propuesta. Un pedido se considera confirmado cuando el cliente acepta la cotización o confirma la compra en la tienda. Los plazos de entrega son estimados.</p>
+
+  <h2>5. Precios, impuestos y pagos</h2>
+  <p>Los precios se expresan en dólares estadounidenses e incluyen o detallan los impuestos aplicables. Los pagos se coordinan con nuestro equipo y se registran en la plataforma. Las facturas indican su fecha de vencimiento y saldo.</p>
+
+  <h2>6. Archivos y propiedad intelectual</h2>
+  <p>Al subir archivos (modelos, imágenes, documentos) usted declara contar con los derechos necesarios sobre ellos y nos autoriza a utilizarlos únicamente para atender su solicitud. No fabricaremos piezas que infrinjan derechos de terceros o que estén prohibidas por la ley.</p>
+
+  <h2>7. Cancelaciones</h2>
+  <p>Puede cancelar un pedido mientras se encuentre pendiente. Una vez aprobado o en producción, la cancelación depende del avance del trabajo y debe acordarse con el equipo.</p>
+
+  <h2>8. Datos personales</h2>
+  <p>Usamos sus datos para gestionar su cuenta, cotizaciones, pedidos, facturación y comunicaciones sobre su actividad. No los compartimos con terceros salvo obligación legal o proveedores necesarios para prestar el servicio.</p>
+
+  <h2>9. Uso aceptable</h2>
+  <p>Queda prohibido intentar acceder a información de otros usuarios, interferir con el funcionamiento del sitio o utilizar la plataforma con fines ilícitos.</p>
+
+  <h2>10. Limitación de responsabilidad</h2>
+  <p>Nos esforzamos por la calidad de cada trabajo; sin embargo, no respondemos por daños indirectos derivados del uso de las piezas fuera de las especificaciones acordadas.</p>
+
+  <h2>11. Cambios en los términos</h2>
+  <p>Podemos actualizar estos términos. La versión vigente es la publicada en esta página.</p>
+
+  <h2>12. Contacto</h2>
+  <p>Para consultas escriba a {% if negocio.correo %}<a href="mailto:{{ negocio.correo }}">{{ negocio.correo }}</a>{% else %}nuestro equipo mediante la sección de soporte{% endif %}.</p>
+</article>
+{% endblock %}

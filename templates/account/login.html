@@ -1,0 +1,9 @@
+{% extends "layouts/guest.html" %}
+
+{% block titulo %}Ingresar{% endblock %}
+
+{% block contenido %}
+{% with pestana="login" siguiente=redirect_field_value %}
+{% include "components/auth_paneles.html" %}
+{% endwith %}
+{% endblock %}

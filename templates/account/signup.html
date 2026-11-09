@@ -1,0 +1,9 @@
+{% extends "layouts/guest.html" %}
+
+{% block titulo %}Crear cuenta{% endblock %}
+
+{% block contenido %}
+{% with pestana="registro" siguiente=redirect_field_value %}
+{% include "components/auth_paneles.html" %}
+{% endwith %}
+{% endblock %}

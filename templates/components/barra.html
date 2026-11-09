@@ -1,0 +1,81 @@
+{% load bootstrap %}
+{% with ns=request.resolver_match.namespace %}
+<header class="barra-superior sticky-top">
+  <nav class="navbar navbar-expand-lg" aria-label="Navegación principal">
+    <div class="container-xxl">
+      <div class="barra-izquierda d-flex align-items-center">
+        <a class="navbar-brand me-0" href="{% if user.is_authenticated %}{% url 'redirigir' %}{% else %}{% url 'guest:inicio' %}{% endif %}">
+          <span class="material-symbols-rounded icono-marca" aria-hidden="true">deployed_code</span>
+          <span>{{ negocio.nombre_negocio|default:"3DForge Studio" }}</span>
+        </a>
+      </div>
+      <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#menu-principal" aria-controls="menu-principal" aria-expanded="false" aria-label="Abrir menú">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="menu-principal">
+        <ul class="navbar-nav mx-lg-auto mb-2 mb-lg-0">
+          {% if ns == "customer" %}
+            {% activo "customer:panel" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'customer:panel' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">space_dashboard</span>Panel</a></li>
+            {% activo "customer:tienda" "customer:carrito" "customer:checkout" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'customer:tienda' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">storefront</span>Tienda</a></li>
+            {% activo "customer:cotizar" "customer:cotizaciones" "customer:cotizacion" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'customer:cotizaciones' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">request_quote</span>Cotizaciones</a></li>
+            {% activo "customer:pedidos" "customer:pedido" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'customer:pedidos' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">package_2</span>Pedidos</a></li>
+            {% activo "customer:facturas" "customer:factura" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'customer:facturas' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">receipt_long</span>Facturas</a></li>
+            {% activo "customer:soporte" "customer:soporte_detalle" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'customer:soporte' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">support_agent</span>Soporte</a></li>
+          {% elif ns == "operator" %}
+            {% activo "operator:panel" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'operator:panel' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">space_dashboard</span>Panel</a></li>
+            {% activo "operator:cotizaciones" "operator:cotizacion" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'operator:cotizaciones' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">request_quote</span>Cotizaciones</a></li>
+            {% activo "operator:encargos" "operator:encargo" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'operator:encargos' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">package_2</span>Encargos</a></li>
+            {% activo "operator:facturas" "operator:factura" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'operator:facturas' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">receipt_long</span>Facturas</a></li>
+            {% activo "operator:clientes" "operator:cliente" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'operator:clientes' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">groups</span>Clientes</a></li>
+            {% activo "operator:soporte" "operator:soporte_detalle" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'operator:soporte' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">support_agent</span>Soporte</a></li>
+          {% elif ns == "administrator" %}
+            {% activo "administrator:dashboard" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'administrator:dashboard' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">monitoring</span>Dashboard</a></li>
+            {% activo "administrator:inventario" "administrator:producto_crear" "administrator:producto_editar" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'administrator:inventario' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">inventory_2</span>Productos</a></li>
+            {% activo "administrator:servicios" "administrator:servicio_crear" "administrator:servicio_editar" "administrator:categoria_crear" "administrator:categoria_editar" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'administrator:servicios' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">handyman</span>Servicios</a></li>
+            {% activo "administrator:usuarios" "administrator:usuario_crear" "administrator:usuario_editar" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'administrator:usuarios' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">manage_accounts</span>Usuarios</a></li>
+            {% activo "administrator:ventas" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'administrator:ventas' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">payments</span>Ventas</a></li>
+            {% activo "administrator:configuracion" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'administrator:configuracion' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">settings</span>Configuración</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'operator:panel' %}"><span class="material-symbols-rounded">swap_horiz</span>Operación</a></li>
+          {% else %}
+            {% activo "guest:inicio" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'guest:inicio' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">home</span>Inicio</a></li>
+            {% activo "guest:catalogo" "guest:producto" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'guest:catalogo' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">storefront</span>Productos</a></li>
+            {% activo "guest:servicios" "guest:servicio" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'guest:servicios' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">handyman</span>Servicios</a></li>
+          {% endif %}
+        </ul>
+        <div class="barra-derecha d-flex align-items-center gap-1">
+          {% if user.is_authenticated %}
+          <a class="btn btn-icono" href="{% if user.is_staff %}{% url 'operator:notificaciones' %}{% else %}{% url 'customer:notificaciones' %}{% endif %}" aria-label="Notificaciones">
+            <span class="material-symbols-rounded">notifications</span>
+            {% if notificaciones_no_leidas %}<span class="insignia-notificacion">{{ notificaciones_no_leidas }}</span>{% endif %}
+          </a>
+          {% endif %}
+          <button type="button" class="btn btn-icono" data-alternar-tema aria-label="Cambiar a tema oscuro" aria-pressed="false">
+            <span class="material-symbols-rounded icono-tema">dark_mode</span>
+          </button>
+          {% if user.is_authenticated %}
+          <div class="dropdown">
+            <button class="btn btn-tonal dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="avatar-inicial">{{ user.nombres|slice:":1"|upper }}</span>
+              <span class="d-none d-sm-inline">{{ user.nombres }}</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li class="px-3 py-2"><div class="fw-medium">{{ user.nombre_completo }}</div><small class="text-body-secondary">{{ user.correo }}</small></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{% if user.is_staff %}{% url 'account_change_password' %}{% else %}{% url 'customer:cuenta' %}{% endif %}"><span class="material-symbols-rounded">person</span>{% if user.is_staff %}Mi cuenta{% else %}Mi perfil{% endif %}</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <form method="post" action="{% url 'account_logout' %}">{% csrf_token %}
+                  <button type="submit" class="dropdown-item"><span class="material-symbols-rounded">logout</span>Cerrar sesión</button>
+                </form>
+              </li>
+            </ul>
+          </div>
+          {% else %}
+          <a class="btn btn-primary ms-1" href="{% url 'guest:acceso' %}"><span class="material-symbols-rounded">login</span>Ingresar</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+{% endwith %}

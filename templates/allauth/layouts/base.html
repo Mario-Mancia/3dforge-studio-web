@@ -1,0 +1,13 @@
+{% extends "layouts/guest.html" %}
+
+{% block titulo %}{% block head_title %}{% endblock head_title %}{% endblock %}
+
+{% block estilos %}{% block extra_head %}{% endblock extra_head %}{% endblock %}
+
+{% block contenido %}
+<div class="auth-contenido">
+  {% block body %}{% block content %}{% endblock content %}{% endblock body %}
+</div>
+{% endblock %}
+
+{% block scripts %}{% block extra_body %}{% endblock extra_body %}{% endblock %}

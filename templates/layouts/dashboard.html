@@ -1,12 +1,8 @@
 {% extends "layouts/base.html" %}
 
 {% block cuerpo %}
-{% if request.resolver_match.namespace == "administrator" %}
-{% include "components/nav_admin.html" %}
-{% else %}
-{% include "components/nav_operador.html" %}
-{% endif %}
-<main class="container-fluid py-4">
+{% include "components/barra.html" %}
+<main class="container-xxl py-4 contenido-animado">
   {% block contenido %}{% endblock %}
 </main>
 {% include "components/footer.html" %}

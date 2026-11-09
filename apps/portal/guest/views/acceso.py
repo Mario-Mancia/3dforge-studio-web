@@ -17,4 +17,5 @@ class AccesoView(TemplateView):
         if not url_has_allowed_host_and_scheme(siguiente, {self.request.get_host()}, self.request.is_secure()):
             siguiente = ""
         contexto["siguiente"] = siguiente
+        contexto["pestana"] = "registro" if self.request.GET.get("registro") else "login"
         return contexto

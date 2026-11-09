@@ -2,10 +2,14 @@
     "use strict";
 
     var PALETA = ["primary", "success", "warning", "danger", "info", "secondary", "purple"];
+    var instancias = [];
+
+    function variable(nombre) {
+        return getComputedStyle(document.documentElement).getPropertyValue(nombre).trim();
+    }
 
     function color(nombre) {
-        var valor = getComputedStyle(document.documentElement).getPropertyValue("--bs-" + nombre).trim();
-        return valor || "#0d6efd";
+        return variable("--bs-" + nombre) || "#167C80";
     }
 
     function colores(cantidad) {
@@ -24,6 +28,12 @@
         });
     }
 
+    function configurarBase() {
+        Chart.defaults.color = variable("--md-text-secondary") || "#52686A";
+        Chart.defaults.borderColor = variable("--md-border") || "#D8E1E1";
+        Chart.defaults.font.family = "Roboto, system-ui, sans-serif";
+    }
+
     function construir(canvas, datos) {
         var tipo = canvas.getAttribute("data-tipo") || "bar";
         var circular = tipo === "doughnut" || tipo === "pie";
@@ -34,7 +44,8 @@
                 label: serie.nombre,
                 data: serie.valores,
                 backgroundColor: circular ? paleta : paleta[i],
-                borderColor: circular ? paleta : paleta[i],
+                borderColor: circular ? variable("--md-surface") : paleta[i],
+                borderRadius: circular ? 0 : 6,
                 tension: 0.25
             };
         });
@@ -45,7 +56,7 @@
                 ticks: { callback: function (valor) { return datos.dinero ? "$" + valor : valor; } }
             };
         }
-        new Chart(canvas, {
+        return new Chart(canvas, {
             type: tipo,
             data: { labels: datos.etiquetas, datasets: conjuntos },
             options: {
@@ -68,9 +79,12 @@
         });
     }
 
-    $(function () {
+    function dibujar() {
         var origen = document.getElementById("datos-graficos");
         if (!origen || typeof Chart === "undefined") { return; }
+        instancias.forEach(function (grafico) { grafico.destroy(); });
+        instancias = [];
+        configurarBase();
         var todos = JSON.parse(origen.textContent);
         $("canvas[data-grafico]").each(function () {
             var datos = todos[this.getAttribute("data-grafico")];
@@ -79,7 +93,10 @@
                 $(this).closest(".ratio").replaceWith($('<p class="text-body-secondary mb-0"></p>').text("Sin datos en este período."));
                 return;
             }
-            construir(this, datos);
+            instancias.push(construir(this, datos));
         });
-    });
+    }
+
+    $(dibujar);
+    document.addEventListener("tema:cambio", dibujar);
 })(jQuery);
