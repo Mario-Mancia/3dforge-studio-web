@@ -1,0 +1,7 @@
+Hola {{ usuario.nombres }},
+
+{{ asunto }}
+
+{{ mensaje }}
+
+Ingrese a la plataforma para ver los detalles.

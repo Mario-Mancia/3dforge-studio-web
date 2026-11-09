@@ -1,0 +1,14 @@
+{% extends "layouts/customer.html" %}
+{% load bootstrap %}
+
+{% block titulo %}Solicitud #{{ solicitud.pk }}{% endblock %}
+
+{% block contenido %}
+<a class="btn btn-link ps-0" href="{% url 'customer:soporte' %}">&larr; Soporte</a>
+<h1 class="h3">#{{ solicitud.pk }} · {{ solicitud.asunto }} {{ solicitud.estado|badge:solicitud.get_estado_display }}</h1>
+<p>Prioridad: {{ solicitud.get_prioridad_display }} · Creada: {{ solicitud.creado_en|date:"d/m/Y H:i" }}{% if solicitud.usuario_responsable %} · Atiende: {{ solicitud.usuario_responsable.nombre_completo }}{% endif %}</p>
+<p>{{ solicitud.descripcion|linebreaksbr }}</p>
+{% if solicitud.estado != "CERRADA" %}
+<form method="post" action="{% url 'customer:soporte_cerrar' solicitud.pk %}" data-confirmar="¿Cerrar la solicitud?">{% csrf_token %}<button type="submit" class="btn btn-outline-danger">Cerrar solicitud</button></form>
+{% endif %}
+{% endblock %}

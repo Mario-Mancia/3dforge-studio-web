@@ -54,3 +54,15 @@ class ValidarCampoView(LoginRequiredMixin, View):
         formulario.full_clean()
         errores = [str(error) for error in formulario.errors.get(campo, [])]
         return JsonResponse({"valido": not errores, "errores": errores})
+
+# >>> fase-8
+from apps.crm.forms.crm import InteraccionForm, NotaForm, SolicitudSoporteForm
+
+FORMULARIOS.update(
+    {
+        "soporte": ((GRUPO_CLIENTE,), lambda r, d, pk: SolicitudSoporteForm(d)),
+        "nota": ((GRUPO_OPERADOR, GRUPO_ADMINISTRADOR), lambda r, d, pk: NotaForm(d)),
+        "interaccion": ((GRUPO_OPERADOR, GRUPO_ADMINISTRADOR), lambda r, d, pk: InteraccionForm(d)),
+    }
+)
+# <<< fase-8

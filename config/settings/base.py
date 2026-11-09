@@ -260,3 +260,12 @@ if "test" in _sys.argv:
 # >>> fase-7
 FACTURA_VENCIMIENTO_DIAS = int(os.getenv("FACTURA_VENCIMIENTO_DIAS", "30"))
 # <<< fase-7
+
+# >>> fase-8
+MIDDLEWARE.insert(
+    MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware") + 1,
+    "apps.core.middleware.SinCacheMiddleware",
+)
+TEMPLATES[0]["OPTIONS"]["context_processors"].append("apps.notificaciones.context_processors.no_leidas")
+SESION_UNICA = os.getenv("SESION_UNICA", "True") == "True"
+# <<< fase-8

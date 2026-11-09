@@ -1,4 +1,4 @@
-from .clientes import ClientesView
+from .clientes import ClienteAccionView, ClienteOperadorView, ClientesView
 from .cotizaciones import (
     CotizacionesView,
     CotizacionOperadorAccionView,
@@ -13,4 +13,6 @@ from .encargos import (
     EncargosView,
 )
 from .facturas import FacturaAccionView, FacturaDesdeEncargoView, FacturaOperadorView, FacturasView
+from .notificaciones import NotificacionAccionOperadorView, NotificacionesOperadorView
 from .panel import PanelView
+from .soporte import SoporteAccionView, SoporteOperadorDetalleView, SoporteOperadorView

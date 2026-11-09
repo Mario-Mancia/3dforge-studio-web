@@ -76,7 +76,11 @@
         }
     });
 
-    $(window).on("pageshow", function () {
+    $(window).on("pageshow", function (evento) {
+        if (evento.originalEvent && evento.originalEvent.persisted) {
+            window.location.reload();
+            return;
+        }
         $("button[type=submit]").prop("disabled", false);
     });
 })(jQuery);

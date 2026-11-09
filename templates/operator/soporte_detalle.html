@@ -1,0 +1,19 @@
+{% extends "layouts/dashboard.html" %}
+{% load bootstrap %}
+
+{% block titulo %}Solicitud #{{ solicitud.pk }}{% endblock %}
+
+{% block contenido %}
+<a class="btn btn-link ps-0" href="{% url 'operator:soporte' %}">&larr; Soporte</a>
+<h1 class="h3">#{{ solicitud.pk }} · {{ solicitud.asunto }} {{ solicitud.estado|badge:solicitud.get_estado_display }}</h1>
+<p>Cliente: <a href="{% url 'operator:cliente' solicitud.cliente.pk %}">{{ solicitud.cliente }}</a> · Prioridad: {{ solicitud.get_prioridad_display }} · Responsable: {{ solicitud.usuario_responsable|default:"Sin asignar" }}</p>
+<p>{{ solicitud.descripcion|linebreaksbr }}</p>
+<div class="d-flex flex-wrap gap-3">
+  {% if solicitud.estado != "CERRADA" %}
+  <form method="post" action="{% url 'operator:soporte_accion' solicitud.pk 'tomar' %}">{% csrf_token %}<button type="submit" class="btn btn-outline-primary">Tomar solicitud</button></form>
+  {% endif %}
+  {% if form_estado %}
+  <form method="post" action="{% url 'operator:soporte_accion' solicitud.pk 'estado' %}" class="d-flex gap-2" novalidate>{% csrf_token %}{% formulario_bs form_estado %}<button type="submit" class="btn btn-primary align-self-start">Cambiar estado</button></form>
+  {% endif %}
+</div>
+{% endblock %}

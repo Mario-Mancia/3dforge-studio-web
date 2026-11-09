@@ -13,8 +13,10 @@
         <li class="nav-item"><a class="nav-link" href="{% url 'customer:cotizaciones' %}">Cotizaciones</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'customer:pedidos' %}">Pedidos</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'customer:facturas' %}">Facturas</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'customer:soporte' %}">Soporte</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'customer:cuenta' %}">Mi cuenta</a></li>
       </ul>
+      <a class="btn btn-outline-primary btn-sm me-2" href="{% url 'customer:notificaciones' %}">Notificaciones <span class="badge text-bg-primary">{{ notificaciones_no_leidas|default:0 }}</span></a>
       <form method="post" action="{% url 'account_logout' %}">{% csrf_token %}<button type="submit" class="btn btn-outline-secondary btn-sm">Salir</button></form>
     </div>
   </div>

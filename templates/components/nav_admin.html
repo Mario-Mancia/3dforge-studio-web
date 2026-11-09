@@ -13,6 +13,7 @@
         <li class="nav-item"><a class="nav-link" href="{% url 'administrator:configuracion' %}">Configuración</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'operator:panel' %}">Vista operador</a></li>
       </ul>
+      <a class="btn btn-outline-light btn-sm me-2" href="{% url 'operator:notificaciones' %}">Notificaciones <span class="badge text-bg-primary">{{ notificaciones_no_leidas|default:0 }}</span></a>
       <form method="post" action="{% url 'account_logout' %}">{% csrf_token %}<button type="submit" class="btn btn-outline-light btn-sm">Salir</button></form>
     </div>
   </div>

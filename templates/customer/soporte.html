@@ -1,0 +1,24 @@
+{% extends "layouts/customer.html" %}
+{% load bootstrap %}
+
+{% block titulo %}Soporte{% endblock %}
+
+{% block contenido %}
+<h1 class="h3 mb-3">Soporte</h1>
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="card"><div class="card-body">
+      <h2 class="h6">Nueva solicitud</h2>
+      <form method="post" novalidate data-validar="soporte" data-validar-url="{% url 'validar_campo' 'soporte' %}">
+        {% csrf_token %}{% formulario_bs form %}<button type="submit" class="btn btn-primary">Enviar</button>
+      </form>
+    </div></div>
+  </div>
+  <div class="col-lg-7">
+    <h2 class="h6">Mis solicitudes</h2>
+    <ul class="list-group">
+      {% for s in solicitudes %}<li class="list-group-item"><a href="{% url 'customer:soporte_detalle' s.pk %}">#{{ s.pk }} · {{ s.asunto }}</a> {{ s.estado|badge:s.get_estado_display }}</li>{% empty %}<li class="list-group-item text-body-secondary">Aún no tiene solicitudes.</li>{% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

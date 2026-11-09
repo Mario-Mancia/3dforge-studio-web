@@ -3,6 +3,8 @@ from .cotizaciones import CotizacionAccionView, CotizacionArchivoView, Cotizacio
 from .cotizar import CotizarView
 from .cuenta import CuentaView
 from .facturas import FacturaClienteView, FacturasClienteView
+from .notificaciones import NotificacionAccionClienteView, NotificacionesClienteView
 from .panel import PanelView
 from .pedidos import PedidoArchivoView, PedidoCancelarView, PedidoDetalleView, PedidosView
+from .soporte import SoporteCerrarView, SoporteDetalleView, SoporteView
 from .tienda import TiendaView

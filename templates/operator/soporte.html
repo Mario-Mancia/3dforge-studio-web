@@ -1,0 +1,26 @@
+{% extends "layouts/dashboard.html" %}
+{% load bootstrap %}
+
+{% block titulo %}Soporte{% endblock %}
+
+{% block contenido %}
+<h1 class="h3 mb-3">Solicitudes de soporte</h1>
+<form method="get" class="row g-2 mb-3">
+  <div class="col-sm-6 col-md-4"><input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Asunto o correo" maxlength="100"></div>
+  <div class="col-sm-4 col-md-3"><select name="estado" class="form-select"><option value="">Todos los estados</option>{% for valor, etiqueta in estados %}<option value="{{ valor }}"{% if estado == valor %} selected{% endif %}>{{ etiqueta }}</option>{% endfor %}</select></div>
+  <div class="col-auto"><button type="submit" class="btn btn-primary">Filtrar</button></div>
+</form>
+<div class="table-responsive">
+<table class="table table-striped table-hover align-middle">
+  <thead><tr><th>#</th><th>Asunto</th><th>Cliente</th><th>Prioridad</th><th>Estado</th><th>Responsable</th><th>Creada</th></tr></thead>
+  <tbody>
+  {% for s in solicitudes %}
+    <tr><td><a href="{% url 'operator:soporte_detalle' s.pk %}">{{ s.pk }}</a></td><td>{{ s.asunto }}</td><td>{{ s.cliente }}</td><td>{{ s.get_prioridad_display }}</td><td>{{ s.estado|badge:s.get_estado_display }}</td><td>{{ s.usuario_responsable|default:"Sin asignar" }}</td><td>{{ s.creado_en|date:"d/m/Y" }}</td></tr>
+  {% empty %}
+    <tr><td colspan="7" class="text-center text-body-secondary">Sin solicitudes.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% include "components/paginacion.html" %}
+{% endblock %}

@@ -1,0 +1,24 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Notificaciones</h1>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary btn-sm" href="?{% if not solo_no_leidas %}no_leidas=1{% endif %}">{% if solo_no_leidas %}Ver todas{% else %}Solo no leídas{% endif %}</a>
+    <form method="post" action="{% url ruta_accion 'todas' %}">{% csrf_token %}<button type="submit" class="btn btn-outline-primary btn-sm">Marcar todas como leídas</button></form>
+  </div>
+</div>
+<ul class="list-group mb-3">
+  {% for n, destino in items %}
+  <li class="list-group-item d-flex justify-content-between align-items-start{% if not n.leida %} list-group-item-primary{% endif %}">
+    <div>
+      <div class="fw-bold">{% if destino %}<a href="{{ destino }}">{{ n.titulo }}</a>{% else %}{{ n.titulo }}{% endif %}</div>
+      <div>{{ n.mensaje }}</div>
+      <small class="text-body-secondary">{{ n.fecha_creacion|date:"d/m/Y H:i" }}</small>
+    </div>
+    {% if not n.leida %}
+    <form method="post" action="{% url ruta_accion 'leer' %}">{% csrf_token %}<input type="hidden" name="pk" value="{{ n.pk }}"><button type="submit" class="btn btn-outline-secondary btn-sm">Leída</button></form>
+    {% endif %}
+  </li>
+  {% empty %}
+  <li class="list-group-item text-body-secondary">No tiene notificaciones.</li>
+  {% endfor %}
+</ul>
+{% include "components/paginacion.html" %}

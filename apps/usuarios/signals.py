@@ -21,3 +21,16 @@ def activar_usuario(sender, request, email_address, **kwargs):
     if usuario.estado_id == ESTADO_PENDIENTE:
         usuario.estado_id = ESTADO_ACTIVO
         usuario.save(update_fields=["estado"])
+
+# >>> sesion-unica
+from django.conf import settings
+from django.contrib.auth.signals import user_logged_in
+
+from apps.usuarios.sesiones import cerrar_otras_sesiones
+
+
+@receiver(user_logged_in, dispatch_uid="usuarios.sesion_unica")
+def aplicar_sesion_unica(sender, request, user, **kwargs):
+    if getattr(settings, "SESION_UNICA", True) and request is not None:
+        cerrar_otras_sesiones(user, request.session.session_key)
+# <<< sesion-unica

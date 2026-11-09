@@ -4,8 +4,16 @@ from django.utils import timezone
 
 from apps.core.models.base import ModeloValidado
 from apps.core.validators import validar_nombre_persona, validar_telefono
-from apps.usuarios.constants import ESTADO_ACTIVO, ESTADO_INACTIVO, ESTADOS_BLOQUEADOS
+from apps.usuarios.constants import (
+    ESTADO_ACTIVO,
+    ESTADO_INACTIVO,
+    ESTADOS_BLOQUEADOS,
+    GRUPO_ADMINISTRADOR,
+    GRUPO_OPERADOR,
+)
 from apps.usuarios.managers import UsuarioManager
+
+ROLES_PERSONAL = (GRUPO_OPERADOR, GRUPO_ADMINISTRADOR)
 
 
 class Usuario(ModeloValidado, AbstractBaseUser, PermissionsMixin):
@@ -69,9 +77,18 @@ class Usuario(ModeloValidado, AbstractBaseUser, PermissionsMixin):
         super().save(*args, **kwargs)
         self._estado_inicial = self.estado_id
 
+    def tiene_empleado_inactivo(self):
+        from apps.usuarios.models.empleado import Empleado
+
+        return Empleado.objects.filter(usuario_id=self.pk, activo=False).exists()
+
     def tiene_algun_rol(self, roles):
         if not (self.is_active and self.estado_id == ESTADO_ACTIVO):
             return False
+        if any(rol in ROLES_PERSONAL for rol in roles) and self.tiene_empleado_inactivo():
+            roles = tuple(rol for rol in roles if rol not in ROLES_PERSONAL)
+            if not roles:
+                return False
         if self.is_superuser:
             return True
         return self.groups.filter(name__in=roles).exists()

@@ -69,6 +69,8 @@ def actualizar_usuario(usuario_id, actor, datos):
     if _es_administrador_activo(usuario) and not sera_admin and not _otros_administradores(usuario).exists():
         raise ErrorUsuarios("Debe quedar al menos un administrador activo.")
 
+    if usuario.pk == actor.pk and empleado and not datos.get("empleado_activo"):
+        raise ErrorUsuarios("No puede desactivar su propio perfil de empleado.")
     usuario.nombres = datos["nombres"]
     usuario.apellidos = datos["apellidos"]
     usuario.telefono = datos.get("telefono") or None
