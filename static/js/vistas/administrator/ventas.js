@@ -1,3 +1,3 @@
 $(function () {
-    console.debug("vista cargada: administrator:ventas");
+    $("input[type=date]").on("change", function () { this.form.requestSubmit(); });
 });

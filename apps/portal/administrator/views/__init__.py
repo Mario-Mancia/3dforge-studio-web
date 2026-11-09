@@ -16,4 +16,4 @@ from .servicios import (
     ServiciosView,
 )
 from .usuarios import UsuarioCrearView, UsuarioEditarView, UsuariosView
-from .ventas import VentasView
+from .ventas import VentasExportarView, VentasView

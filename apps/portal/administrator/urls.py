@@ -21,5 +21,6 @@ urlpatterns = [
     path("usuarios/nuevo/", views.UsuarioCrearView.as_view(), name="usuario_crear"),
     path("usuarios/<int:pk>/editar/", views.UsuarioEditarView.as_view(), name="usuario_editar"),
     path("ventas/", views.VentasView.as_view(), name="ventas"),
+    path("ventas/exportar/<slug:tipo>/", views.VentasExportarView.as_view(), name="ventas_exportar"),
     path("configuracion/", views.ConfiguracionView.as_view(), name="configuracion"),
 ]

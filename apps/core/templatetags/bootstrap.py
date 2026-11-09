@@ -99,3 +99,25 @@ def atributos_validacion(context):
     if pk and clave in CON_PK:
         partes.append(format_html('data-validar-pk="{}"', pk))
     return mark_safe(" ".join(partes))
+
+# >>> fase-9b
+PROGRESO_ENCARGO = {
+    "PENDIENTE": 25,
+    "EN_REVISION": 25,
+    "APROBADO": 50,
+    "EN_ESPERA": 50,
+    "EN_PRODUCCION": 75,
+    "FINALIZADO": 100,
+    "ENTREGADO": 100,
+}
+
+
+@register.filter
+def progreso_valor(estado):
+    return PROGRESO_ENCARGO.get(str(estado), 0)
+
+
+@register.filter
+def progreso_clase(estado):
+    return f"w-{PROGRESO_ENCARGO.get(str(estado), 25)}"
+# <<< fase-9b

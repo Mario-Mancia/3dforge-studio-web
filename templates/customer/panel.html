@@ -1,8 +1,82 @@
 {% extends "layouts/customer.html" %}
+{% load bootstrap %}
 
-{% block titulo %}Panel del cliente{% endblock %}
+{% block titulo %}Mi panel{% endblock %}
 
 {% block contenido %}
-<h1 class="h3">Panel del cliente</h1>
-<p class="text-body-secondary">Ruta: <code>{{ request.path }}</code> (pendiente de implementar)</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="h3 mb-0">Hola, {{ user.nombres }}</h1>
+  <div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-primary btn-sm" href="{% url 'customer:tienda' %}">Ir a la tienda</a>
+    <a class="btn btn-outline-primary btn-sm" href="{% url 'customer:cotizar' %}">Solicitar cotización</a>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'customer:soporte' %}">Soporte</a>
+  </div>
+</div>
+
+<div class="row row-cols-2 row-cols-lg-5 g-3 mb-4">
+  {% include "components/kpi.html" with titulo="Cotizaciones por responder" valor=kpis.por_responder %}
+  {% include "components/kpi.html" with titulo="Cotizaciones en revisión" valor=kpis.en_revision %}
+  {% include "components/kpi.html" with titulo="Pedidos en curso" valor=kpis.pedidos_en_curso %}
+  {% include "components/kpi.html" with titulo="Saldo pendiente" valor=kpis.saldo_pendiente prefijo="$" decimales=2 %}
+  {% include "components/kpi.html" with titulo="Soporte abierto" valor=kpis.soporte_abierto %}
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <h2 class="h5">Cotizaciones que esperan su respuesta</h2>
+    <ul class="list-group mb-4">
+      {% for c in cotizaciones %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span><a href="{% url 'customer:cotizacion' c.pk %}">{{ c.codigo }}</a> · ${{ c.total|floatformat:2 }}</span>
+        <small class="text-body-secondary">vence {{ c.fecha_vencimiento|date:"d/m/Y" }}</small>
+      </li>
+      {% empty %}<li class="list-group-item text-body-secondary">No tiene cotizaciones pendientes de respuesta.</li>{% endfor %}
+    </ul>
+
+    <h2 class="h5">Pedidos en curso</h2>
+    <ul class="list-group mb-4">
+      {% for e in pedidos %}
+      <li class="list-group-item">
+        <div class="d-flex justify-content-between"><a href="{% url 'customer:pedido' e.pk %}">{{ e.codigo }}</a> {{ e.estado|badge:e.get_estado_display }}</div>
+        <div class="progress mt-2" role="progressbar" aria-label="Progreso del pedido {{ e.codigo }}" aria-valuenow="{{ e.estado|progreso_valor }}" aria-valuemin="0" aria-valuemax="100">
+          <div class="progress-bar {{ e.estado|progreso_clase }}"></div>
+        </div>
+        {% if e.fecha_entrega_estimada %}<small class="text-body-secondary">Entrega estimada: {{ e.fecha_entrega_estimada|date:"d/m/Y" }}</small>{% endif %}
+      </li>
+      {% empty %}<li class="list-group-item text-body-secondary">No tiene pedidos en curso.</li>{% endfor %}
+    </ul>
+  </div>
+
+  <div class="col-lg-6">
+    <h2 class="h5">Facturas con saldo</h2>
+    <ul class="list-group mb-4">
+      {% for f in facturas %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span><a href="{% url 'customer:factura' f.pk %}">{{ f.numero_factura }}</a> {{ f.estado|badge:f.get_estado_display }}</span>
+        <span>${{ f.saldo_pendiente|floatformat:2 }}</span>
+      </li>
+      {% empty %}<li class="list-group-item text-body-secondary">No tiene facturas con saldo pendiente.</li>{% endfor %}
+    </ul>
+
+    <h2 class="h5">Soporte abierto</h2>
+    <ul class="list-group mb-4">
+      {% for s in soporte %}
+      <li class="list-group-item"><a href="{% url 'customer:soporte_detalle' s.pk %}">#{{ s.pk }} · {{ s.asunto }}</a> {{ s.estado|badge:s.get_estado_display }}</li>
+      {% empty %}<li class="list-group-item text-body-secondary">No tiene solicitudes abiertas.</li>{% endfor %}
+    </ul>
+
+    <div class="d-flex justify-content-between align-items-center">
+      <h2 class="h5 mb-0">Últimas notificaciones</h2>
+      <a class="btn btn-link btn-sm" href="{% url 'customer:notificaciones' %}">Ver todas</a>
+    </div>
+    <ul class="list-group mt-2">
+      {% for n, destino in notificaciones %}
+      <li class="list-group-item{% if not n.leida %} list-group-item-primary{% endif %}">
+        {% if destino %}<a href="{{ destino }}">{{ n.titulo }}</a>{% else %}{{ n.titulo }}{% endif %}<br>
+        <small class="text-body-secondary">{{ n.fecha_creacion|date:"d/m/Y H:i" }}</small>
+      </li>
+      {% empty %}<li class="list-group-item text-body-secondary">No tiene notificaciones.</li>{% endfor %}
+    </ul>
+  </div>
+</div>
 {% endblock %}

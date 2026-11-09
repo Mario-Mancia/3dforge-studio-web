@@ -1,8 +1,57 @@
 {% extends "layouts/dashboard.html" %}
+{% load bootstrap %}
 
 {% block titulo %}Ventas y finanzas{% endblock %}
 
 {% block contenido %}
-<h1 class="h3">Ventas y finanzas</h1>
-<p class="text-body-secondary">Ruta: <code>{{ request.path }}</code> (pendiente de implementar)</p>
+<h1 class="h3 mb-3">Ventas y finanzas</h1>
+<form method="get" class="row g-2 align-items-end mb-3">
+  <div class="col-sm-4 col-md-3"><label class="form-label" for="filtro-desde">Desde</label><input type="date" class="form-control" id="filtro-desde" name="desde" value="{{ desde|date:'Y-m-d' }}"></div>
+  <div class="col-sm-4 col-md-3"><label class="form-label" for="filtro-hasta">Hasta</label><input type="date" class="form-control" id="filtro-hasta" name="hasta" value="{{ hasta|date:'Y-m-d' }}"></div>
+  <div class="col-auto"><button type="submit" class="btn btn-primary">Aplicar</button></div>
+  <div class="col-auto ms-md-auto d-flex gap-2">
+    <a class="btn btn-outline-secondary" href="{% url 'administrator:ventas_exportar' 'facturas' %}?desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}">CSV de facturas</a>
+    <a class="btn btn-outline-secondary" href="{% url 'administrator:ventas_exportar' 'pagos' %}?desde={{ desde|date:'Y-m-d' }}&hasta={{ hasta|date:'Y-m-d' }}">CSV de pagos</a>
+  </div>
+</form>
+
+<div class="row row-cols-2 row-cols-lg-3 row-cols-xl-6 g-3 mb-4">
+  {% include "components/kpi.html" with titulo="Facturado" valor=resumen.facturado prefijo="$" decimales=2 ayuda="Facturas no anuladas" %}
+  {% include "components/kpi.html" with titulo="Cobrado" valor=resumen.cobrado prefijo="$" decimales=2 ayuda="Pagos confirmados" %}
+  {% include "components/kpi.html" with titulo="Saldo de lo facturado" valor=resumen.saldo_facturas prefijo="$" decimales=2 %}
+  {% include "components/kpi.html" with titulo="Facturas" valor=resumen.cantidad_facturas ayuda="Anuladas aparte" %}
+  {% include "components/kpi.html" with titulo="Ticket promedio" valor=resumen.ticket_promedio prefijo="$" decimales=2 %}
+  {% include "components/kpi.html" with titulo="Facturas anuladas" valor=resumen.cantidad_anuladas %}
+</div>
+
+<h2 class="h5">Cobrado por método de pago</h2>
+<div class="table-responsive mb-4">
+<table class="table table-striped align-middle">
+  <thead><tr><th>Método</th><th class="text-end">Pagos</th><th class="text-end">Total</th></tr></thead>
+  <tbody>
+  {% for m in resumen.por_metodo %}<tr><td>{{ m.metodo }}</td><td class="text-end">{{ m.pagos }}</td><td class="text-end">${{ m.total|floatformat:2 }}</td></tr>{% empty %}<tr><td colspan="3" class="text-center text-body-secondary">Sin pagos en el período.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+
+<h2 class="h5">Facturas emitidas <small class="text-body-secondary">({{ total_facturas }}{% if total_facturas > limite %}, mostrando {{ limite }}{% endif %})</small></h2>
+<div class="table-responsive mb-4">
+<table class="table table-striped table-hover align-middle">
+  <thead><tr><th>Número</th><th>Emisión</th><th>Cliente</th><th>Estado</th><th class="text-end">Total</th><th class="text-end">Saldo</th></tr></thead>
+  <tbody>
+  {% for f in facturas %}<tr><td><a href="{% url 'operator:factura' f.pk %}">{{ f.numero_factura }}</a></td><td>{{ f.fecha_emision|date:"d/m/Y" }}</td><td>{{ f.nombre_facturacion }}</td><td>{{ f.estado|badge:f.get_estado_display }}</td><td class="text-end">${{ f.total|floatformat:2 }}</td><td class="text-end">${{ f.saldo_pendiente|floatformat:2 }}</td></tr>{% empty %}<tr><td colspan="6" class="text-center text-body-secondary">Sin facturas en el período.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+
+<h2 class="h5">Pagos <small class="text-body-secondary">({{ total_pagos }}{% if total_pagos > limite %}, mostrando {{ limite }}{% endif %})</small></h2>
+<div class="table-responsive">
+<table class="table table-striped table-hover align-middle">
+  <thead><tr><th>Fecha</th><th>Factura</th><th>Cliente</th><th>Método</th><th>Estado</th><th class="text-end">Monto</th></tr></thead>
+  <tbody>
+  {% for p in pagos %}<tr><td>{{ p.fecha_pago|date:"d/m/Y H:i" }}</td><td><a href="{% url 'operator:factura' p.factura.pk %}">{{ p.factura.numero_factura }}</a></td><td>{{ p.factura.nombre_facturacion }}</td><td>{{ p.metodo_pago.nombre }}</td><td>{{ p.estado|badge:p.get_estado_display }}</td><td class="text-end">${{ p.monto|floatformat:2 }}</td></tr>{% empty %}<tr><td colspan="6" class="text-center text-body-secondary">Sin pagos en el período.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+<p class="small text-body-secondary mt-3">Las fechas se interpretan en la zona horaria del sistema. Venta = factura no anulada por fecha de emisión; cobrado = pago confirmado por fecha de pago.</p>
 {% endblock %}
