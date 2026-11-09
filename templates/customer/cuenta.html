@@ -1,22 +1,61 @@
 {% extends "layouts/customer.html" %}
 {% load bootstrap %}
 
-{% block titulo %}Mi cuenta{% endblock %}
+{% block titulo %}Mi perfil{% endblock %}
 
 {% block contenido %}
-<h1 class="h3 mb-3">Mi cuenta</h1>
-<p>Correo: <strong>{{ cliente.correo }}</strong> · <a href="{% url 'account_change_password' %}">Cambiar contraseña</a></p>
-<form method="post" novalidate {% atributos_validacion %}>
-  {% csrf_token %}
-  {% formulario_bs form %}
-  <button type="submit" class="btn btn-primary">Guardar cambios</button>
-</form>
-{% if actividad.cotizaciones %}
-<h2 class="h5 mt-4">Cotizaciones recientes</h2>
-<ul class="list-group">{% for c in actividad.cotizaciones %}<li class="list-group-item"><a href="{% url 'customer:cotizacion' c.pk %}">{{ c.codigo }}</a> {{ c.estado|badge:c.get_estado_display }}</li>{% endfor %}</ul>
-{% endif %}
-{% if actividad.encargos %}
-<h2 class="h5 mt-4">Encargos recientes</h2>
-<ul class="list-group">{% for e in actividad.encargos %}<li class="list-group-item"><a href="{% url 'customer:pedido' e.pk %}">{{ e.codigo }}</a> {{ e.estado|badge:e.get_estado_display }}</li>{% endfor %}</ul>
-{% endif %}
+<div class="encabezado-pagina">
+  <div class="d-flex align-items-center gap-3">
+    <span class="icono-encabezado"><span class="material-symbols-rounded">person</span></span>
+    <div><h1 class="h3 mb-0">Mi perfil</h1><p class="text-body-secondary mb-0">Mantenga sus datos al día para cotizar y facturar.</p></div>
+  </div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card"><div class="card-body text-center">
+      <span class="avatar-grande mb-3">{{ user.nombres|slice:":1"|upper }}</span>
+      <h2 class="h5 mb-0">{{ user.nombre_completo }}</h2>
+      <p class="text-body-secondary mb-3">{{ cliente.correo }}</p>
+      <a class="btn btn-outline-secondary w-100" href="{% url 'account_change_password' %}"><span class="material-symbols-rounded">lock_reset</span>Cambiar contraseña</a>
+    </div></div>
+    {% if actividad.cotizaciones or actividad.encargos %}
+    <div class="card mt-3"><div class="card-body">
+      <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">history</span>Actividad reciente</h2>
+      <ul class="list-unstyled mb-0">
+        {% for c in actividad.cotizaciones %}<li class="d-flex justify-content-between mb-2"><a href="{% url 'customer:cotizacion' c.pk %}">{{ c.codigo }}</a> {{ c.estado|badge:c.get_estado_display }}</li>{% endfor %}
+        {% for e in actividad.encargos %}<li class="d-flex justify-content-between mb-2"><a href="{% url 'customer:pedido' e.pk %}">{{ e.codigo }}</a> {{ e.estado|badge:e.get_estado_display }}</li>{% endfor %}
+      </ul>
+    </div></div>
+    {% endif %}
+  </div>
+  <div class="col-lg-8">
+    <form method="post" novalidate {% atributos_validacion %}>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="alert alert-danger">{% for e in form.non_field_errors %}<div>{{ e }}</div>{% endfor %}</div>{% endif %}
+      <div class="card seccion-formulario"><div class="card-body">
+        <div class="etiqueta-seccion">Tipo de cuenta</div>
+        {% include "components/campo.html" with campo=form.tipo_cliente %}
+      </div></div>
+      <div class="card seccion-formulario"><div class="card-body">
+        <div class="etiqueta-seccion">Datos de contacto</div>
+        <div class="row g-3">
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.nombres %}</div>
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.apellidos %}</div>
+        </div>
+        {% include "components/campo.html" with campo=form.telefono %}
+      </div></div>
+      <div class="card seccion-formulario"><div class="card-body">
+        <div class="etiqueta-seccion">Facturación</div>
+        {% include "components/campo.html" with campo=form.nombre_empresa %}
+        <div class="row g-3">
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.identificacion_fiscal %}</div>
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.direccion %}</div>
+        </div>
+      </div></div>
+      <div class="d-flex justify-content-end mt-3">
+        <button type="submit" class="btn btn-primary btn-lg"><span class="material-symbols-rounded">save</span>Guardar cambios</button>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}

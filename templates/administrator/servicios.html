@@ -3,16 +3,18 @@
 {% block titulo %}Servicios y categorías{% endblock %}
 
 {% block contenido %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h1 class="h3 mb-0">Servicios y categorías</h1>
-  <div class="d-flex gap-2">
-    <a class="btn btn-primary" href="{% url 'administrator:servicio_crear' %}">Nuevo servicio</a>
-    <a class="btn btn-outline-primary" href="{% url 'administrator:categoria_crear' %}">Nueva categoría</a>
+<div class="encabezado-pagina">
+  <div class="d-flex align-items-center gap-3">
+    <span class="icono-encabezado"><span class="material-symbols-rounded">handyman</span></span>
+    <div><h1 class="h3 mb-0">Servicios y categorías</h1><p class="text-body-secondary mb-0">Oferta de trabajos y su clasificación.</p></div>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-primary" href="{% url 'administrator:servicio_crear' %}"><span class="material-symbols-rounded">add</span>Nuevo servicio</a>
+    <a class="btn btn-outline-primary" href="{% url 'administrator:categoria_crear' %}"><span class="material-symbols-rounded">category</span>Nueva categoría</a>
   </div>
 </div>
-<h2 class="h5">Servicios</h2>
-<div class="table-responsive">
-<table class="table table-striped align-middle">
+<div class="table-responsive mb-4">
+<table class="table table-hover align-middle tabla-acciones">
   <thead><tr><th>Categoría</th><th>Servicio</th><th class="text-end">Precio base</th><th>Archivo</th><th>Estado</th><th>Acciones</th></tr></thead>
   <tbody>
   {% for servicio in servicios %}
@@ -20,19 +22,19 @@
       <td>{{ servicio.categoria.nombre }}</td><td>{{ servicio.nombre }}</td><td class="text-end">${{ servicio.precio_base|floatformat:2 }}</td>
       <td>{% if servicio.requiere_archivo %}Sí{% else %}No{% endif %}</td>
       <td>{% if servicio.activo %}<span class="badge text-bg-success">Activo</span>{% else %}<span class="badge text-bg-secondary">Inactivo</span>{% endif %}</td>
-      <td><div class="d-flex gap-2">
-        <a class="btn btn-outline-primary btn-sm" href="{% url 'administrator:servicio_editar' servicio.pk %}">Editar</a>
-        <form method="post" action="{% url 'administrator:servicio_activo' servicio.pk %}" data-confirmar="¿Cambiar el estado del servicio?">{% csrf_token %}<button type="submit" class="btn btn-outline-secondary btn-sm">{% if servicio.activo %}Desactivar{% else %}Activar{% endif %}</button></form>
+      <td><div class="acciones-tabla">
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'administrator:servicio_editar' servicio.pk %}"><span class="material-symbols-rounded">edit</span>Editar</a>
+        <form method="post" action="{% url 'administrator:servicio_activo' servicio.pk %}" data-confirmar="¿Cambiar el estado del servicio?">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-secondary"><span class="material-symbols-rounded">{% if servicio.activo %}visibility_off{% else %}visibility{% endif %}</span>{% if servicio.activo %}Desactivar{% else %}Activar{% endif %}</button></form>
       </div></td>
     </tr>
   {% empty %}
-    <tr><td colspan="6" class="text-center text-body-secondary">Sin servicios.</td></tr>
+    <tr><td colspan="6" class="celda-vacia"><div class="estado-vacio"><span class="material-symbols-rounded">handyman</span><p>Sin servicios.</p></div></td></tr>
   {% endfor %}
   </tbody>
 </table>
 </div>
-<h2 class="h5 mt-4">Categorías</h2>
+<h2 class="h5">Categorías</h2>
 <ul class="list-group">
-  {% for categoria in categorias %}<li class="list-group-item d-flex justify-content-between align-items-center">{{ categoria.nombre }} <span><span class="badge text-bg-{% if categoria.activo %}success{% else %}secondary{% endif %}">{% if categoria.activo %}activa{% else %}inactiva{% endif %}</span> <a class="btn btn-outline-primary btn-sm" href="{% url 'administrator:categoria_editar' categoria.pk %}">Editar</a></span></li>{% endfor %}
+  {% for categoria in categorias %}<li class="list-group-item d-flex justify-content-between align-items-center">{{ categoria.nombre }} <span class="d-flex align-items-center gap-2"><span class="badge text-bg-{% if categoria.activo %}success{% else %}secondary{% endif %}">{% if categoria.activo %}activa{% else %}inactiva{% endif %}</span> <a class="btn btn-sm btn-outline-primary" href="{% url 'administrator:categoria_editar' categoria.pk %}"><span class="material-symbols-rounded">edit</span>Editar</a></span></li>{% endfor %}
 </ul>
 {% endblock %}

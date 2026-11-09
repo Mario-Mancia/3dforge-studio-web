@@ -4,20 +4,29 @@
 {% block titulo %}Mis pedidos{% endblock %}
 
 {% block contenido %}
-<h1 class="h3 mb-3">Mis pedidos</h1>
+<div class="encabezado-pagina">
+  <div class="d-flex align-items-center gap-3">
+    <span class="icono-encabezado"><span class="material-symbols-rounded">package_2</span></span>
+    <div><h1 class="h3 mb-0">Mis pedidos</h1><p class="text-body-secondary mb-0">Seguimiento de tus compras y trabajos.</p></div>
+  </div>
+  <a class="btn btn-outline-primary" href="{% url 'customer:tienda' %}"><span class="material-symbols-rounded">storefront</span>Ir a la tienda</a>
+</div>
 {% if encargos %}
 <div class="table-responsive">
-<table class="table table-striped table-hover align-middle">
-  <thead><tr><th>Código</th><th>Fecha</th><th>Estado</th><th class="text-end">Total</th></tr></thead>
+<table class="table table-hover align-middle tabla-acciones">
+  <thead><tr><th>Código</th><th>Fecha</th><th>Estado</th><th class="text-end">Total</th><th>Acciones</th></tr></thead>
   <tbody>
   {% for e in encargos %}
-    <tr><td><a href="{% url 'customer:pedido' e.pk %}">{{ e.codigo }}</a></td><td>{{ e.fecha_solicitud|date:"d/m/Y" }}</td><td>{{ e.estado|badge:e.get_estado_display }}</td><td class="text-end">${{ e.total|floatformat:2 }}</td></tr>
+    <tr>
+      <td><a href="{% url 'customer:pedido' e.pk %}">{{ e.codigo }}</a></td><td>{{ e.fecha_solicitud|date:"d/m/Y" }}</td><td>{{ e.estado|badge:e.get_estado_display }}</td><td class="text-end">${{ e.total|floatformat:2 }}</td>
+      <td><a class="btn btn-sm btn-outline-primary" href="{% url 'customer:pedido' e.pk %}"><span class="material-symbols-rounded">visibility</span>Ver</a></td>
+    </tr>
   {% endfor %}
   </tbody>
 </table>
 </div>
 {% include "components/paginacion.html" %}
 {% else %}
-<div class="alert alert-info">Aún no tiene pedidos.</div>
+<div class="estado-vacio"><span class="material-symbols-rounded">package_2</span><p>Aún no tiene pedidos.</p></div>
 {% endif %}
 {% endblock %}

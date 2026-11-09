@@ -4,35 +4,55 @@
 {% block titulo %}{{ cliente.nombre_visible }}{% endblock %}
 
 {% block contenido %}
-<a class="btn btn-link ps-0" href="{% url 'operator:clientes' %}">&larr; Clientes</a>
-<h1 class="h3">{{ cliente.nombre_visible }}</h1>
-<p>{{ cliente.correo }} · {{ cliente.telefono|default:"sin teléfono" }} · {{ cliente.get_tipo_cliente_display }}{% if cliente.identificacion_fiscal %} · {{ cliente.identificacion_fiscal }}{% endif %}</p>
-<div class="row g-3 mb-4">
-  <div class="col-lg-6"><div class="card"><div class="card-body">
-    <h2 class="h6">Nueva nota</h2>
-    <form method="post" action="{% url 'operator:cliente_accion' cliente.pk 'nota' %}" novalidate data-validar="nota" data-validar-url="{% url 'validar_campo' 'nota' %}">{% csrf_token %}{% formulario_bs form_nota %}<button type="submit" class="btn btn-primary btn-sm">Guardar nota</button></form>
-  </div></div></div>
-  <div class="col-lg-6"><div class="card"><div class="card-body">
-    <h2 class="h6">Registrar interacción</h2>
-    <form method="post" action="{% url 'operator:cliente_accion' cliente.pk 'interaccion' %}" novalidate data-validar="interaccion" data-validar-url="{% url 'validar_campo' 'interaccion' %}">{% csrf_token %}{% formulario_bs form_interaccion %}<button type="submit" class="btn btn-primary btn-sm">Registrar</button></form>
-  </div></div></div>
-</div>
-<div class="row g-3">
-  <div class="col-lg-6">
-    <h2 class="h6">Interacciones</h2>
-    <ul class="list-group mb-3">{% for i in interacciones %}<li class="list-group-item"><strong>{{ i.get_tipo_interaccion_display }}</strong> · {{ i.asunto }}<br><small class="text-body-secondary">{{ i.fecha_interaccion|date:"d/m/Y H:i" }} · {{ i.usuario_responsable.nombre_completo }}</small></li>{% empty %}<li class="list-group-item text-body-secondary">Sin interacciones.</li>{% endfor %}</ul>
-    <h2 class="h6">Notas</h2>
-    <ul class="list-group mb-3">{% for n in notas %}<li class="list-group-item">{{ n.contenido|linebreaksbr }}<br><small class="text-body-secondary">{{ n.fecha_creacion|date:"d/m/Y H:i" }} · {{ n.usuario.nombre_completo }}</small></li>{% empty %}<li class="list-group-item text-body-secondary">Sin notas.</li>{% endfor %}</ul>
+<a class="btn btn-link ps-0 volver" href="{% url 'operator:clientes' %}"><span class="material-symbols-rounded">arrow_back</span>Clientes</a>
+<div class="encabezado-pagina">
+  <div class="d-flex align-items-center gap-3">
+    <span class="avatar-grande">{{ cliente.nombre_visible|slice:":1"|upper }}</span>
+    <div><h1 class="h3 mb-0">{{ cliente.nombre_visible }}</h1><p class="text-body-secondary mb-0">{{ cliente.correo }} · {{ cliente.telefono|default:"sin teléfono" }} · {{ cliente.get_tipo_cliente_display }}{% if cliente.identificacion_fiscal %} · {{ cliente.identificacion_fiscal }}{% endif %}</p></div>
   </div>
-  <div class="col-lg-6">
-    <h2 class="h6">Cotizaciones</h2>
-    <ul class="list-group mb-3">{% for c in cotizaciones %}<li class="list-group-item"><a href="{% url 'operator:cotizacion' c.pk %}">{{ c.codigo }}</a> {{ c.estado|badge:c.get_estado_display }}</li>{% empty %}<li class="list-group-item text-body-secondary">Sin cotizaciones.</li>{% endfor %}</ul>
-    <h2 class="h6">Encargos</h2>
-    <ul class="list-group mb-3">{% for e in encargos %}<li class="list-group-item"><a href="{% url 'operator:encargo' e.pk %}">{{ e.codigo }}</a> {{ e.estado|badge:e.get_estado_display }}</li>{% empty %}<li class="list-group-item text-body-secondary">Sin encargos.</li>{% endfor %}</ul>
-    <h2 class="h6">Facturas</h2>
-    <ul class="list-group mb-3">{% for f in facturas %}<li class="list-group-item"><a href="{% url 'operator:factura' f.pk %}">{{ f.numero_factura }}</a> {{ f.estado|badge:f.get_estado_display }} · saldo ${{ f.saldo_pendiente|floatformat:2 }}</li>{% empty %}<li class="list-group-item text-body-secondary">Sin facturas.</li>{% endfor %}</ul>
-    <h2 class="h6">Soporte</h2>
-    <ul class="list-group">{% for s in solicitudes %}<li class="list-group-item"><a href="{% url 'operator:soporte_detalle' s.pk %}">#{{ s.pk }} · {{ s.asunto }}</a> {{ s.estado|badge:s.get_estado_display }}</li>{% empty %}<li class="list-group-item text-body-secondary">Sin solicitudes.</li>{% endfor %}</ul>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="row g-3 mb-3">
+      <div class="col-md-6"><div class="card h-100"><div class="card-body">
+        <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">request_quote</span>Cotizaciones</h2>
+        <ul class="list-unstyled mb-0">{% for c in cotizaciones %}<li class="d-flex justify-content-between mb-2"><a href="{% url 'operator:cotizacion' c.pk %}">{{ c.codigo }}</a> {{ c.estado|badge:c.get_estado_display }}</li>{% empty %}<li class="text-body-secondary">Sin cotizaciones.</li>{% endfor %}</ul>
+      </div></div></div>
+      <div class="col-md-6"><div class="card h-100"><div class="card-body">
+        <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">package_2</span>Encargos</h2>
+        <ul class="list-unstyled mb-0">{% for e in encargos %}<li class="d-flex justify-content-between mb-2"><a href="{% url 'operator:encargo' e.pk %}">{{ e.codigo }}</a> {{ e.estado|badge:e.get_estado_display }}</li>{% empty %}<li class="text-body-secondary">Sin encargos.</li>{% endfor %}</ul>
+      </div></div></div>
+      <div class="col-md-6"><div class="card h-100"><div class="card-body">
+        <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">receipt_long</span>Facturas</h2>
+        <ul class="list-unstyled mb-0">{% for f in facturas %}<li class="d-flex justify-content-between mb-2"><a href="{% url 'operator:factura' f.pk %}">{{ f.numero_factura }}</a> <span>{{ f.estado|badge:f.get_estado_display }} ${{ f.saldo_pendiente|floatformat:2 }}</span></li>{% empty %}<li class="text-body-secondary">Sin facturas.</li>{% endfor %}</ul>
+      </div></div></div>
+      <div class="col-md-6"><div class="card h-100"><div class="card-body">
+        <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">support_agent</span>Soporte</h2>
+        <ul class="list-unstyled mb-0">{% for s in solicitudes %}<li class="d-flex justify-content-between mb-2"><a href="{% url 'operator:soporte_detalle' s.pk %}">#{{ s.pk }} · {{ s.asunto }}</a> {{ s.estado|badge:s.get_estado_display }}</li>{% empty %}<li class="text-body-secondary">Sin solicitudes.</li>{% endfor %}</ul>
+      </div></div></div>
+    </div>
+    <div class="card mb-3"><div class="card-body">
+      <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">forum</span>Interacciones</h2>
+      <ul class="linea-tiempo">{% for i in interacciones %}<li><strong>{{ i.get_tipo_interaccion_display }}</strong> · {{ i.asunto }}<div class="small text-body-secondary">{{ i.fecha_interaccion|date:"d/m/Y H:i" }} · {{ i.usuario_responsable.nombre_completo }}</div></li>{% empty %}<li class="text-body-secondary">Sin interacciones.</li>{% endfor %}</ul>
+    </div></div>
+    <div class="card"><div class="card-body">
+      <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">sticky_note_2</span>Notas</h2>
+      <ul class="linea-tiempo">{% for n in notas %}<li>{{ n.contenido|linebreaksbr }}<div class="small text-body-secondary">{{ n.fecha_creacion|date:"d/m/Y H:i" }} · {{ n.usuario.nombre_completo }}</div></li>{% empty %}<li class="text-body-secondary">Sin notas.</li>{% endfor %}</ul>
+    </div></div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="panel-gestion">
+      <div class="card"><div class="card-body">
+        <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">edit_note</span>Nueva nota</h2>
+        <form method="post" action="{% url 'operator:cliente_accion' cliente.pk 'nota' %}" novalidate data-validar="nota" data-validar-url="{% url 'validar_campo' 'nota' %}">{% csrf_token %}{% formulario_bs form_nota %}<button type="submit" class="btn btn-primary">Guardar nota</button></form>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">call</span>Registrar interacción</h2>
+        <form method="post" action="{% url 'operator:cliente_accion' cliente.pk 'interaccion' %}" novalidate data-validar="interaccion" data-validar-url="{% url 'validar_campo' 'interaccion' %}">{% csrf_token %}{% formulario_bs form_interaccion %}<button type="submit" class="btn btn-primary">Registrar</button></form>
+      </div></div>
+    </div>
   </div>
 </div>
 {% endblock %}

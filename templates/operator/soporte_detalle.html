@@ -4,16 +4,40 @@
 {% block titulo %}Solicitud #{{ solicitud.pk }}{% endblock %}
 
 {% block contenido %}
-<a class="btn btn-link ps-0" href="{% url 'operator:soporte' %}">&larr; Soporte</a>
-<h1 class="h3">#{{ solicitud.pk }} · {{ solicitud.asunto }} {{ solicitud.estado|badge:solicitud.get_estado_display }}</h1>
-<p>Cliente: <a href="{% url 'operator:cliente' solicitud.cliente.pk %}">{{ solicitud.cliente }}</a> · Prioridad: {{ solicitud.get_prioridad_display }} · Responsable: {{ solicitud.usuario_responsable|default:"Sin asignar" }}</p>
-<p>{{ solicitud.descripcion|linebreaksbr }}</p>
-<div class="d-flex flex-wrap gap-3">
-  {% if solicitud.estado != "CERRADA" %}
-  <form method="post" action="{% url 'operator:soporte_accion' solicitud.pk 'tomar' %}">{% csrf_token %}<button type="submit" class="btn btn-outline-primary">Tomar solicitud</button></form>
-  {% endif %}
-  {% if form_estado %}
-  <form method="post" action="{% url 'operator:soporte_accion' solicitud.pk 'estado' %}" class="d-flex gap-2" novalidate>{% csrf_token %}{% formulario_bs form_estado %}<button type="submit" class="btn btn-primary align-self-start">Cambiar estado</button></form>
-  {% endif %}
+<a class="btn btn-link ps-0 volver" href="{% url 'operator:soporte' %}"><span class="material-symbols-rounded">arrow_back</span>Soporte</a>
+<div class="encabezado-pagina">
+  <div class="d-flex align-items-center gap-3">
+    <span class="icono-encabezado"><span class="material-symbols-rounded">support_agent</span></span>
+    <div><h1 class="h3 mb-1">#{{ solicitud.pk }} · {{ solicitud.asunto }}</h1>{{ solicitud.estado|badge:solicitud.get_estado_display }}</div>
+  </div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card"><div class="card-body">
+      <dl class="lista-datos mb-3">
+        <dt>Cliente</dt><dd><a href="{% url 'operator:cliente' solicitud.cliente.pk %}">{{ solicitud.cliente }}</a></dd>
+        <dt>Prioridad</dt><dd>{{ solicitud.get_prioridad_display }}</dd>
+        <dt>Responsable</dt><dd>{{ solicitud.usuario_responsable|default:"Sin asignar" }}</dd>
+        <dt>Creada</dt><dd>{{ solicitud.creado_en|date:"d/m/Y H:i" }}</dd>
+      </dl>
+      <p class="mb-0">{{ solicitud.descripcion|linebreaksbr }}</p>
+    </div></div>
+  </div>
+  <div class="col-lg-4">
+    <div class="panel-gestion">
+      {% if solicitud.estado != "CERRADA" %}
+      <div class="card"><div class="card-body">
+        <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">assignment_ind</span>Asignación</h2>
+        <form method="post" action="{% url 'operator:soporte_accion' solicitud.pk 'tomar' %}">{% csrf_token %}<button type="submit" class="btn btn-outline-primary">Tomar solicitud</button></form>
+      </div></div>
+      {% endif %}
+      {% if form_estado %}
+      <div class="card"><div class="card-body">
+        <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">swap_horiz</span>Cambiar estado</h2>
+        <form method="post" action="{% url 'operator:soporte_accion' solicitud.pk 'estado' %}" novalidate>{% csrf_token %}{% formulario_bs form_estado %}<button type="submit" class="btn btn-primary">Actualizar estado</button></form>
+      </div></div>
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}

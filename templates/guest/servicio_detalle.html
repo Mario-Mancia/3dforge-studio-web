@@ -4,15 +4,29 @@
 {% block titulo %}{{ servicio.nombre }}{% endblock %}
 
 {% block contenido %}
-<a class="btn btn-link ps-0" href="{% url 'guest:servicios' %}">&larr; Volver a servicios</a>
-<h1 class="h3">{{ servicio.nombre }}</h1>
-<p class="text-body-secondary">{{ servicio.categoria.nombre }}</p>
-<p class="fs-4 fw-bold">Desde ${{ servicio.precio_base|floatformat:2 }}</p>
-<p>{{ servicio.descripcion|linebreaksbr }}</p>
-{% if servicio.requiere_archivo %}<div class="alert alert-warning">Este servicio requiere que adjunte un archivo de su diseño.</div>{% endif %}
-<a class="btn btn-primary" href="{% url 'guest:acceso' %}?next={% url 'customer:cotizar' %}">Solicitar cotización</a>
-{% with mensaje="Hola, me interesa el servicio: "|add:servicio.nombre %}
-{% whatsapp_url negocio.telefono mensaje as wa %}
-{% if wa %}<a class="btn btn-success" href="{{ wa }}" target="_blank" rel="noopener">WhatsApp</a>{% endif %}
-{% endwith %}
+<a class="btn btn-link ps-0 volver" href="{% url 'guest:servicios' %}"><span class="material-symbols-rounded">arrow_back</span>Volver a servicios</a>
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card"><div class="card-body p-4">
+      <span class="icono-encabezado mb-3"><span class="material-symbols-rounded">handyman</span></span>
+      <h1 class="h2">{{ servicio.nombre }}</h1>
+      <span class="badge text-bg-secondary mb-3">{{ servicio.categoria.nombre }}</span>
+      <p>{{ servicio.descripcion|linebreaksbr }}</p>
+      {% if servicio.requiere_archivo %}<div class="alert alert-warning d-flex gap-2"><span class="material-symbols-rounded">upload_file</span><div>Este servicio requiere que adjunte un archivo de su diseño al solicitar la cotización.</div></div>{% endif %}
+    </div></div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card"><div class="card-body">
+      <p class="text-body-secondary mb-1">Precio base</p>
+      <p class="precio-grande display-6 mb-3">${{ servicio.precio_base|floatformat:2 }}</p>
+      <div class="d-grid gap-2">
+        <a class="btn btn-primary btn-lg" href="{% url 'guest:acceso' %}?next={% url 'customer:cotizar' %}"><span class="material-symbols-rounded">request_quote</span>Solicitar cotización</a>
+        {% with mensaje="Hola, me interesa el servicio: "|add:servicio.nombre %}
+        {% whatsapp_url negocio.telefono mensaje as wa %}
+        {% if wa %}<a class="btn btn-success" href="{{ wa }}" target="_blank" rel="noopener"><span class="material-symbols-rounded">chat</span>Consultar por WhatsApp</a>{% endif %}
+        {% endwith %}
+      </div>
+    </div></div>
+  </div>
+</div>
 {% endblock %}

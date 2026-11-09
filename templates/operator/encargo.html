@@ -4,54 +4,79 @@
 {% block titulo %}Encargo {{ encargo.codigo }}{% endblock %}
 
 {% block contenido %}
-<a class="btn btn-link ps-0" href="{% url 'operator:encargos' %}">&larr; Encargos</a>
-<h1 class="h3">Encargo {{ encargo.codigo }} {{ encargo.estado|badge:encargo.get_estado_display }}</h1>
-<p>Cliente: {{ encargo.cliente }} ({{ encargo.cliente.correo }}) · Responsable: {% if encargo.empleado_responsable %}{{ encargo.empleado_responsable.usuario.nombre_completo }}{% else %}Sin asignar{% endif %}</p>
-<p>Entrega estimada: {{ encargo.fecha_entrega_estimada|date:"d/m/Y"|default:"-" }} · Entrega real: {{ encargo.fecha_entrega_real|date:"d/m/Y"|default:"-" }}</p>
-{% if encargo.cotizacion %}<p>Origen: cotización <a href="{% url 'operator:cotizacion' encargo.cotizacion.pk %}">{{ encargo.cotizacion.codigo }}</a></p>{% endif %}
-<p>{{ encargo.descripcion|linebreaksbr }}</p>
-<div class="table-responsive">
-<table class="table table-striped align-middle">
-  <thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th><th>Archivos</th></tr></thead>
-  <tbody>
-  {% for d in encargo.detalles.all %}
-    <tr>
-      <td>{{ d.descripcion }}{% if d.especificaciones %}<br><small class="text-body-secondary">{% for clave, valor in d.especificaciones.items %}{{ clave|capfirst }}: {{ valor }}{% if not forloop.last %} · {% endif %}{% endfor %}</small>{% endif %}</td>
-      <td>{{ d.cantidad|floatformat:2 }}</td><td>${{ d.precio_unitario|floatformat:2 }}</td><td>${{ d.subtotal|floatformat:2 }}</td>
-      <td>{% for a in d.archivos.all %}<a href="{% url 'operator:encargo_archivo' encargo.pk a.pk %}">{{ a.nombre_archivo }}</a><br>{% empty %}-{% endfor %}</td>
-    </tr>
-  {% endfor %}
-  </tbody>
-</table>
-</div>
-<p>Subtotal: ${{ encargo.subtotal|floatformat:2 }} · Descuento: ${{ encargo.descuento|floatformat:2 }} · Impuesto: ${{ encargo.impuesto|floatformat:2 }} · <strong>Total: ${{ encargo.total|floatformat:2 }}</strong></p>
-
-<div class="row g-3">
-  {% if form_estado %}
-  <div class="col-lg-4"><div class="card"><div class="card-body">
-    <h2 class="h6">Cambiar estado</h2>
-    <form method="post" action="{% url 'operator:encargo_accion' encargo.pk 'estado' %}" novalidate>{% csrf_token %}{% formulario_bs form_estado %}<button type="submit" class="btn btn-primary btn-sm">Actualizar estado</button></form>
-  </div></div></div>
-  {% endif %}
-  <div class="col-lg-4"><div class="card"><div class="card-body">
-    <h2 class="h6">Responsable</h2>
-    <form method="post" action="{% url 'operator:encargo_accion' encargo.pk 'asignar' %}" novalidate>{% csrf_token %}{% formulario_bs form_asignar %}<button type="submit" class="btn btn-primary btn-sm">Asignar</button></form>
-  </div></div></div>
-  <div class="col-lg-4"><div class="card"><div class="card-body">
-    <h2 class="h6">Cargar archivo</h2>
-    <form method="post" enctype="multipart/form-data" action="{% url 'operator:encargo_accion' encargo.pk 'archivo' %}" novalidate>{% csrf_token %}{% formulario_bs form_archivo %}<button type="submit" class="btn btn-primary btn-sm">Subir</button></form>
-  </div></div></div>
+<a class="btn btn-link ps-0 volver" href="{% url 'operator:encargos' %}"><span class="material-symbols-rounded">arrow_back</span>Encargos</a>
+<div class="encabezado-pagina">
+  <div class="d-flex align-items-center gap-3">
+    <span class="icono-encabezado"><span class="material-symbols-rounded">package_2</span></span>
+    <div><h1 class="h3 mb-1">Encargo {{ encargo.codigo }}</h1>{{ encargo.estado|badge:encargo.get_estado_display }}</div>
+  </div>
+  <div class="d-flex gap-2">
+    {% if encargo.factura %}
+    <a class="btn btn-outline-primary" href="{% url 'operator:factura' encargo.factura.pk %}"><span class="material-symbols-rounded">receipt_long</span>Ver factura {{ encargo.factura.numero_factura }}</a>
+    {% else %}
+    <form method="post" action="{% url 'operator:encargo_factura' encargo.pk %}">{% csrf_token %}<button type="submit" class="btn btn-success"><span class="material-symbols-rounded">receipt_long</span>Crear factura</button></form>
+    {% endif %}
+  </div>
 </div>
 
-<h2 class="h5 mt-4">Factura</h2>
-{% if encargo.factura %}
-<a class="btn btn-outline-primary" href="{% url 'operator:factura' encargo.factura.pk %}">Ver factura {{ encargo.factura.numero_factura }}</a>
-{% else %}
-<form method="post" action="{% url 'operator:encargo_factura' encargo.pk %}">{% csrf_token %}<button type="submit" class="btn btn-success">Crear factura</button></form>
-{% endif %}
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card mb-3"><div class="card-body">
+      <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">info</span>Resumen</h2>
+      <dl class="lista-datos mb-3">
+        <dt>Cliente</dt><dd><a href="{% url 'operator:cliente' encargo.cliente.pk %}">{{ encargo.cliente }}</a> · {{ encargo.cliente.correo }}</dd>
+        <dt>Responsable</dt><dd>{% if encargo.empleado_responsable %}{{ encargo.empleado_responsable.usuario.nombre_completo }}{% else %}Sin asignar{% endif %}</dd>
+        <dt>Entrega estimada</dt><dd>{{ encargo.fecha_entrega_estimada|date:"d/m/Y"|default:"-" }}</dd>
+        <dt>Entrega real</dt><dd>{{ encargo.fecha_entrega_real|date:"d/m/Y"|default:"-" }}</dd>
+        {% if encargo.cotizacion %}<dt>Origen</dt><dd>Cotización <a href="{% url 'operator:cotizacion' encargo.cotizacion.pk %}">{{ encargo.cotizacion.codigo }}</a></dd>{% endif %}
+      </dl>
+      <p class="mb-0 text-body-secondary">{{ encargo.descripcion|linebreaksbr }}</p>
+    </div></div>
 
-<h2 class="h5 mt-4">Historial</h2>
-<ul class="list-group">
-  {% for h in encargo.historial.all %}<li class="list-group-item">{{ h.fecha_cambio|date:"d/m/Y H:i" }} · {{ h.estado_nuevo|badge:h.get_estado_nuevo_display }} · {{ h.usuario.nombre_completo }}{% if h.comentario %} · {{ h.comentario }}{% endif %}</li>{% endfor %}
-</ul>
+    <div class="card mb-3"><div class="card-body">
+      <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">list_alt</span>Líneas del encargo</h2>
+      <div class="table-responsive">
+      <table class="table align-middle">
+        <thead><tr><th>Descripción</th><th>Cantidad</th><th class="text-end">Precio</th><th class="text-end">Subtotal</th><th>Archivos</th></tr></thead>
+        <tbody>
+        {% for d in encargo.detalles.all %}
+          <tr>
+            <td>{{ d.descripcion }}{% if d.especificaciones %}<br><small class="text-body-secondary">{% for clave, valor in d.especificaciones.items %}{{ clave|capfirst }}: {{ valor }}{% if not forloop.last %} · {% endif %}{% endfor %}</small>{% endif %}</td>
+            <td>{{ d.cantidad|floatformat:2 }}</td><td class="text-end">${{ d.precio_unitario|floatformat:2 }}</td><td class="text-end">${{ d.subtotal|floatformat:2 }}</td>
+            <td>{% for a in d.archivos.all %}<a class="d-block" href="{% url 'operator:encargo_archivo' encargo.pk a.pk %}"><span class="material-symbols-rounded">download</span>{{ a.nombre_archivo }}</a>{% empty %}-{% endfor %}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      </div>
+      <p class="mt-3 mb-0 text-end">Subtotal ${{ encargo.subtotal|floatformat:2 }} · Descuento ${{ encargo.descuento|floatformat:2 }} · Impuesto ${{ encargo.impuesto|floatformat:2 }} · <strong>Total ${{ encargo.total|floatformat:2 }}</strong></p>
+    </div></div>
+
+    <div class="card"><div class="card-body">
+      <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">history</span>Historial</h2>
+      <ul class="linea-tiempo">
+        {% for h in encargo.historial.all %}<li><div>{{ h.estado_nuevo|badge:h.get_estado_nuevo_display }} <small class="text-body-secondary">{{ h.fecha_cambio|date:"d/m/Y H:i" }} · {{ h.usuario.nombre_completo }}</small></div>{% if h.comentario %}<div class="small">{{ h.comentario }}</div>{% endif %}</li>{% endfor %}
+      </ul>
+    </div></div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="panel-gestion">
+      {% if form_estado %}
+      <div class="card"><div class="card-body">
+        <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">swap_horiz</span>Cambiar estado</h2>
+        <form method="post" action="{% url 'operator:encargo_accion' encargo.pk 'estado' %}" novalidate>{% csrf_token %}{% formulario_bs form_estado %}<button type="submit" class="btn btn-primary">Actualizar estado</button></form>
+      </div></div>
+      {% endif %}
+      <div class="card"><div class="card-body">
+        <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">person_pin</span>Responsable</h2>
+        <form method="post" action="{% url 'operator:encargo_accion' encargo.pk 'asignar' %}" novalidate>{% csrf_token %}{% formulario_bs form_asignar %}<button type="submit" class="btn btn-primary">Asignar responsable</button></form>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">upload_file</span>Cargar archivo</h2>
+        <form method="post" enctype="multipart/form-data" action="{% url 'operator:encargo_accion' encargo.pk 'archivo' %}" novalidate>{% csrf_token %}{% formulario_bs form_archivo %}<button type="submit" class="btn btn-primary">Subir archivo</button></form>
+      </div></div>
+    </div>
+  </div>
+</div>
 {% endblock %}

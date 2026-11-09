@@ -4,29 +4,57 @@
 {% block titulo %}Inicio{% endblock %}
 
 {% block contenido %}
-<div class="p-5 mb-4 bg-body rounded-3 border">
-  <h1 class="display-6">{{ negocio.nombre_negocio|default:"3DForge Studio" }}</h1>
-  <p class="lead">Impresión, diseño y modelado 3D. Productos listos y trabajos a medida.</p>
-  <a class="btn btn-primary" href="{% url 'guest:catalogo' %}">Ver productos</a>
-  <a class="btn btn-outline-primary" href="{% url 'guest:servicios' %}">Ver servicios</a>
-  {% whatsapp_url negocio.telefono "Hola, quisiera más información." as wa %}
-  {% if wa %}<a class="btn btn-success" href="{{ wa }}" target="_blank" rel="noopener">WhatsApp</a>{% endif %}
-</div>
+<section class="heroe p-4 p-md-5 mb-4">
+  <div class="row align-items-center g-4">
+    <div class="col-lg-7">
+      <span class="chip-disp chip-disponible mb-3"><span class="material-symbols-rounded">bolt</span>Impresión 3D a tu medida</span>
+      <h1 class="display-6 fw-medium">{{ negocio.nombre_negocio|default:"3DForge Studio" }}</h1>
+      <p class="lead text-body-secondary">Diseño, modelado e impresión 3D. Compra productos listos o solicita una cotización para tu proyecto.</p>
+      <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-primary btn-lg" href="{% url 'guest:catalogo' %}"><span class="material-symbols-rounded">storefront</span>Ver productos</a>
+        <a class="btn btn-outline-secondary btn-lg" href="{% url 'guest:servicios' %}"><span class="material-symbols-rounded">handyman</span>Ver servicios</a>
+        {% whatsapp_url negocio.telefono "Hola, quisiera más información." as wa %}
+        {% if wa %}<a class="btn btn-success btn-lg" href="{{ wa }}" target="_blank" rel="noopener"><span class="material-symbols-rounded">chat</span>WhatsApp</a>{% endif %}
+      </div>
+    </div>
+    <div class="col-lg-5 text-center d-none d-lg-block"><span class="material-symbols-rounded text-primary icono-hero" aria-hidden="true">deployed_code</span></div>
+  </div>
+</section>
+
+<section class="cinta-beneficios mb-5">
+  <div class="beneficio"><span class="material-symbols-rounded">print</span><div><strong>Impresión de calidad</strong><div class="small text-body-secondary">Materiales y acabados a tu medida.</div></div></div>
+  <div class="beneficio"><span class="material-symbols-rounded">request_quote</span><div><strong>Cotiza en línea</strong><div class="small text-body-secondary">Sube tu archivo y recibe una propuesta.</div></div></div>
+  <div class="beneficio"><span class="material-symbols-rounded">local_shipping</span><div><strong>Seguimiento de pedidos</strong><div class="small text-body-secondary">Conoce el avance de cada trabajo.</div></div></div>
+  <div class="beneficio"><span class="material-symbols-rounded">support_agent</span><div><strong>Atención cercana</strong><div class="small text-body-secondary">Soporte y asesoría directa.</div></div></div>
+</section>
+
 {% if productos %}
-<h2 class="h4">Productos disponibles</h2>
-<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-4">
+<div class="encabezado-pagina">
+  <h2 class="h4 mb-0">Productos destacados</h2>
+  <a class="btn btn-link" href="{% url 'guest:catalogo' %}">Ver todos<span class="material-symbols-rounded">arrow_forward</span></a>
+</div>
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-5 rejilla-animada">
   {% for producto in productos %}{% include "components/producto_tarjeta.html" %}{% endfor %}
 </div>
 {% endif %}
+
 {% if servicios %}
-<h2 class="h4">Servicios</h2>
-<div class="row row-cols-1 row-cols-md-3 g-3">
+<div class="encabezado-pagina">
+  <h2 class="h4 mb-0">Nuestros servicios</h2>
+  <a class="btn btn-link" href="{% url 'guest:servicios' %}">Ver todos<span class="material-symbols-rounded">arrow_forward</span></a>
+</div>
+<div class="row row-cols-1 row-cols-md-3 g-3 rejilla-animada">
   {% for servicio in servicios %}
-  <div class="col"><div class="card h-100"><div class="card-body">
-    <h3 class="h6 card-title"><a class="link-body-emphasis" href="{% url 'guest:servicio' servicio.pk %}">{{ servicio.nombre }}</a></h3>
-    <p class="mb-1 text-body-secondary">{{ servicio.categoria.nombre }}</p>
-    <p class="fw-bold mb-0">Desde ${{ servicio.precio_base|floatformat:2 }}</p>
-  </div></div></div>
+  <div class="col">
+    <a class="card card-hover tarjeta-servicio h-100 text-decoration-none" href="{% url 'guest:servicio' servicio.pk %}">
+      <div class="card-body">
+        <span class="icono-servicio mb-3"><span class="material-symbols-rounded" aria-hidden="true">handyman</span></span>
+        <h3 class="h6 text-body">{{ servicio.nombre }}</h3>
+        <span class="badge text-bg-secondary">{{ servicio.categoria.nombre }}</span>
+        <p class="precio-grande mt-3 mb-0">Desde ${{ servicio.precio_base|floatformat:2 }}</p>
+      </div>
+    </a>
+  </div>
   {% endfor %}
 </div>
 {% endif %}

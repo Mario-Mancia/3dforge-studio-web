@@ -1,9 +1,13 @@
+{% load bootstrap %}
 <div class="col">
-  <div class="card h-100">
-    <div class="card-body">
-      <div class="small text-body-secondary">{{ titulo }}</div>
-      <div class="h3 mb-0">{{ prefijo }}{% if decimales %}{{ valor|floatformat:decimales }}{% else %}{{ valor }}{% endif %}{{ sufijo }}</div>
-      {% if ayuda %}<div class="small text-body-secondary">{{ ayuda }}</div>{% endif %}
+  <div class="card card-hover h-100">
+    <div class="card-body d-flex gap-3 align-items-center">
+      <span class="kpi-icono"><span class="material-symbols-rounded" aria-hidden="true">{{ titulo|icono_kpi }}</span></span>
+      <div class="min-w-0">
+        <div class="small text-body-secondary">{{ titulo }}</div>
+        <div class="kpi-valor">{{ prefijo }}{% if decimales %}{{ valor|floatformat:decimales }}{% else %}{{ valor }}{% endif %}{{ sufijo }}</div>
+        {% if ayuda %}<div class="small text-body-secondary">{{ ayuda }}</div>{% endif %}
+      </div>
     </div>
   </div>
 </div>

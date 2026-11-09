@@ -3,39 +3,26 @@
 {% block titulo %}Tienda{% endblock %}
 
 {% block contenido %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h1 class="h3 mb-0">Tienda</h1>
-  <a class="btn btn-outline-primary" href="{% url 'customer:carrito' %}">Carrito <span class="badge text-bg-primary">{{ unidades }}</span></a>
+<div class="encabezado-pagina">
+  <div class="d-flex align-items-center gap-3">
+    <span class="icono-encabezado"><span class="material-symbols-rounded">storefront</span></span>
+    <div><h1 class="h3 mb-0">Tienda</h1><p class="text-body-secondary mb-0">Productos listos para llevar.</p></div>
+  </div>
+  <a class="btn btn-outline-primary" href="{% url 'customer:carrito' %}"><span class="material-symbols-rounded">shopping_cart</span>Carrito <span class="badge text-bg-primary">{{ unidades }}</span></a>
 </div>
-<form method="get" class="row g-2 mb-3">
-  <div class="col-sm-8 col-md-6"><input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Buscar por nombre o SKU" maxlength="100"></div>
-  <div class="col-auto"><button type="submit" class="btn btn-primary">Buscar</button></div>
+<form method="get" class="mb-4 buscador">
+  <div class="input-group">
+    <span class="input-group-text"><span class="material-symbols-rounded">search</span></span>
+    <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Buscar por nombre o SKU" maxlength="100" aria-label="Buscar productos">
+    <button type="submit" class="btn btn-primary">Buscar</button>
+  </div>
 </form>
 {% if productos %}
-<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-3">
-  {% for producto in productos %}
-  <div class="col"><div class="card h-100">
-    {% if producto.imagen %}<img src="{{ producto.imagen_url }}" class="card-img-top" alt="{{ producto.nombre }}" loading="lazy">{% endif %}
-    <div class="card-body">
-      <h2 class="h6 card-title">{{ producto.nombre }}</h2>
-      <p class="fw-bold mb-1">${{ producto.precio|floatformat:2 }}</p>
-      <p class="text-body-secondary">{{ producto.disponibilidad }}</p>
-    </div>
-    {% if producto.stock > 0 %}
-    <div class="card-footer">
-      <form method="post" action="{% url 'customer:carrito_agregar' producto.pk %}" class="input-group">
-        {% csrf_token %}
-        <input type="hidden" name="siguiente" value="{{ request.get_full_path }}">
-        <input type="number" class="form-control" name="cantidad" value="1" min="1" max="{{ producto.stock }}" aria-label="Cantidad">
-        <button type="submit" class="btn btn-primary">Agregar</button>
-      </form>
-    </div>
-    {% endif %}
-  </div></div>
-  {% endfor %}
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-4 rejilla-animada">
+  {% for producto in productos %}{% include "components/producto_tarjeta.html" with carrito=True %}{% endfor %}
 </div>
 {% include "components/paginacion.html" %}
 {% else %}
-<div class="alert alert-info">No hay productos disponibles por ahora.</div>
+<div class="estado-vacio"><span class="material-symbols-rounded">search_off</span><p>{% if q %}No encontramos productos para «{{ q }}».{% else %}No hay productos disponibles por ahora.{% endif %}</p></div>
 {% endif %}
 {% endblock %}

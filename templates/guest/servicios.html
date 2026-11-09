@@ -3,25 +3,37 @@
 {% block titulo %}Servicios{% endblock %}
 
 {% block contenido %}
-<h1 class="h3 mb-3">Servicios</h1>
-<ul class="nav nav-pills mb-3">
+<div class="encabezado-pagina">
+  <div class="d-flex align-items-center gap-3">
+    <span class="icono-encabezado"><span class="material-symbols-rounded">handyman</span></span>
+    <div><h1 class="h3 mb-0">Servicios</h1><p class="text-body-secondary mb-0">Trabajos a medida para tu proyecto.</p></div>
+  </div>
+  <div class="input-group buscador">
+    <span class="input-group-text"><span class="material-symbols-rounded">filter_alt</span></span>
+    <input type="search" id="filtro-servicios" class="form-control" placeholder="Filtrar en esta página" maxlength="60" aria-label="Filtrar servicios">
+  </div>
+</div>
+<ul class="nav nav-pills mb-4">
   <li class="nav-item"><a class="nav-link{% if not categoria_actual %} active{% endif %}" href="{% url 'guest:servicios' %}">Todos</a></li>
-  {% for categoria in categorias %}
-  <li class="nav-item"><a class="nav-link{% if categoria_actual == categoria.pk %} active{% endif %}" href="?categoria={{ categoria.pk }}">{{ categoria.nombre }}</a></li>
-  {% endfor %}
+  {% for categoria in categorias %}<li class="nav-item"><a class="nav-link{% if categoria_actual == categoria.pk %} active{% endif %}" href="?categoria={{ categoria.pk }}">{{ categoria.nombre }}</a></li>{% endfor %}
 </ul>
-<input type="search" id="filtro-servicios" class="form-control mb-3" placeholder="Filtrar en esta página" maxlength="60">
 {% if servicios %}
-<div class="row row-cols-1 row-cols-md-3 g-3">
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 rejilla-animada">
   {% for servicio in servicios %}
-  <div class="col servicio-item" data-nombre="{{ servicio.nombre|lower }}"><div class="card h-100"><div class="card-body">
-    <h2 class="h6 card-title"><a class="link-body-emphasis" href="{% url 'guest:servicio' servicio.pk %}">{{ servicio.nombre }}</a></h2>
-    <p class="mb-1 text-body-secondary">{{ servicio.categoria.nombre }}</p>
-    <p class="fw-bold mb-0">Desde ${{ servicio.precio_base|floatformat:2 }}</p>
-  </div></div></div>
+  <div class="col servicio-item" data-nombre="{{ servicio.nombre|lower }}">
+    <a class="card card-hover tarjeta-servicio h-100 text-decoration-none" href="{% url 'guest:servicio' servicio.pk %}">
+      <div class="card-body">
+        <span class="icono-servicio mb-3"><span class="material-symbols-rounded" aria-hidden="true">handyman</span></span>
+        <h2 class="h6 text-body">{{ servicio.nombre }}</h2>
+        <span class="badge text-bg-secondary">{{ servicio.categoria.nombre }}</span>
+        {% if servicio.requiere_archivo %}<span class="badge text-bg-info">Requiere archivo</span>{% endif %}
+        <p class="precio-grande mt-3 mb-0">Desde ${{ servicio.precio_base|floatformat:2 }}</p>
+      </div>
+    </a>
+  </div>
   {% endfor %}
 </div>
 {% else %}
-<div class="alert alert-info">No hay servicios disponibles por ahora.</div>
+<div class="estado-vacio"><span class="material-symbols-rounded">construction</span><p>No hay servicios disponibles por ahora.</p></div>
 {% endif %}
 {% endblock %}

@@ -4,11 +4,61 @@
 {% block titulo %}Solicitar cotización{% endblock %}
 
 {% block contenido %}
-<h1 class="h3 mb-2">Solicitar cotización</h1>
-<p class="text-body-secondary">Describa el trabajo que necesita. Un operador revisará su solicitud y le enviará una propuesta con precio y plazo.</p>
-<form method="post" enctype="multipart/form-data" novalidate {% atributos_validacion %}>
-  {% csrf_token %}
-  {% formulario_bs form %}
-  <button type="submit" class="btn btn-primary">Enviar solicitud</button>
-</form>
+<div class="encabezado-pagina">
+  <div class="d-flex align-items-center gap-3">
+    <span class="icono-encabezado"><span class="material-symbols-rounded">request_quote</span></span>
+    <div><h1 class="h3 mb-0">Solicitar cotización</h1><p class="text-body-secondary mb-0">Cuéntenos qué necesita y le enviaremos una propuesta.</p></div>
+  </div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-8">
+    <form method="post" enctype="multipart/form-data" novalidate {% atributos_validacion %}>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="alert alert-danger">{% for e in form.non_field_errors %}<div>{{ e }}</div>{% endfor %}</div>{% endif %}
+
+      <div class="card seccion-formulario"><div class="card-body">
+        <div class="etiqueta-seccion">1 · Qué necesita</div>
+        <div class="row g-3">
+          <div class="col-md-8">{% include "components/campo.html" with campo=form.servicio %}</div>
+          <div class="col-md-4">{% include "components/campo.html" with campo=form.cantidad %}</div>
+        </div>
+        {% include "components/campo.html" with campo=form.descripcion %}
+        {% include "components/campo.html" with campo=form.solicitud %}
+      </div></div>
+
+      <div class="card seccion-formulario"><div class="card-body">
+        <div class="etiqueta-seccion">2 · Especificaciones (opcional)</div>
+        <div class="row g-3">
+          <div class="col-md-4">{% include "components/campo.html" with campo=form.material %}</div>
+          <div class="col-md-4">{% include "components/campo.html" with campo=form.color %}</div>
+          <div class="col-md-4">{% include "components/campo.html" with campo=form.dimensiones %}</div>
+        </div>
+      </div></div>
+
+      <div class="card seccion-formulario"><div class="card-body">
+        <div class="etiqueta-seccion">3 · Archivos</div>
+        <div class="zona-archivos" data-campo="archivos">
+          <label class="form-label d-flex align-items-center gap-2" for="{{ form.archivos.id_for_label }}"><span class="material-symbols-rounded">upload_file</span>{{ form.archivos.label }}</label>
+          {{ form.archivos|bs }}
+          <div class="archivos-elegidos">Ningún archivo seleccionado</div>
+          <div class="form-text">{{ form.archivos.help_text }} Máximo 5 archivos de 50 MB.</div>
+          <div class="invalid-feedback{% if form.archivos.errors %} d-block{% endif %}">{{ form.archivos.errors|join:" " }}</div>
+        </div>
+      </div></div>
+
+      <div class="d-flex justify-content-end gap-2 mt-3">
+        <a class="btn btn-link" href="{% url 'customer:cotizaciones' %}">Cancelar</a>
+        <button type="submit" class="btn btn-primary btn-lg"><span class="material-symbols-rounded">send</span>Enviar solicitud</button>
+      </div>
+    </form>
+  </div>
+  <div class="col-lg-4">
+    <div class="card"><div class="card-body">
+      <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">lightbulb</span>Cómo funciona</h2>
+      <div class="paso-numerado"><span class="numero">1</span><div><strong>Envíe su solicitud</strong><div class="small text-body-secondary">Describa el trabajo y adjunte sus archivos.</div></div></div>
+      <div class="paso-numerado"><span class="numero">2</span><div><strong>Recibe una propuesta</strong><div class="small text-body-secondary">Nuestro equipo la revisa y le envía precio y plazo.</div></div></div>
+      <div class="paso-numerado mb-0"><span class="numero">3</span><div><strong>Acepte y siga su pedido</strong><div class="small text-body-secondary">Al aceptar, creamos su pedido y puede ver el avance.</div></div></div>
+    </div></div>
+  </div>
+</div>
 {% endblock %}

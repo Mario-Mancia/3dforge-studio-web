@@ -1,0 +1,117 @@
+/* ============================================================
+   COMPONENTES DE INTERFAZ (UI-2) - se carga despues de app.css
+   ============================================================ */
+
+/* Encabezados de pagina */
+.encabezado-pagina {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+.icono-encabezado {
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--md-radio-l);
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.icono-encabezado .material-symbols-rounded { font-size: 1.6rem; }
+.volver { display: inline-flex; align-items: center; gap: .25rem; margin-bottom: .75rem; }
+
+.titulo-tarjeta { display: flex; align-items: center; gap: .55rem; font-size: 1rem; font-weight: 500; margin-bottom: 1rem; }
+.titulo-tarjeta .material-symbols-rounded { color: var(--md-primary); }
+
+/* Rejillas animadas */
+.rejilla-animada > * { animation: aparecer .45s var(--md-mov) both; }
+.rejilla-animada > *:nth-child(2) { animation-delay: .05s; }
+.rejilla-animada > *:nth-child(3) { animation-delay: .1s; }
+.rejilla-animada > *:nth-child(4) { animation-delay: .15s; }
+.rejilla-animada > *:nth-child(5) { animation-delay: .2s; }
+.rejilla-animada > *:nth-child(6) { animation-delay: .25s; }
+.rejilla-animada > *:nth-child(n+7) { animation-delay: .3s; }
+
+/* Tarjetas de producto y servicio */
+.tarjeta-producto { overflow: hidden; }
+.tarjeta-producto .ratio img { transition: transform .6s var(--md-mov); }
+.tarjeta-producto:hover .ratio img { transform: scale(1.06); }
+.tarjeta-producto .card-title a { color: var(--md-text); }
+.tarjeta-producto .card-title a:hover { color: var(--md-primary); text-decoration: none; }
+.producto-placeholder { background: linear-gradient(135deg, var(--md-primary-container), var(--md-surface-secondary)); color: var(--md-primary); }
+.precio-grande { font-size: 1.45rem; font-weight: 500; color: var(--md-primary); line-height: 1.1; }
+.chip-disp {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .3rem .7rem;
+    border-radius: 100px;
+    font-size: .75rem;
+    font-weight: 500;
+    box-shadow: var(--md-shadow-1);
+    z-index: 2;
+}
+.chip-disp .material-symbols-rounded { font-size: 1rem; }
+.chip-disponible { background: var(--md-success-container); color: var(--md-success); }
+.chip-ultimas { background: var(--md-warning-container); color: #7A5B00; }
+[data-bs-theme="dark"] .chip-ultimas { color: var(--md-warning); }
+.chip-agotado { background: var(--md-error-container); color: var(--md-error); }
+.tarjeta-servicio .icono-servicio {
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--md-radio-l);
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.cinta-beneficios { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); }
+.beneficio { display: flex; gap: .85rem; align-items: flex-start; padding: 1rem; border-radius: var(--md-radio-l); background: var(--md-surface); border: 1px solid var(--md-border); }
+.beneficio .material-symbols-rounded { color: var(--md-primary); font-size: 1.8rem; }
+
+/* Imagen y ficha de detalle */
+.imagen-detalle { border-radius: var(--md-radio-xl); overflow: hidden; border: 1px solid var(--md-border); box-shadow: var(--md-shadow-2); background: var(--md-surface); }
+.lista-datos { display: grid; grid-template-columns: auto 1fr; gap: .5rem 1.25rem; margin: 0; }
+.lista-datos dt { color: var(--md-text-secondary); font-weight: 400; }
+.lista-datos dd { margin: 0; font-weight: 500; }
+
+/* Panel de gestion en columna */
+.panel-gestion { display: flex; flex-direction: column; gap: 1rem; }
+@media (min-width: 992px) { .panel-gestion { position: sticky; top: 5.5rem; } }
+.panel-gestion .btn[type="submit"] { width: 100%; }
+
+/* Tablas con acciones */
+.tabla-acciones th:last-child, .tabla-acciones td:last-child { width: 1%; white-space: nowrap; text-align: right; }
+.celda-vacia { padding: 2rem 1rem !important; }
+.estado-vacio p { margin: .5rem 0 0; }
+
+/* Linea de tiempo del historial */
+.linea-tiempo { list-style: none; margin: 0; padding: 0 0 0 1.4rem; border-left: 2px solid var(--md-border); }
+.linea-tiempo li { position: relative; padding: 0 0 1.1rem 1rem; }
+.linea-tiempo li:last-child { padding-bottom: 0; }
+.linea-tiempo li::before { content: ""; position: absolute; left: -1.95rem; top: .35rem; width: .8rem; height: .8rem; border-radius: 50%; background: var(--md-primary); border: 3px solid var(--md-surface); box-shadow: 0 0 0 2px var(--md-primary-container); }
+
+/* Indicadores */
+.kpi-icono { width: 2.6rem; height: 2.6rem; border-radius: var(--md-radio-m); background: var(--md-primary-container); color: var(--md-on-primary-container); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.kpi-valor { font-size: 1.65rem; font-weight: 500; line-height: 1.1; }
+
+/* Zona de archivos */
+.zona-archivos { border: 2px dashed var(--md-border); border-radius: var(--md-radio-l); padding: 1rem; background: var(--md-surface-secondary); transition: border-color .2s var(--md-mov), background-color .2s var(--md-mov); }
+.zona-archivos:hover, .zona-archivos:focus-within { border-color: var(--md-primary); background: var(--md-primary-container); }
+.archivos-elegidos { font-size: .85rem; color: var(--md-text-secondary); margin-top: .5rem; }
+
+/* Pasos y resumen de cuenta */
+.paso-numerado { display: flex; gap: .85rem; align-items: flex-start; margin-bottom: 1rem; }
+.paso-numerado .numero { width: 1.9rem; height: 1.9rem; border-radius: 50%; background: var(--md-primary); color: var(--md-on-primary); display: inline-flex; align-items: center; justify-content: center; font-weight: 500; flex-shrink: 0; }
+.avatar-grande { width: 4.5rem; height: 4.5rem; border-radius: 50%; background: var(--md-primary); color: var(--md-on-primary); display: inline-flex; align-items: center; justify-content: center; font-size: 1.9rem; font-weight: 500; }
+.seccion-formulario + .seccion-formulario { margin-top: 1rem; }
+.icono-hero { font-size: 11rem; opacity: .85; }
+.buscador { min-width: 16rem; max-width: 30rem; }
+.min-w-0 { min-width: 0; }
+.etiqueta-seccion { font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--md-text-secondary); font-weight: 500; margin-bottom: .75rem; }

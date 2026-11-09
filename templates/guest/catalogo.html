@@ -3,17 +3,25 @@
 {% block titulo %}Productos{% endblock %}
 
 {% block contenido %}
-<h1 class="h3 mb-3">Productos</h1>
-<form method="get" class="row g-2 mb-3">
-  <div class="col-sm-8 col-md-6"><input type="search" id="q" name="q" value="{{ q }}" class="form-control" placeholder="Buscar por nombre o SKU" maxlength="100"></div>
-  <div class="col-auto"><button type="submit" class="btn btn-primary">Buscar</button></div>
-</form>
+<div class="encabezado-pagina">
+  <div class="d-flex align-items-center gap-3">
+    <span class="icono-encabezado"><span class="material-symbols-rounded">storefront</span></span>
+    <div><h1 class="h3 mb-0">Productos</h1><p class="text-body-secondary mb-0">Piezas listas para llevar.</p></div>
+  </div>
+  <form method="get" class="flex-grow-1 buscador">
+    <div class="input-group">
+      <span class="input-group-text"><span class="material-symbols-rounded">search</span></span>
+      <input type="search" id="q" name="q" value="{{ q }}" class="form-control" placeholder="Buscar por nombre o SKU" maxlength="100" aria-label="Buscar productos">
+      <button type="submit" class="btn btn-primary">Buscar</button>
+    </div>
+  </form>
+</div>
 {% if productos %}
-<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-3">
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-4 rejilla-animada">
   {% for producto in productos %}{% include "components/producto_tarjeta.html" %}{% endfor %}
 </div>
 {% include "components/paginacion.html" %}
 {% else %}
-<div class="alert alert-info">No hay productos disponibles por ahora.</div>
+<div class="estado-vacio"><span class="material-symbols-rounded">search_off</span><p>{% if q %}No encontramos productos para «{{ q }}».{% else %}No hay productos disponibles por ahora.{% endif %}</p></div>
 {% endif %}
 {% endblock %}

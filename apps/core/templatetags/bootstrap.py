@@ -142,3 +142,33 @@ def tipo_toast(etiqueta):
 def icono_toast(etiqueta):
     return ICONOS_TOAST[tipo_toast(etiqueta)]
 # <<< ui-1
+
+# >>> ui-2
+ICONOS_KPI = (
+    ("vencida", "event_busy"),
+    ("stock", "inventory"),
+    ("ticket", "confirmation_number"),
+    ("saldo", "savings"),
+    ("por cobrar", "pending_actions"),
+    ("cobrado", "account_balance_wallet"),
+    ("ventas", "payments"),
+    ("facturad", "request_quote"),
+    ("factura", "receipt_long"),
+    ("cliente", "group_add"),
+    ("conversi", "percent"),
+    ("cotizaci", "request_quote"),
+    ("pedido", "package_2"),
+    ("encargo", "package_2"),
+    ("soporte", "support_agent"),
+    ("anulada", "block"),
+)
+
+
+@register.filter
+def icono_kpi(titulo):
+    minuscula = str(titulo).lower()
+    for clave, icono in ICONOS_KPI:
+        if clave in minuscula:
+            return icono
+    return "analytics"
+# <<< ui-2
