@@ -1,8 +1,68 @@
 {% extends "layouts/dashboard.html" %}
+{% load static %}
 
-{% block titulo %}Dashboard administrativo{% endblock %}
+{% block titulo %}Dashboard{% endblock %}
 
 {% block contenido %}
-<h1 class="h3">Dashboard administrativo</h1>
-<p class="text-body-secondary">Ruta: <code>{{ request.path }}</code> (pendiente de implementar)</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="h3 mb-0">Dashboard administrativo</h1>
+  <form method="get">
+    <select name="rango" class="form-select" aria-label="Período de los gráficos">
+      {% for clave, texto in rangos %}<option value="{{ clave }}"{% if clave == rango %} selected{% endif %}>{{ texto }}</option>{% endfor %}
+    </select>
+  </form>
+</div>
+
+<div class="row row-cols-2 row-cols-lg-3 row-cols-xl-6 g-3 mb-4">
+  {% include "components/kpi.html" with titulo="Ventas del mes" valor=kpis.ventas_mes prefijo="$" decimales=2 %}
+  {% include "components/kpi.html" with titulo="Cobrado del mes" valor=kpis.cobrado_mes prefijo="$" decimales=2 %}
+  {% include "components/kpi.html" with titulo="Por cobrar" valor=kpis.por_cobrar prefijo="$" decimales=2 %}
+  {% include "components/kpi.html" with titulo="Facturas vencidas" valor=kpis.facturas_vencidas %}
+  {% include "components/kpi.html" with titulo="Productos bajo stock" valor=kpis.productos_bajo_stock %}
+  {% include "components/kpi.html" with titulo="Clientes nuevos (mes)" valor=kpis.clientes_nuevos %}
+</div>
+<div class="row row-cols-1 row-cols-md-2 g-3 mb-4">
+  {% if conversion is not None %}{% include "components/kpi.html" with titulo="Conversión de cotizaciones" valor=conversion sufijo=" %" ayuda="Aceptadas sobre cotizaciones cerradas en el período" %}{% else %}{% include "components/kpi.html" with titulo="Conversión de cotizaciones" valor="-" ayuda="Aún no hay cotizaciones cerradas en el período" %}{% endif %}
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-8"><div class="card h-100"><div class="card-body">
+    <h2 class="h6">Ventas frente a cobros</h2>
+    <div class="ratio ratio-16x9"><canvas data-grafico="ventas_cobros" data-tipo="line"></canvas></div>
+  </div></div></div>
+  <div class="col-lg-4"><div class="card h-100"><div class="card-body">
+    <h2 class="h6">Ingresos por servicios y productos</h2>
+    <div class="ratio ratio-1x1"><canvas data-grafico="ingresos_tipo" data-tipo="doughnut"></canvas></div>
+  </div></div></div>
+  <div class="col-lg-6"><div class="card h-100"><div class="card-body">
+    <h2 class="h6">Lo más vendido (top 5)</h2>
+    <div class="ratio ratio-16x9"><canvas data-grafico="top_ventas" data-tipo="bar" data-eje="y"></canvas></div>
+  </div></div></div>
+  <div class="col-lg-6"><div class="card h-100"><div class="card-body">
+    <h2 class="h6">Encargos por estado</h2>
+    <div class="ratio ratio-16x9"><canvas data-grafico="encargos_estado" data-tipo="bar"></canvas></div>
+  </div></div></div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <h2 class="h6">Productos con stock bajo</h2>
+    <ul class="list-group">
+      {% for p in stock_bajo %}<li class="list-group-item d-flex justify-content-between"><a href="{% url 'administrator:producto_editar' p.pk %}">{{ p.sku }} · {{ p.nombre }}</a><span>{{ p.stock }} / mín. {{ p.minimo }}</span></li>{% empty %}<li class="list-group-item text-body-secondary">Ningún producto bajo el mínimo.</li>{% endfor %}
+    </ul>
+  </div>
+  <div class="col-lg-6">
+    <h2 class="h6">Facturas vencidas</h2>
+    <ul class="list-group">
+      {% for f in vencidas %}<li class="list-group-item d-flex justify-content-between"><a href="{% url 'operator:factura' f.pk %}">{{ f.numero }} · {{ f.cliente }}</a><span>${{ f.saldo|floatformat:2 }} · {{ f.vence|date:"d/m/Y" }}</span></li>{% empty %}<li class="list-group-item text-body-secondary">No hay facturas vencidas.</li>{% endfor %}
+    </ul>
+  </div>
+</div>
+<p class="small text-body-secondary mt-3">Los datos se actualizan cada minuto.</p>
+{% endblock %}
+
+{% block scripts %}
+{{ graficos|json_script:"datos-graficos" }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{% static 'js/components/graficos.js' %}"></script>
 {% endblock %}

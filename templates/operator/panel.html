@@ -1,8 +1,55 @@
 {% extends "layouts/dashboard.html" %}
+{% load static bootstrap %}
 
 {% block titulo %}Panel operativo{% endblock %}
 
 {% block contenido %}
-<h1 class="h3">Panel operativo</h1>
-<p class="text-body-secondary">Ruta: <code>{{ request.path }}</code> (pendiente de implementar)</p>
+<h1 class="h3 mb-3">Panel operativo</h1>
+<div class="row row-cols-2 row-cols-lg-5 g-3 mb-4">
+  {% include "components/kpi.html" with titulo="Cotizaciones por atender" valor=kpis.cotizaciones_por_atender %}
+  {% include "components/kpi.html" with titulo="Encargos activos" valor=kpis.encargos_activos %}
+  {% include "components/kpi.html" with titulo="Mis encargos" valor=trabajo.mis_encargos_total %}
+  {% include "components/kpi.html" with titulo="Facturas vencidas" valor=kpis.facturas_vencidas %}
+  {% include "components/kpi.html" with titulo="Soporte abierto" valor=kpis.soporte_abierto %}
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-6"><div class="card h-100"><div class="card-body">
+    <h2 class="h6">Encargos por estado</h2>
+    <div class="ratio ratio-16x9"><canvas data-grafico="encargos_estado" data-tipo="bar"></canvas></div>
+  </div></div></div>
+  <div class="col-lg-6"><div class="card h-100"><div class="card-body">
+    <h2 class="h6">Carga de las últimas 8 semanas</h2>
+    <div class="ratio ratio-16x9"><canvas data-grafico="carga_semanal" data-tipo="line"></canvas></div>
+  </div></div></div>
+</div>
+
+<h2 class="h5">Mi trabajo pendiente</h2>
+<div class="row g-3">
+  <div class="col-lg-4">
+    <h3 class="h6">Cotizaciones por atender</h3>
+    <ul class="list-group">
+      {% for c in trabajo.cotizaciones %}<li class="list-group-item"><a href="{% url 'operator:cotizacion' c.pk %}">{{ c.codigo }}</a> {{ c.estado|badge:c.get_estado_display }}<br><small class="text-body-secondary">{{ c.cliente }}</small></li>{% empty %}<li class="list-group-item text-body-secondary">Nada pendiente.</li>{% endfor %}
+    </ul>
+  </div>
+  <div class="col-lg-4">
+    <h3 class="h6">Mis encargos activos</h3>
+    <ul class="list-group">
+      {% for e in trabajo.mis_encargos %}<li class="list-group-item"><a href="{% url 'operator:encargo' e.pk %}">{{ e.codigo }}</a> {{ e.estado|badge:e.get_estado_display }}<br><small class="text-body-secondary">{{ e.cliente }}{% if e.fecha_entrega_estimada %} · entrega {{ e.fecha_entrega_estimada|date:"d/m/Y" }}{% endif %}</small></li>{% empty %}<li class="list-group-item text-body-secondary">No tiene encargos asignados.</li>{% endfor %}
+    </ul>
+  </div>
+  <div class="col-lg-4">
+    <h3 class="h6">Soporte</h3>
+    <ul class="list-group">
+      {% for s in trabajo.soporte %}<li class="list-group-item"><a href="{% url 'operator:soporte_detalle' s.pk %}">#{{ s.pk }} · {{ s.asunto }}</a><br><small class="text-body-secondary">{{ s.cliente }}</small></li>{% empty %}<li class="list-group-item text-body-secondary">Sin solicitudes pendientes.</li>{% endfor %}
+    </ul>
+  </div>
+</div>
+<p class="small text-body-secondary mt-3">Los indicadores generales se actualizan cada minuto.</p>
+{% endblock %}
+
+{% block scripts %}
+{{ graficos|json_script:"datos-graficos" }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{% static 'js/components/graficos.js' %}"></script>
 {% endblock %}

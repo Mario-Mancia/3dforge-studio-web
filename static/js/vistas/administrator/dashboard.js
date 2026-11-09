@@ -1,3 +1,3 @@
 $(function () {
-    console.debug("vista cargada: administrator:dashboard");
+    $("select[name=rango]").on("change", function () { this.form.requestSubmit(); });
 });
