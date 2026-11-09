@@ -3,24 +3,25 @@
 {% block titulo %}Servicios{% endblock %}
 
 {% block contenido %}
-<h1>Servicios</h1>
-<nav class="filtros">
-  <a href="{% url 'guest:servicios' %}"{% if not categoria_actual %} class="activo"{% endif %}>Todos</a>
+<h1 class="h3 mb-3">Servicios</h1>
+<ul class="nav nav-pills mb-3">
+  <li class="nav-item"><a class="nav-link{% if not categoria_actual %} active{% endif %}" href="{% url 'guest:servicios' %}">Todos</a></li>
   {% for categoria in categorias %}
-  <a href="?categoria={{ categoria.pk }}"{% if categoria_actual == categoria.pk %} class="activo"{% endif %}>{{ categoria.nombre }}</a>
+  <li class="nav-item"><a class="nav-link{% if categoria_actual == categoria.pk %} active{% endif %}" href="?categoria={{ categoria.pk }}">{{ categoria.nombre }}</a></li>
   {% endfor %}
-</nav>
+</ul>
+<input type="search" id="filtro-servicios" class="form-control mb-3" placeholder="Filtrar en esta página" maxlength="60">
 {% if servicios %}
-<div class="rejilla">
+<div class="row row-cols-1 row-cols-md-3 g-3">
   {% for servicio in servicios %}
-  <article class="tarjeta">
-    <h3><a href="{% url 'guest:servicio' servicio.pk %}">{{ servicio.nombre }}</a></h3>
-    <p>{{ servicio.categoria.nombre }}</p>
-    <p class="precio">Desde ${{ servicio.precio_base|floatformat:2 }}</p>
-  </article>
+  <div class="col servicio-item" data-nombre="{{ servicio.nombre|lower }}"><div class="card h-100"><div class="card-body">
+    <h2 class="h6 card-title"><a class="link-body-emphasis" href="{% url 'guest:servicio' servicio.pk %}">{{ servicio.nombre }}</a></h2>
+    <p class="mb-1 text-body-secondary">{{ servicio.categoria.nombre }}</p>
+    <p class="fw-bold mb-0">Desde ${{ servicio.precio_base|floatformat:2 }}</p>
+  </div></div></div>
   {% endfor %}
 </div>
 {% else %}
-<p>No hay servicios disponibles por ahora.</p>
+<div class="alert alert-info">No hay servicios disponibles por ahora.</div>
 {% endif %}
 {% endblock %}

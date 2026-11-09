@@ -3,36 +3,30 @@
 {% block titulo %}Usuarios y empleados{% endblock %}
 
 {% block contenido %}
-<h1>Usuarios y empleados</h1>
-<p><a class="boton" href="{% url 'administrator:usuario_crear' %}">Nuevo empleado</a></p>
-<form method="get" class="filtros">
-  <input type="search" name="q" value="{{ q }}" placeholder="Correo o nombre" maxlength="100">
-  <select name="rol">
-    <option value="">Todos los roles</option>
-    {% for r in roles %}<option value="{{ r }}"{% if rol == r %} selected{% endif %}>{{ r }}</option>{% endfor %}
-    <option value="SIN_ROL"{% if rol == "SIN_ROL" %} selected{% endif %}>Sin rol</option>
-  </select>
-  <select name="estado">
-    <option value="">Todos los estados</option>
-    {% for e in estados %}<option value="{{ e.pk }}"{% if estado == e.pk|stringformat:"s" %} selected{% endif %}>{{ e.nombre }}</option>{% endfor %}
-  </select>
-  <button type="submit">Filtrar</button>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Usuarios y empleados</h1>
+  <a class="btn btn-primary" href="{% url 'administrator:usuario_crear' %}">Nuevo empleado</a>
+</div>
+<form method="get" class="row g-2 mb-3">
+  <div class="col-sm-6 col-md-4"><input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Correo o nombre" maxlength="100"></div>
+  <div class="col-sm-3 col-md-2"><select name="rol" class="form-select"><option value="">Todos los roles</option>{% for r in roles %}<option value="{{ r }}"{% if rol == r %} selected{% endif %}>{{ r }}</option>{% endfor %}<option value="SIN_ROL"{% if rol == "SIN_ROL" %} selected{% endif %}>Sin rol</option></select></div>
+  <div class="col-sm-3 col-md-2"><select name="estado" class="form-select"><option value="">Todos los estados</option>{% for e in estados %}<option value="{{ e.pk }}"{% if estado == e.pk|stringformat:"s" %} selected{% endif %}>{{ e.nombre }}</option>{% endfor %}</select></div>
+  <div class="col-auto"><button type="submit" class="btn btn-primary">Filtrar</button></div>
 </form>
-<div class="tabla-scroll">
-<table>
+<div class="table-responsive">
+<table class="table table-striped align-middle">
   <thead><tr><th>Correo</th><th>Nombre</th><th>Roles</th><th>Estado</th><th>Empleado</th><th></th></tr></thead>
   <tbody>
   {% for u in usuarios %}
     <tr>
-      <td>{{ u.correo }}</td>
-      <td>{{ u.nombre_completo }}</td>
-      <td>{% for g in u.groups.all %}{{ g.name }}{% if not forloop.last %}, {% endif %}{% empty %}-{% endfor %}{% if u.is_superuser %} (superusuario){% endif %}</td>
+      <td>{{ u.correo }}</td><td>{{ u.nombre_completo }}</td>
+      <td>{% for g in u.groups.all %}<span class="badge text-bg-primary">{{ g.name }}</span> {% empty %}-{% endfor %}{% if u.is_superuser %}<span class="badge text-bg-dark">superusuario</span>{% endif %}</td>
       <td>{{ u.estado.nombre }}</td>
-      <td>{% if u.empleado %}{{ u.empleado.codigo_empleado }} - {{ u.empleado.cargo }}{% if not u.empleado.activo %} (inactivo){% endif %}{% else %}-{% endif %}</td>
-      <td><a href="{% url 'administrator:usuario_editar' u.pk %}">Editar</a></td>
+      <td>{% if u.empleado %}{{ u.empleado.codigo_empleado }} - {{ u.empleado.cargo }}{% if not u.empleado.activo %} <span class="badge text-bg-secondary">inactivo</span>{% endif %}{% else %}-{% endif %}</td>
+      <td><a class="btn btn-outline-primary btn-sm" href="{% url 'administrator:usuario_editar' u.pk %}">Editar</a></td>
     </tr>
   {% empty %}
-    <tr><td colspan="6">Sin usuarios.</td></tr>
+    <tr><td colspan="6" class="text-center text-body-secondary">Sin usuarios.</td></tr>
   {% endfor %}
   </tbody>
 </table>

@@ -1,26 +1,23 @@
 {% extends "layouts/dashboard.html" %}
+{% load bootstrap %}
 
 {% block titulo %}Encargo {{ encargo.codigo }}{% endblock %}
 
 {% block contenido %}
-<p><a href="{% url 'operator:encargos' %}">&larr; Encargos</a></p>
-<h1>Encargo {{ encargo.codigo }}</h1>
-<p>Estado: <strong>{{ encargo.get_estado_display }}</strong> · Cliente: {{ encargo.cliente }} ({{ encargo.cliente.correo }})</p>
-<p>Responsable: {% if encargo.empleado_responsable %}{{ encargo.empleado_responsable.usuario.nombre_completo }}{% else %}Sin asignar{% endif %}
- · Entrega estimada: {{ encargo.fecha_entrega_estimada|date:"d/m/Y"|default:"-" }} · Entrega real: {{ encargo.fecha_entrega_real|date:"d/m/Y"|default:"-" }}</p>
+<a class="btn btn-link ps-0" href="{% url 'operator:encargos' %}">&larr; Encargos</a>
+<h1 class="h3">Encargo {{ encargo.codigo }} {{ encargo.estado|badge:encargo.get_estado_display }}</h1>
+<p>Cliente: {{ encargo.cliente }} ({{ encargo.cliente.correo }}) · Responsable: {% if encargo.empleado_responsable %}{{ encargo.empleado_responsable.usuario.nombre_completo }}{% else %}Sin asignar{% endif %}</p>
+<p>Entrega estimada: {{ encargo.fecha_entrega_estimada|date:"d/m/Y"|default:"-" }} · Entrega real: {{ encargo.fecha_entrega_real|date:"d/m/Y"|default:"-" }}</p>
 {% if encargo.cotizacion %}<p>Origen: cotización <a href="{% url 'operator:cotizacion' encargo.cotizacion.pk %}">{{ encargo.cotizacion.codigo }}</a></p>{% endif %}
 <p>{{ encargo.descripcion|linebreaksbr }}</p>
-
-<div class="tabla-scroll">
-<table>
+<div class="table-responsive">
+<table class="table table-striped align-middle">
   <thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th><th>Archivos</th></tr></thead>
   <tbody>
   {% for d in encargo.detalles.all %}
     <tr>
-      <td>{{ d.descripcion }}{% if d.especificaciones %}<br><small>{% for clave, valor in d.especificaciones.items %}{{ clave|capfirst }}: {{ valor }}{% if not forloop.last %} · {% endif %}{% endfor %}</small>{% endif %}</td>
-      <td>{{ d.cantidad|floatformat:2 }}</td>
-      <td>${{ d.precio_unitario|floatformat:2 }}</td>
-      <td>${{ d.subtotal|floatformat:2 }}</td>
+      <td>{{ d.descripcion }}{% if d.especificaciones %}<br><small class="text-body-secondary">{% for clave, valor in d.especificaciones.items %}{{ clave|capfirst }}: {{ valor }}{% if not forloop.last %} · {% endif %}{% endfor %}</small>{% endif %}</td>
+      <td>{{ d.cantidad|floatformat:2 }}</td><td>${{ d.precio_unitario|floatformat:2 }}</td><td>${{ d.subtotal|floatformat:2 }}</td>
       <td>{% for a in d.archivos.all %}<a href="{% url 'operator:encargo_archivo' encargo.pk a.pk %}">{{ a.nombre_archivo }}</a><br>{% empty %}-{% endfor %}</td>
     </tr>
   {% endfor %}
@@ -29,23 +26,32 @@
 </div>
 <p>Subtotal: ${{ encargo.subtotal|floatformat:2 }} · Descuento: ${{ encargo.descuento|floatformat:2 }} · Impuesto: ${{ encargo.impuesto|floatformat:2 }} · <strong>Total: ${{ encargo.total|floatformat:2 }}</strong></p>
 
-{% if form_estado %}
-<h2>Cambiar estado</h2>
-<form method="post" action="{% url 'operator:encargo_accion' encargo.pk 'estado' %}">{% csrf_token %}{{ form_estado.as_p }}<button type="submit">Actualizar estado</button></form>
-{% endif %}
-<h2>Responsable</h2>
-<form method="post" action="{% url 'operator:encargo_accion' encargo.pk 'asignar' %}">{% csrf_token %}{{ form_asignar.as_p }}<button type="submit">Asignar</button></form>
-<h2>Cargar archivo</h2>
-<form method="post" enctype="multipart/form-data" action="{% url 'operator:encargo_accion' encargo.pk 'archivo' %}">{% csrf_token %}{{ form_archivo.as_p }}<button type="submit">Subir</button></form>
+<div class="row g-3">
+  {% if form_estado %}
+  <div class="col-lg-4"><div class="card"><div class="card-body">
+    <h2 class="h6">Cambiar estado</h2>
+    <form method="post" action="{% url 'operator:encargo_accion' encargo.pk 'estado' %}" novalidate>{% csrf_token %}{% formulario_bs form_estado %}<button type="submit" class="btn btn-primary btn-sm">Actualizar estado</button></form>
+  </div></div></div>
+  {% endif %}
+  <div class="col-lg-4"><div class="card"><div class="card-body">
+    <h2 class="h6">Responsable</h2>
+    <form method="post" action="{% url 'operator:encargo_accion' encargo.pk 'asignar' %}" novalidate>{% csrf_token %}{% formulario_bs form_asignar %}<button type="submit" class="btn btn-primary btn-sm">Asignar</button></form>
+  </div></div></div>
+  <div class="col-lg-4"><div class="card"><div class="card-body">
+    <h2 class="h6">Cargar archivo</h2>
+    <form method="post" enctype="multipart/form-data" action="{% url 'operator:encargo_accion' encargo.pk 'archivo' %}" novalidate>{% csrf_token %}{% formulario_bs form_archivo %}<button type="submit" class="btn btn-primary btn-sm">Subir</button></form>
+  </div></div></div>
+</div>
 
-<h2>Factura</h2>
+<h2 class="h5 mt-4">Factura</h2>
 {% if encargo.factura %}
-<p><a href="{% url 'operator:factura' encargo.factura.pk %}">Ver factura {{ encargo.factura.numero_factura }}</a></p>
+<a class="btn btn-outline-primary" href="{% url 'operator:factura' encargo.factura.pk %}">Ver factura {{ encargo.factura.numero_factura }}</a>
 {% else %}
-<form method="post" action="{% url 'operator:encargo_factura' encargo.pk %}">{% csrf_token %}<button type="submit">Crear factura</button></form>
+<form method="post" action="{% url 'operator:encargo_factura' encargo.pk %}">{% csrf_token %}<button type="submit" class="btn btn-success">Crear factura</button></form>
 {% endif %}
-<h2>Historial</h2>
-<ul>
-  {% for h in encargo.historial.all %}<li>{{ h.fecha_cambio|date:"d/m/Y H:i" }} · {{ h.get_estado_nuevo_display }} · {{ h.usuario.nombre_completo }}{% if h.comentario %} · {{ h.comentario }}{% endif %}</li>{% endfor %}
+
+<h2 class="h5 mt-4">Historial</h2>
+<ul class="list-group">
+  {% for h in encargo.historial.all %}<li class="list-group-item">{{ h.fecha_cambio|date:"d/m/Y H:i" }} · {{ h.estado_nuevo|badge:h.get_estado_nuevo_display }} · {{ h.usuario.nombre_completo }}{% if h.comentario %} · {{ h.comentario }}{% endif %}</li>{% endfor %}
 </ul>
 {% endblock %}

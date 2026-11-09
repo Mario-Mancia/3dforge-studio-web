@@ -1,74 +1,69 @@
 {% extends "layouts/dashboard.html" %}
+{% load bootstrap %}
 
 {% block titulo %}Cotización {{ cotizacion.codigo }}{% endblock %}
 
 {% block contenido %}
-<p><a href="{% url 'operator:cotizaciones' %}">&larr; Bandeja de cotizaciones</a></p>
-<h1>Cotización {{ cotizacion.codigo }}</h1>
-<p>Estado: <strong>{{ cotizacion.get_estado_display }}</strong> · Cliente: {{ cotizacion.cliente }} ({{ cotizacion.cliente.correo }}) · Responsable: {{ cotizacion.usuario_responsable|default:"Sin asignar" }}</p>
-{% if cotizacion.solicitud %}<h2>Solicitud del cliente</h2><p>{{ cotizacion.solicitud|linebreaksbr }}</p>{% endif %}
-{% for d in cotizacion.detalles.all %}
-  {% if d.especificaciones %}<p><small>{{ d.descripcion }}: {% for clave, valor in d.especificaciones.items %}{{ clave|capfirst }}: {{ valor }}{% if not forloop.last %} · {% endif %}{% endfor %}</small></p>{% endif %}
-{% endfor %}
+<a class="btn btn-link ps-0" href="{% url 'operator:cotizaciones' %}">&larr; Bandeja de cotizaciones</a>
+<h1 class="h3">Cotización {{ cotizacion.codigo }} {{ cotizacion.estado|badge:cotizacion.get_estado_display }}</h1>
+<p>Cliente: {{ cotizacion.cliente }} ({{ cotizacion.cliente.correo }}) · Responsable: {{ cotizacion.usuario_responsable|default:"Sin asignar" }}</p>
+{% if cotizacion.solicitud %}<h2 class="h5">Solicitud del cliente</h2><p>{{ cotizacion.solicitud|linebreaksbr }}</p>{% endif %}
+{% for d in cotizacion.detalles.all %}{% if d.especificaciones %}<p><small class="text-body-secondary">{{ d.descripcion }}: {% for clave, valor in d.especificaciones.items %}{{ clave|capfirst }}: {{ valor }}{% if not forloop.last %} · {% endif %}{% endfor %}</small></p>{% endif %}{% endfor %}
 {% if cotizacion.archivos.all %}
-<h2>Archivos del cliente</h2>
-<ul>
-  {% for a in cotizacion.archivos.all %}<li><a href="{% url 'operator:cotizacion_archivo' cotizacion.pk a.pk %}">{{ a.nombre_archivo }}</a> ({{ a.formato }}, {{ a.tamano_bytes|filesizeformat }})</li>{% endfor %}
-</ul>
+<h2 class="h5">Archivos del cliente</h2>
+<ul>{% for a in cotizacion.archivos.all %}<li><a href="{% url 'operator:cotizacion_archivo' cotizacion.pk a.pk %}">{{ a.nombre_archivo }}</a> ({{ a.formato }}, {{ a.tamano_bytes|filesizeformat }})</li>{% endfor %}</ul>
 {% endif %}
 
 {% if editable %}
-<h2>Revisión</h2>
+<h2 class="h5">Revisión</h2>
 <form method="post" novalidate>
   {% csrf_token %}
   {{ formset.management_form }}
   {{ formset.non_form_errors }}
-  <div class="tabla-scroll">
-  <table>
-    <thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio unitario</th><th>Descuento</th></tr></thead>
+  <div class="table-responsive">
+  <table class="table align-middle">
+    <thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio unitario</th><th>Descuento</th><th class="text-end">Subtotal</th></tr></thead>
     <tbody>
     {% for f in formset %}
-      <tr>
-        <td>{{ f.id }}{{ f.descripcion }}{{ f.non_field_errors }}</td>
-        <td>{{ f.cantidad }}{{ f.cantidad.errors }}</td>
-        <td>{{ f.precio_unitario }}{{ f.precio_unitario.errors }}</td>
-        <td>{{ f.descuento }}{{ f.descuento.errors }}</td>
+      <tr data-linea>
+        <td>{{ f.id }}{{ f.descripcion|bs }}{{ f.non_field_errors }}</td>
+        <td>{{ f.cantidad|bs }}<div class="invalid-feedback d-block">{{ f.cantidad.errors|join:" " }}</div></td>
+        <td>{{ f.precio_unitario|bs }}<div class="invalid-feedback d-block">{{ f.precio_unitario.errors|join:" " }}</div></td>
+        <td>{{ f.descuento|bs }}<div class="invalid-feedback d-block">{{ f.descuento.errors|join:" " }}</div></td>
+        <td class="text-end subtotal-previo">-</td>
       </tr>
     {% endfor %}
     </tbody>
   </table>
   </div>
-  {{ form.as_p }}
-  <button type="submit">Guardar revisión</button>
+  {% formulario_bs form %}
+  <button type="submit" class="btn btn-primary">Guardar revisión</button>
 </form>
 {% else %}
-<div class="tabla-scroll">
-<table>
-  <thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio unitario</th><th>Descuento</th><th>Subtotal</th></tr></thead>
-  <tbody>
-  {% for d in cotizacion.detalles.all %}
-    <tr><td>{{ d.descripcion }}</td><td>{{ d.cantidad|floatformat:2 }}</td><td>${{ d.precio_unitario|floatformat:2 }}</td><td>${{ d.descuento|floatformat:2 }}</td><td>${{ d.subtotal|floatformat:2 }}</td></tr>
-  {% endfor %}
-  </tbody>
+<div class="table-responsive">
+<table class="table table-striped">
+  <thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio unitario</th><th>Descuento</th><th class="text-end">Subtotal</th></tr></thead>
+  <tbody>{% for d in cotizacion.detalles.all %}<tr><td>{{ d.descripcion }}</td><td>{{ d.cantidad|floatformat:2 }}</td><td>${{ d.precio_unitario|floatformat:2 }}</td><td>${{ d.descuento|floatformat:2 }}</td><td class="text-end">${{ d.subtotal|floatformat:2 }}</td></tr>{% endfor %}</tbody>
 </table>
 </div>
 {% if cotizacion.observaciones %}<p>Observaciones: {{ cotizacion.observaciones|linebreaksbr }}</p>{% endif %}
 {% endif %}
-<p>Subtotal: ${{ cotizacion.subtotal|floatformat:2 }} · Descuento: ${{ cotizacion.descuento|floatformat:2 }} · Impuesto: ${{ cotizacion.impuesto|floatformat:2 }} · <strong>Total: ${{ cotizacion.total|floatformat:2 }}</strong></p>
+<p class="mt-3">Subtotal: ${{ cotizacion.subtotal|floatformat:2 }} · Descuento: ${{ cotizacion.descuento|floatformat:2 }} · Impuesto: ${{ cotizacion.impuesto|floatformat:2 }} · <strong>Total: ${{ cotizacion.total|floatformat:2 }}</strong></p>
 {% if cotizacion.plazo_entrega_dias %}<p>Plazo estimado: {{ cotizacion.plazo_entrega_dias }} días.</p>{% endif %}
 {% if cotizacion.fecha_vencimiento %}<p>Válida hasta: {{ cotizacion.fecha_vencimiento|date:"d/m/Y H:i" }}</p>{% endif %}
-
+<div class="d-flex flex-wrap gap-2">
 {% if cotizacion.estado == "ACEPTADA" %}
-{% if cotizacion.encargo %}
-<p><a href="{% url 'operator:encargo' cotizacion.encargo.pk %}">Ver encargo {{ cotizacion.encargo.codigo }}</a></p>
-{% else %}
-<form method="post" action="{% url 'operator:cotizacion_encargo' cotizacion.pk %}">{% csrf_token %}<button type="submit">Crear encargo</button></form>
-{% endif %}
+  {% if cotizacion.encargo %}
+  <a class="btn btn-outline-primary" href="{% url 'operator:encargo' cotizacion.encargo.pk %}">Ver encargo {{ cotizacion.encargo.codigo }}</a>
+  {% else %}
+  <form method="post" action="{% url 'operator:cotizacion_encargo' cotizacion.pk %}">{% csrf_token %}<button type="submit" class="btn btn-success">Crear encargo</button></form>
+  {% endif %}
 {% endif %}
 {% if cotizacion.estado == "BORRADOR" %}
-<form method="post" action="{% url 'operator:cotizacion_accion' cotizacion.pk 'enviar' %}">{% csrf_token %}<button type="submit">Enviar al cliente</button></form>
+  <form method="post" action="{% url 'operator:cotizacion_accion' cotizacion.pk 'enviar' %}" data-confirmar="¿Enviar la cotización al cliente?">{% csrf_token %}<button type="submit" class="btn btn-primary">Enviar al cliente</button></form>
 {% endif %}
 {% if cotizacion.estado == "SOLICITADA" or cotizacion.estado == "BORRADOR" or cotizacion.estado == "ENVIADA" %}
-<form method="post" action="{% url 'operator:cotizacion_accion' cotizacion.pk 'cancelar' %}">{% csrf_token %}<button type="submit">Cancelar cotización</button></form>
+  <form method="post" action="{% url 'operator:cotizacion_accion' cotizacion.pk 'cancelar' %}" data-confirmar="¿Cancelar esta cotización?">{% csrf_token %}<button type="submit" class="btn btn-outline-danger">Cancelar cotización</button></form>
 {% endif %}
+</div>
 {% endblock %}

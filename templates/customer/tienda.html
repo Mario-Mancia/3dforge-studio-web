@@ -3,33 +3,39 @@
 {% block titulo %}Tienda{% endblock %}
 
 {% block contenido %}
-<h1>Tienda</h1>
-<p><a href="{% url 'customer:carrito' %}">Ver carrito ({{ unidades }} unidades)</a></p>
-<form method="get" class="filtros">
-  <input type="search" name="q" value="{{ q }}" placeholder="Buscar por nombre o SKU" maxlength="100">
-  <button type="submit">Buscar</button>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Tienda</h1>
+  <a class="btn btn-outline-primary" href="{% url 'customer:carrito' %}">Carrito <span class="badge text-bg-primary">{{ unidades }}</span></a>
+</div>
+<form method="get" class="row g-2 mb-3">
+  <div class="col-sm-8 col-md-6"><input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Buscar por nombre o SKU" maxlength="100"></div>
+  <div class="col-auto"><button type="submit" class="btn btn-primary">Buscar</button></div>
 </form>
 {% if productos %}
-<div class="rejilla">
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-3">
   {% for producto in productos %}
-  <article class="tarjeta">
-    {% if producto.imagen %}<img src="{{ producto.imagen_url }}" alt="{{ producto.nombre }}" loading="lazy">{% else %}<div class="sin-imagen">Sin imagen</div>{% endif %}
-    <h3>{{ producto.nombre }}</h3>
-    <p class="precio">${{ producto.precio|floatformat:2 }}</p>
-    <p class="disp disp-{{ producto.disponibilidad_codigo }}">{{ producto.disponibilidad }}</p>
+  <div class="col"><div class="card h-100">
+    {% if producto.imagen %}<img src="{{ producto.imagen_url }}" class="card-img-top" alt="{{ producto.nombre }}" loading="lazy">{% endif %}
+    <div class="card-body">
+      <h2 class="h6 card-title">{{ producto.nombre }}</h2>
+      <p class="fw-bold mb-1">${{ producto.precio|floatformat:2 }}</p>
+      <p class="text-body-secondary">{{ producto.disponibilidad }}</p>
+    </div>
     {% if producto.stock > 0 %}
-    <form method="post" action="{% url 'customer:carrito_agregar' producto.pk %}">
-      {% csrf_token %}
-      <input type="hidden" name="siguiente" value="{{ request.get_full_path }}">
-      <input type="number" name="cantidad" value="1" min="1" max="{{ producto.stock }}" style="width:5em">
-      <button type="submit">Agregar</button>
-    </form>
+    <div class="card-footer">
+      <form method="post" action="{% url 'customer:carrito_agregar' producto.pk %}" class="input-group">
+        {% csrf_token %}
+        <input type="hidden" name="siguiente" value="{{ request.get_full_path }}">
+        <input type="number" class="form-control" name="cantidad" value="1" min="1" max="{{ producto.stock }}" aria-label="Cantidad">
+        <button type="submit" class="btn btn-primary">Agregar</button>
+      </form>
+    </div>
     {% endif %}
-  </article>
+  </div></div>
   {% endfor %}
 </div>
 {% include "components/paginacion.html" %}
 {% else %}
-<p>No hay productos disponibles por ahora.</p>
+<div class="alert alert-info">No hay productos disponibles por ahora.</div>
 {% endif %}
 {% endblock %}

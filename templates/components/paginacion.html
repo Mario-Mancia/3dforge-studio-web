@@ -1,7 +1,17 @@
 {% if is_paginated %}
-<nav class="paginacion">
-  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if bajo %}&bajo=1{% endif %}{% if estado %}&estado={{ estado|urlencode }}{% endif %}">Anterior</a>{% endif %}
-  <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if bajo %}&bajo=1{% endif %}{% if estado %}&estado={{ estado|urlencode }}{% endif %}">Siguiente</a>{% endif %}
+<nav aria-label="Paginación">
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}
+    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if bajo %}&bajo=1{% endif %}{% if estado %}&estado={{ estado|urlencode }}{% endif %}{% if rol %}&rol={{ rol|urlencode }}{% endif %}">Anterior</a></li>
+    {% else %}
+    <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+    {% endif %}
+    <li class="page-item active"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+    {% if page_obj.has_next %}
+    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if bajo %}&bajo=1{% endif %}{% if estado %}&estado={{ estado|urlencode }}{% endif %}{% if rol %}&rol={{ rol|urlencode }}{% endif %}">Siguiente</a></li>
+    {% else %}
+    <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+    {% endif %}
+  </ul>
 </nav>
 {% endif %}

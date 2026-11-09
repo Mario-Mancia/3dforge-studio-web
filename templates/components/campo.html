@@ -1,0 +1,14 @@
+{% load bootstrap %}
+<div class="mb-3" data-campo="{{ campo.name }}">
+  {% if campo.field.widget.input_type == "checkbox" %}
+  <div class="form-check">
+    {{ campo|bs }}
+    <label class="form-check-label" for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+  </div>
+  {% else %}
+  <label class="form-label" for="{{ campo.id_for_label }}">{{ campo.label }}{% if campo.field.required %} <span class="text-danger">*</span>{% endif %}</label>
+  {{ campo|bs }}
+  {% endif %}
+  {% if campo.help_text %}<div class="form-text">{{ campo.help_text }}</div>{% endif %}
+  <div class="invalid-feedback{% if campo.errors %} d-block{% endif %}">{% for e in campo.errors %}{{ e }} {% endfor %}</div>
+</div>

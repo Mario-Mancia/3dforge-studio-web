@@ -1,6 +1,11 @@
-<article class="tarjeta">
-  {% if producto.imagen %}<img src="{{ producto.imagen_url }}" alt="{{ producto.nombre }}" loading="lazy">{% else %}<div class="sin-imagen">Sin imagen</div>{% endif %}
-  <h3><a href="{% url 'guest:producto' producto.pk %}">{{ producto.nombre }}</a></h3>
-  <p class="precio">${{ producto.precio|floatformat:2 }}</p>
-  <p class="disp disp-{{ producto.disponibilidad_codigo }}">{{ producto.disponibilidad }}</p>
-</article>
+{% load bootstrap %}
+<div class="col">
+  <div class="card h-100">
+    {% if producto.imagen %}<img src="{{ producto.imagen_url }}" class="card-img-top" alt="{{ producto.nombre }}" loading="lazy">{% endif %}
+    <div class="card-body">
+      <h2 class="h6 card-title"><a class="link-body-emphasis" href="{% url 'guest:producto' producto.pk %}">{{ producto.nombre }}</a></h2>
+      <p class="fw-bold mb-1">${{ producto.precio|floatformat:2 }}</p>
+      <p class="mb-0 text-body-secondary">{{ producto.disponibilidad }}</p>
+    </div>
+  </div>
+</div>

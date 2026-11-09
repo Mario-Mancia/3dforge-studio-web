@@ -3,32 +3,34 @@
 {% block titulo %}Carrito{% endblock %}
 
 {% block contenido %}
-<h1>Mi carrito</h1>
+<h1 class="h3 mb-3">Mi carrito</h1>
 {% if lineas %}
-<div class="tabla-scroll">
-<table>
+<div class="table-responsive">
+<table class="table table-striped align-middle">
   <thead><tr><th>Producto</th><th>Precio</th><th>Cantidad</th><th>Subtotal</th><th></th></tr></thead>
   <tbody>
   {% for l in lineas %}
-    <tr>
-      <td>{% if l.producto %}{{ l.producto.nombre }}{% else %}Producto no disponible{% endif %}{% if not l.disponible %}<br><small class="disp-agotado">No disponible en la cantidad indicada</small>{% endif %}</td>
+    <tr{% if not l.disponible %} class="table-danger"{% endif %}>
+      <td>{% if l.producto %}{{ l.producto.nombre }}{% else %}Producto no disponible{% endif %}{% if not l.disponible %}<br><small>No disponible en la cantidad indicada</small>{% endif %}</td>
       <td>{% if l.producto %}${{ l.producto.precio|floatformat:2 }}{% endif %}</td>
-      <td>
-        {% if l.producto %}
-        <form method="post">{% csrf_token %}<input type="hidden" name="accion" value="actualizar"><input type="hidden" name="producto" value="{{ l.producto.pk }}"><input type="number" name="cantidad" value="{{ l.cantidad }}" min="0" max="99" style="width:5em"><button type="submit">Actualizar</button></form>
-        {% else %}{{ l.cantidad }}{% endif %}
-      </td>
+      <td>{% if l.producto %}
+        <form method="post" class="input-group input-group-sm">{% csrf_token %}<input type="hidden" name="accion" value="actualizar"><input type="hidden" name="producto" value="{{ l.producto.pk }}"><input type="number" class="form-control" name="cantidad" value="{{ l.cantidad }}" min="0" max="99" aria-label="Cantidad"><button type="submit" class="btn btn-outline-primary">Actualizar</button></form>
+        {% else %}{{ l.cantidad }}{% endif %}</td>
       <td>{% if l.calculo %}${{ l.calculo.subtotal|floatformat:2 }}{% endif %}</td>
-      <td>{% if l.producto %}<form method="post">{% csrf_token %}<input type="hidden" name="accion" value="quitar"><input type="hidden" name="producto" value="{{ l.producto.pk }}"><button type="submit">Quitar</button></form>{% endif %}</td>
+      <td>{% if l.producto %}<form method="post">{% csrf_token %}<input type="hidden" name="accion" value="quitar"><input type="hidden" name="producto" value="{{ l.producto.pk }}"><button type="submit" class="btn btn-outline-danger btn-sm">Quitar</button></form>{% endif %}</td>
     </tr>
   {% endfor %}
   </tbody>
 </table>
 </div>
-<p>Subtotal: ${{ totales.subtotal|floatformat:2 }} · Impuesto: ${{ totales.impuesto|floatformat:2 }} · <strong>Total: ${{ totales.total|floatformat:2 }}</strong></p>
-<form method="post">{% csrf_token %}<input type="hidden" name="accion" value="vaciar"><button type="submit">Vaciar carrito</button></form>
-{% if problemas %}<p>Corrija los productos marcados para continuar.</p>{% else %}<p><a class="boton" href="{% url 'customer:checkout' %}">Continuar con la compra</a></p>{% endif %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <p class="mb-0">Subtotal: ${{ totales.subtotal|floatformat:2 }} · Impuesto: ${{ totales.impuesto|floatformat:2 }} · <strong>Total: ${{ totales.total|floatformat:2 }}</strong></p>
+  <div class="d-flex gap-2">
+    <form method="post" data-confirmar="¿Vaciar el carrito?">{% csrf_token %}<input type="hidden" name="accion" value="vaciar"><button type="submit" class="btn btn-outline-secondary">Vaciar</button></form>
+    {% if problemas %}<button type="button" class="btn btn-primary" disabled>Corrija los productos marcados</button>{% else %}<a class="btn btn-primary" href="{% url 'customer:checkout' %}">Continuar con la compra</a>{% endif %}
+  </div>
+</div>
 {% else %}
-<p>Su carrito está vacío. <a href="{% url 'customer:tienda' %}">Ir a la tienda</a></p>
+<div class="alert alert-info">Su carrito está vacío. <a href="{% url 'customer:tienda' %}">Ir a la tienda</a></div>
 {% endif %}
 {% endblock %}

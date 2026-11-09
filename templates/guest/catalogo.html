@@ -3,17 +3,17 @@
 {% block titulo %}Productos{% endblock %}
 
 {% block contenido %}
-<h1>Productos</h1>
-<form method="get" class="filtros">
-  <input type="search" name="q" value="{{ q }}" placeholder="Buscar por nombre o SKU" maxlength="100">
-  <button type="submit">Buscar</button>
+<h1 class="h3 mb-3">Productos</h1>
+<form method="get" class="row g-2 mb-3">
+  <div class="col-sm-8 col-md-6"><input type="search" id="q" name="q" value="{{ q }}" class="form-control" placeholder="Buscar por nombre o SKU" maxlength="100"></div>
+  <div class="col-auto"><button type="submit" class="btn btn-primary">Buscar</button></div>
 </form>
 {% if productos %}
-<div class="rejilla">
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-3">
   {% for producto in productos %}{% include "components/producto_tarjeta.html" %}{% endfor %}
 </div>
 {% include "components/paginacion.html" %}
 {% else %}
-<p>No hay productos disponibles por ahora.</p>
+<div class="alert alert-info">No hay productos disponibles por ahora.</div>
 {% endif %}
 {% endblock %}

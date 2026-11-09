@@ -1,13 +1,16 @@
 {% extends "layouts/dashboard.html" %}
+{% load bootstrap %}
 
 {% block titulo %}{{ titulo }}{% endblock %}
 
 {% block contenido %}
-<h1>{{ titulo }}</h1>
-<form method="post" enctype="multipart/form-data" novalidate>
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Guardar</button>
-  <a href="{{ volver }}">Cancelar</a>
-</form>
+<div class="row justify-content-center"><div class="col-lg-8">
+  <h1 class="h3 mb-3">{{ titulo }}</h1>
+  <form method="post" enctype="multipart/form-data" novalidate {% atributos_validacion %}>
+    {% csrf_token %}
+    {% formulario_bs form %}
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a class="btn btn-link" href="{{ volver }}">Cancelar</a>
+  </form>
+</div></div>
 {% endblock %}

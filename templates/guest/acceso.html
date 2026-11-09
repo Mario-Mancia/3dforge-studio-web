@@ -4,36 +4,42 @@
 {% block titulo %}Acceso{% endblock %}
 
 {% block contenido %}
-<div class="acceso">
-  <section>
-    <h2>Ingresar</h2>
-    <form method="post" action="{% url 'account_login' %}">
-      {% csrf_token %}
-      <input type="hidden" name="next" value="{{ siguiente }}">
-      <p><label>Correo<br><input type="email" name="login" required autocomplete="email"></label></p>
-      <p><label>Contraseña<br><input type="password" name="password" required autocomplete="current-password"></label></p>
-      <p><label><input type="checkbox" name="remember"> Recordarme</label></p>
-      <button type="submit">Ingresar</button>
-    </form>
-    <p><a href="{% url 'account_reset_password' %}">¿Olvidó su contraseña?</a></p>
-    <form method="post" action="{% provider_login_url 'google' process='login' %}">
-      {% csrf_token %}
-      <button type="submit">Continuar con Google</button>
-    </form>
-  </section>
-  <section>
-    <h2>Crear cuenta de cliente</h2>
-    <form method="post" action="{% url 'account_signup' %}">
-      {% csrf_token %}
-      <input type="hidden" name="next" value="{{ siguiente }}">
-      <p><label>Nombres<br><input type="text" name="nombres" required maxlength="100"></label></p>
-      <p><label>Apellidos<br><input type="text" name="apellidos" required maxlength="100"></label></p>
-      <p><label>Correo<br><input type="email" name="email" required autocomplete="email"></label></p>
-      <p><label>Teléfono (opcional)<br><input type="tel" name="telefono" maxlength="25"></label></p>
-      <p><label>Contraseña<br><input type="password" name="password1" required autocomplete="new-password"></label></p>
-      <p><label>Confirmar contraseña<br><input type="password" name="password2" required autocomplete="new-password"></label></p>
-      <button type="submit">Registrarme</button>
-    </form>
-  </section>
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="card"><div class="card-body">
+      <h1 class="h4 mb-3">Ingresar</h1>
+      <form method="post" action="{% url 'account_login' %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ siguiente }}">
+        <div class="mb-3"><label class="form-label" for="login-correo">Correo</label><input type="email" class="form-control" id="login-correo" name="login" required autocomplete="email"></div>
+        <div class="mb-3"><label class="form-label" for="login-clave">Contraseña</label>
+          <div class="input-group"><input type="password" class="form-control" id="login-clave" name="password" required autocomplete="current-password"><button type="button" class="btn btn-outline-secondary toggle-password" data-objetivo="#login-clave">Ver</button></div>
+        </div>
+        <div class="form-check mb-3"><input type="checkbox" class="form-check-input" id="login-recordar" name="remember"><label class="form-check-label" for="login-recordar">Recordarme</label></div>
+        <button type="submit" class="btn btn-primary">Ingresar</button>
+        <a class="btn btn-link" href="{% url 'account_reset_password' %}">¿Olvidó su contraseña?</a>
+      </form>
+      <hr>
+      <form method="post" action="{% provider_login_url 'google' process='login' %}">{% csrf_token %}<button type="submit" class="btn btn-outline-secondary w-100">Continuar con Google</button></form>
+    </div></div>
+  </div>
+  <div class="col-md-6">
+    <div class="card"><div class="card-body">
+      <h2 class="h4 mb-3">Crear cuenta de cliente</h2>
+      <form method="post" action="{% url 'account_signup' %}" id="form-registro">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ siguiente }}">
+        <div class="row g-2 mb-3">
+          <div class="col-sm-6"><label class="form-label" for="reg-nombres">Nombres</label><input type="text" class="form-control" id="reg-nombres" name="nombres" required maxlength="100"></div>
+          <div class="col-sm-6"><label class="form-label" for="reg-apellidos">Apellidos</label><input type="text" class="form-control" id="reg-apellidos" name="apellidos" required maxlength="100"></div>
+        </div>
+        <div class="mb-3"><label class="form-label" for="reg-correo">Correo</label><input type="email" class="form-control" id="reg-correo" name="email" required autocomplete="email"></div>
+        <div class="mb-3"><label class="form-label" for="reg-telefono">Teléfono (opcional)</label><input type="tel" class="form-control" id="reg-telefono" name="telefono" maxlength="25"></div>
+        <div class="mb-3"><label class="form-label" for="reg-clave1">Contraseña</label><input type="password" class="form-control" id="reg-clave1" name="password1" required autocomplete="new-password" minlength="10"></div>
+        <div class="mb-3"><label class="form-label" for="reg-clave2">Confirmar contraseña</label><input type="password" class="form-control" id="reg-clave2" name="password2" required autocomplete="new-password"></div>
+        <button type="submit" class="btn btn-success">Registrarme</button>
+      </form>
+    </div></div>
+  </div>
 </div>
 {% endblock %}

@@ -1,3 +1,3 @@
-<footer>
-  <p>{{ negocio.nombre_negocio|default:"3DForge Studio" }}</p>
+<footer class="border-top py-3 mt-5 text-center text-body-secondary">
+  <small>{{ negocio.nombre_negocio|default:"3DForge Studio" }}{% if negocio.correo %} · {{ negocio.correo }}{% endif %}</small>
 </footer>

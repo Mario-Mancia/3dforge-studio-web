@@ -1,13 +1,14 @@
 {% extends "layouts/customer.html" %}
+{% load bootstrap %}
 
 {% block titulo %}Solicitar cotización{% endblock %}
 
 {% block contenido %}
-<h1>Solicitar cotización</h1>
-<p>Describa el trabajo que necesita. Un operador revisará su solicitud y le enviará una propuesta con precio y plazo.</p>
-<form method="post" enctype="multipart/form-data" novalidate>
+<h1 class="h3 mb-2">Solicitar cotización</h1>
+<p class="text-body-secondary">Describa el trabajo que necesita. Un operador revisará su solicitud y le enviará una propuesta con precio y plazo.</p>
+<form method="post" enctype="multipart/form-data" novalidate {% atributos_validacion %}>
   {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Enviar solicitud</button>
+  {% formulario_bs form %}
+  <button type="submit" class="btn btn-primary">Enviar solicitud</button>
 </form>
 {% endblock %}

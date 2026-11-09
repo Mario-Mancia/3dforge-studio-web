@@ -1,11 +1,20 @@
-<nav class="nav">
-  <a class="marca" href="{% url 'guest:inicio' %}">{{ negocio.nombre_negocio|default:"3DForge Studio" }}</a>
-  <a href="{% url 'guest:catalogo' %}">Productos</a>
-  <a href="{% url 'guest:servicios' %}">Servicios</a>
-  {% if user.is_authenticated %}
-  <a href="{% url 'redirigir' %}">Mi panel</a>
-  <form method="post" action="{% url 'account_logout' %}">{% csrf_token %}<button type="submit">Salir</button></form>
-  {% else %}
-  <a href="{% url 'guest:acceso' %}">Ingresar</a>
-  {% endif %}
+<nav class="navbar navbar-expand-lg bg-body border-bottom">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'guest:inicio' %}">{{ negocio.nombre_negocio|default:"3DForge Studio" }}</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu-principal" aria-controls="menu-principal" aria-expanded="false" aria-label="Menú">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="menu-principal">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="{% url 'guest:catalogo' %}">Productos</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'guest:servicios' %}">Servicios</a></li>
+      </ul>
+      {% if user.is_authenticated %}
+      <a class="btn btn-outline-primary btn-sm me-2" href="{% url 'redirigir' %}">Mi panel</a>
+      <form method="post" action="{% url 'account_logout' %}">{% csrf_token %}<button type="submit" class="btn btn-outline-secondary btn-sm">Salir</button></form>
+      {% else %}
+      <a class="btn btn-primary btn-sm" href="{% url 'guest:acceso' %}">Ingresar</a>
+      {% endif %}
+    </div>
+  </div>
 </nav>

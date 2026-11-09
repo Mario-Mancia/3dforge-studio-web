@@ -1,36 +1,32 @@
 {% extends "layouts/guest.html" %}
-{% load enlaces %}
+{% load bootstrap enlaces %}
 
 {% block titulo %}Inicio{% endblock %}
 
 {% block contenido %}
-<section class="hero">
-  <h1>{{ negocio.nombre_negocio|default:"3DForge Studio" }}</h1>
-  <p>Impresión, diseño y modelado 3D. Productos listos y trabajos a medida.</p>
-  <p>
-    <a class="boton" href="{% url 'guest:catalogo' %}">Ver productos</a>
-    <a class="boton secundario" href="{% url 'guest:servicios' %}">Ver servicios</a>
-    {% whatsapp_url negocio.telefono "Hola, quisiera más información." as wa %}
-    {% if wa %}<a class="boton secundario" href="{{ wa }}" target="_blank" rel="noopener">WhatsApp</a>{% endif %}
-  </p>
-</section>
-
+<div class="p-5 mb-4 bg-body rounded-3 border">
+  <h1 class="display-6">{{ negocio.nombre_negocio|default:"3DForge Studio" }}</h1>
+  <p class="lead">Impresión, diseño y modelado 3D. Productos listos y trabajos a medida.</p>
+  <a class="btn btn-primary" href="{% url 'guest:catalogo' %}">Ver productos</a>
+  <a class="btn btn-outline-primary" href="{% url 'guest:servicios' %}">Ver servicios</a>
+  {% whatsapp_url negocio.telefono "Hola, quisiera más información." as wa %}
+  {% if wa %}<a class="btn btn-success" href="{{ wa }}" target="_blank" rel="noopener">WhatsApp</a>{% endif %}
+</div>
 {% if productos %}
-<h2>Productos disponibles</h2>
-<div class="rejilla">
+<h2 class="h4">Productos disponibles</h2>
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-4">
   {% for producto in productos %}{% include "components/producto_tarjeta.html" %}{% endfor %}
 </div>
 {% endif %}
-
 {% if servicios %}
-<h2>Servicios</h2>
-<div class="rejilla">
+<h2 class="h4">Servicios</h2>
+<div class="row row-cols-1 row-cols-md-3 g-3">
   {% for servicio in servicios %}
-  <article class="tarjeta">
-    <h3><a href="{% url 'guest:servicio' servicio.pk %}">{{ servicio.nombre }}</a></h3>
-    <p>{{ servicio.categoria.nombre }}</p>
-    <p class="precio">Desde ${{ servicio.precio_base|floatformat:2 }}</p>
-  </article>
+  <div class="col"><div class="card h-100"><div class="card-body">
+    <h3 class="h6 card-title"><a class="link-body-emphasis" href="{% url 'guest:servicio' servicio.pk %}">{{ servicio.nombre }}</a></h3>
+    <p class="mb-1 text-body-secondary">{{ servicio.categoria.nombre }}</p>
+    <p class="fw-bold mb-0">Desde ${{ servicio.precio_base|floatformat:2 }}</p>
+  </div></div></div>
   {% endfor %}
 </div>
 {% endif %}

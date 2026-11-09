@@ -1,32 +1,23 @@
 {% extends "layouts/dashboard.html" %}
+{% load bootstrap %}
 
 {% block titulo %}Encargos{% endblock %}
 
 {% block contenido %}
-<h1>Encargos</h1>
-<form method="get" class="filtros">
-  <input type="search" name="q" value="{{ q }}" placeholder="Código o cliente" maxlength="100">
-  <select name="estado">
-    <option value="">Todos los estados</option>
-    {% for valor, etiqueta in estados %}<option value="{{ valor }}"{% if estado == valor %} selected{% endif %}>{{ etiqueta }}</option>{% endfor %}
-  </select>
-  <button type="submit">Filtrar</button>
+<h1 class="h3 mb-3">Encargos</h1>
+<form method="get" class="row g-2 mb-3">
+  <div class="col-sm-6 col-md-4"><input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Código o cliente" maxlength="100"></div>
+  <div class="col-sm-4 col-md-3"><select name="estado" class="form-select"><option value="">Todos los estados</option>{% for valor, etiqueta in estados %}<option value="{{ valor }}"{% if estado == valor %} selected{% endif %}>{{ etiqueta }}</option>{% endfor %}</select></div>
+  <div class="col-auto"><button type="submit" class="btn btn-primary">Filtrar</button></div>
 </form>
-<div class="tabla-scroll">
-<table>
-  <thead><tr><th>Código</th><th>Cliente</th><th>Solicitud</th><th>Estado</th><th>Total</th><th>Responsable</th></tr></thead>
+<div class="table-responsive">
+<table class="table table-striped table-hover align-middle">
+  <thead><tr><th>Código</th><th>Cliente</th><th>Solicitud</th><th>Estado</th><th class="text-end">Total</th><th>Responsable</th></tr></thead>
   <tbody>
   {% for e in encargos %}
-    <tr>
-      <td><a href="{% url 'operator:encargo' e.pk %}">{{ e.codigo }}</a></td>
-      <td>{{ e.cliente }}</td>
-      <td>{{ e.fecha_solicitud|date:"d/m/Y" }}</td>
-      <td>{{ e.get_estado_display }}</td>
-      <td>${{ e.total|floatformat:2 }}</td>
-      <td>{% if e.empleado_responsable %}{{ e.empleado_responsable.usuario.nombre_completo }}{% else %}Sin asignar{% endif %}</td>
-    </tr>
+    <tr><td><a href="{% url 'operator:encargo' e.pk %}">{{ e.codigo }}</a></td><td>{{ e.cliente }}</td><td>{{ e.fecha_solicitud|date:"d/m/Y" }}</td><td>{{ e.estado|badge:e.get_estado_display }}</td><td class="text-end">${{ e.total|floatformat:2 }}</td><td>{% if e.empleado_responsable %}{{ e.empleado_responsable.usuario.nombre_completo }}{% else %}Sin asignar{% endif %}</td></tr>
   {% empty %}
-    <tr><td colspan="6">Sin encargos.</td></tr>
+    <tr><td colspan="6" class="text-center text-body-secondary">Sin encargos.</td></tr>
   {% endfor %}
   </tbody>
 </table>

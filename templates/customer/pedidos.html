@@ -1,27 +1,23 @@
 {% extends "layouts/customer.html" %}
+{% load bootstrap %}
 
 {% block titulo %}Mis pedidos{% endblock %}
 
 {% block contenido %}
-<h1>Mis pedidos</h1>
+<h1 class="h3 mb-3">Mis pedidos</h1>
 {% if encargos %}
-<div class="tabla-scroll">
-<table>
-  <thead><tr><th>Código</th><th>Fecha</th><th>Estado</th><th>Total</th></tr></thead>
+<div class="table-responsive">
+<table class="table table-striped table-hover align-middle">
+  <thead><tr><th>Código</th><th>Fecha</th><th>Estado</th><th class="text-end">Total</th></tr></thead>
   <tbody>
   {% for e in encargos %}
-    <tr>
-      <td><a href="{% url 'customer:pedido' e.pk %}">{{ e.codigo }}</a></td>
-      <td>{{ e.fecha_solicitud|date:"d/m/Y" }}</td>
-      <td>{{ e.get_estado_display }}</td>
-      <td>${{ e.total|floatformat:2 }}</td>
-    </tr>
+    <tr><td><a href="{% url 'customer:pedido' e.pk %}">{{ e.codigo }}</a></td><td>{{ e.fecha_solicitud|date:"d/m/Y" }}</td><td>{{ e.estado|badge:e.get_estado_display }}</td><td class="text-end">${{ e.total|floatformat:2 }}</td></tr>
   {% endfor %}
   </tbody>
 </table>
 </div>
 {% include "components/paginacion.html" %}
 {% else %}
-<p>Aún no tiene pedidos. Cuando una cotización aceptada pase a producción, aparecerá aquí.</p>
+<div class="alert alert-info">Aún no tiene pedidos.</div>
 {% endif %}
 {% endblock %}

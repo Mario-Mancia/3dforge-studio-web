@@ -3,23 +3,21 @@
 {% block titulo %}Confirmar compra{% endblock %}
 
 {% block contenido %}
-<h1>Confirmar compra</h1>
-<div class="tabla-scroll">
-<table>
+<h1 class="h3 mb-3">Confirmar compra</h1>
+<div class="table-responsive">
+<table class="table table-striped">
   <thead><tr><th>Producto</th><th>Precio</th><th>Cantidad</th><th>Subtotal</th></tr></thead>
   <tbody>
-  {% for l in lineas %}
-    <tr><td>{{ l.producto.nombre }}</td><td>${{ l.producto.precio|floatformat:2 }}</td><td>{{ l.cantidad }}</td><td>${{ l.calculo.subtotal|floatformat:2 }}</td></tr>
-  {% endfor %}
+  {% for l in lineas %}<tr><td>{{ l.producto.nombre }}</td><td>${{ l.producto.precio|floatformat:2 }}</td><td>{{ l.cantidad }}</td><td>${{ l.calculo.subtotal|floatformat:2 }}</td></tr>{% endfor %}
   </tbody>
 </table>
 </div>
 <p>Subtotal: ${{ totales.subtotal|floatformat:2 }} · Impuesto: ${{ totales.impuesto|floatformat:2 }} · <strong>Total: ${{ totales.total|floatformat:2 }}</strong></p>
-<p>Al confirmar se reservan las existencias y se crea su pedido. El pago se coordina con el equipo.</p>
-<form method="post">
+<div class="alert alert-secondary">Al confirmar se reservan las existencias y se crea su pedido. El pago se coordina con el equipo.</div>
+<form method="post" data-confirmar="¿Confirmar la compra?">
   {% csrf_token %}
   <input type="hidden" name="token" value="{{ token }}">
-  <button type="submit">Confirmar compra</button>
-  <a href="{% url 'customer:carrito' %}">Volver al carrito</a>
+  <button type="submit" class="btn btn-primary">Confirmar compra</button>
+  <a class="btn btn-link" href="{% url 'customer:carrito' %}">Volver al carrito</a>
 </form>
 {% endblock %}

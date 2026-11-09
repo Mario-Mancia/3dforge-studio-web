@@ -4,19 +4,20 @@
 {% block titulo %}{{ producto.nombre }}{% endblock %}
 
 {% block contenido %}
-<p><a href="{% url 'guest:catalogo' %}">&larr; Volver a productos</a></p>
-<article class="detalle">
-  {% if producto.imagen %}<img src="{{ producto.imagen_url }}" alt="{{ producto.nombre }}">{% endif %}
-  <div>
-    <h1>{{ producto.nombre }}</h1>
-    <p class="precio">${{ producto.precio|floatformat:2 }}</p>
-    <p class="disp disp-{{ producto.disponibilidad_codigo }}">{{ producto.disponibilidad }}</p>
+<a class="btn btn-link ps-0" href="{% url 'guest:catalogo' %}">&larr; Volver a productos</a>
+<div class="row g-4">
+  <div class="col-md-5">{% if producto.imagen %}<img src="{{ producto.imagen_url }}" class="img-fluid rounded border" alt="{{ producto.nombre }}">{% endif %}</div>
+  <div class="col-md-7">
+    <h1 class="h3">{{ producto.nombre }}</h1>
+    <p class="fs-4 fw-bold">${{ producto.precio|floatformat:2 }}</p>
+    <p class="text-body-secondary">{{ producto.disponibilidad }}</p>
     <p>{{ producto.descripcion|default:""|linebreaksbr }}</p>
-    <p>SKU: {{ producto.sku }}</p>
+    <p>SKU: <code id="sku-producto">{{ producto.sku }}</code> <button type="button" class="btn btn-outline-secondary btn-sm" id="copiar-sku" data-sku="{{ producto.sku }}">Copiar</button></p>
     {% with mensaje="Hola, me interesa el producto: "|add:producto.nombre %}
     {% whatsapp_url negocio.telefono mensaje as wa %}
-    {% if wa %}<a class="boton" href="{{ wa }}" target="_blank" rel="noopener">Consultar por WhatsApp</a>{% endif %}
+    {% if wa %}<a class="btn btn-success" href="{{ wa }}" target="_blank" rel="noopener">Consultar por WhatsApp</a>{% endif %}
     {% endwith %}
+    {% if not user.is_authenticated %}<a class="btn btn-primary" href="{% url 'guest:acceso' %}">Ingrese para comprar</a>{% else %}<a class="btn btn-primary" href="{% url 'customer:tienda' %}">Ir a la tienda</a>{% endif %}
   </div>
-</article>
+</div>
 {% endblock %}

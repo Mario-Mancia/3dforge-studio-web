@@ -1,28 +1,26 @@
 {% extends "layouts/customer.html" %}
+{% load bootstrap %}
 
 {% block titulo %}Mis cotizaciones{% endblock %}
 
 {% block contenido %}
-<h1>Mis cotizaciones</h1>
-<p><a class="boton" href="{% url 'customer:cotizar' %}">Solicitar cotización</a></p>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Mis cotizaciones</h1>
+  <a class="btn btn-primary" href="{% url 'customer:cotizar' %}">Solicitar cotización</a>
+</div>
 {% if cotizaciones %}
-<div class="tabla-scroll">
-<table>
-  <thead><tr><th>Código</th><th>Fecha</th><th>Estado</th><th>Total</th></tr></thead>
+<div class="table-responsive">
+<table class="table table-striped table-hover align-middle">
+  <thead><tr><th>Código</th><th>Fecha</th><th>Estado</th><th class="text-end">Total</th></tr></thead>
   <tbody>
   {% for c in cotizaciones %}
-    <tr>
-      <td><a href="{% url 'customer:cotizacion' c.pk %}">{{ c.codigo }}</a></td>
-      <td>{{ c.fecha_emision|date:"d/m/Y" }}</td>
-      <td>{{ c.get_estado_display }}</td>
-      <td>${{ c.total|floatformat:2 }}</td>
-    </tr>
+    <tr><td><a href="{% url 'customer:cotizacion' c.pk %}">{{ c.codigo }}</a></td><td>{{ c.fecha_emision|date:"d/m/Y" }}</td><td>{{ c.estado|badge:c.get_estado_display }}</td><td class="text-end">${{ c.total|floatformat:2 }}</td></tr>
   {% endfor %}
   </tbody>
 </table>
 </div>
 {% include "components/paginacion.html" %}
 {% else %}
-<p>Aún no ha solicitado cotizaciones.</p>
+<div class="alert alert-info">Aún no ha solicitado cotizaciones.</div>
 {% endif %}
 {% endblock %}

@@ -1,55 +1,60 @@
 {% extends "layouts/dashboard.html" %}
+{% load bootstrap %}
 
 {% block titulo %}Factura {{ factura.numero_factura }}{% endblock %}
 
 {% block contenido %}
-<p><a href="{% url 'operator:facturas' %}">&larr; Facturas</a></p>
-<h1>Factura {{ factura.numero_factura }}</h1>
-<p>Estado: <strong>{{ factura.get_estado_display }}</strong> · Emisión: {{ factura.fecha_emision|date:"d/m/Y" }} · Vence: {{ factura.fecha_vencimiento|date:"d/m/Y"|default:"-" }}</p>
+<a class="btn btn-link ps-0" href="{% url 'operator:facturas' %}">&larr; Facturas</a>
+<h1 class="h3">Factura {{ factura.numero_factura }} {{ factura.estado|badge:factura.get_estado_display }}</h1>
+<p>Emisión: {{ factura.fecha_emision|date:"d/m/Y" }} · Vence: {{ factura.fecha_vencimiento|date:"d/m/Y"|default:"-" }}</p>
 <p>Facturar a: {{ factura.nombre_facturacion }}{% if factura.identificacion_fiscal %} · {{ factura.identificacion_fiscal }}{% endif %}{% if factura.direccion_facturacion %} · {{ factura.direccion_facturacion }}{% endif %}</p>
 {% if factura.encargo %}<p>Encargo: <a href="{% url 'operator:encargo' factura.encargo.pk %}">{{ factura.encargo.codigo }}</a></p>{% endif %}
-<div class="tabla-scroll">
-<table>
-  <thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio</th><th>Descuento</th><th>Subtotal</th></tr></thead>
-  <tbody>
-  {% for d in factura.detalles.all %}
-    <tr><td>{{ d.descripcion }}</td><td>{{ d.cantidad|floatformat:2 }}</td><td>${{ d.precio_unitario|floatformat:2 }}</td><td>${{ d.descuento|floatformat:2 }}</td><td>${{ d.subtotal|floatformat:2 }}</td></tr>
-  {% endfor %}
-  </tbody>
+<div class="table-responsive">
+<table class="table table-striped">
+  <thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio</th><th>Descuento</th><th class="text-end">Subtotal</th></tr></thead>
+  <tbody>{% for d in factura.detalles.all %}<tr><td>{{ d.descripcion }}</td><td>{{ d.cantidad|floatformat:2 }}</td><td>${{ d.precio_unitario|floatformat:2 }}</td><td>${{ d.descuento|floatformat:2 }}</td><td class="text-end">${{ d.subtotal|floatformat:2 }}</td></tr>{% endfor %}</tbody>
 </table>
 </div>
 <p>Subtotal: ${{ factura.subtotal|floatformat:2 }} · Descuento: ${{ factura.descuento|floatformat:2 }} · Impuesto: ${{ factura.impuesto|floatformat:2 }} · <strong>Total: ${{ factura.total|floatformat:2 }}</strong> · <strong>Saldo: ${{ factura.saldo_pendiente|floatformat:2 }}</strong></p>
 {% if factura.observaciones %}<p>{{ factura.observaciones|linebreaksbr }}</p>{% endif %}
 
-<h2>Pagos</h2>
-<div class="tabla-scroll">
-<table>
-  <thead><tr><th>Fecha</th><th>Método</th><th>Monto</th><th>Estado</th><th>Registró</th><th></th></tr></thead>
+<h2 class="h5">Pagos</h2>
+<div class="table-responsive">
+<table class="table table-striped align-middle">
+  <thead><tr><th>Fecha</th><th>Método</th><th class="text-end">Monto</th><th>Estado</th><th>Registró</th><th></th></tr></thead>
   <tbody>
   {% for p in factura.pagos.all %}
     <tr>
-      <td>{{ p.fecha_pago|date:"d/m/Y H:i" }}</td>
-      <td>{{ p.metodo_pago.nombre }}{% if p.referencia %} ({{ p.referencia }}){% endif %}</td>
-      <td>${{ p.monto|floatformat:2 }}</td>
-      <td>{{ p.get_estado_display }}</td>
-      <td>{{ p.registrado_por|default:"-" }}</td>
+      <td>{{ p.fecha_pago|date:"d/m/Y H:i" }}</td><td>{{ p.metodo_pago.nombre }}{% if p.referencia %} ({{ p.referencia }}){% endif %}</td><td class="text-end">${{ p.monto|floatformat:2 }}</td><td>{{ p.estado|badge:p.get_estado_display }}</td><td>{{ p.registrado_por|default:"-" }}</td>
       <td>{% if p.estado == "CONFIRMADO" and factura.estado != "ANULADA" %}
-        <form method="post" action="{% url 'operator:factura_accion' factura.pk 'anular_pago' %}">{% csrf_token %}<input type="hidden" name="pago" value="{{ p.pk }}"><input type="text" name="motivo" placeholder="Motivo" required maxlength="500"><button type="submit">Cancelar pago</button></form>
+        <form method="post" action="{% url 'operator:factura_accion' factura.pk 'anular_pago' %}" class="input-group input-group-sm" data-confirmar="¿Cancelar este pago?">{% csrf_token %}<input type="hidden" name="pago" value="{{ p.pk }}"><input type="text" class="form-control" name="motivo" placeholder="Motivo" required maxlength="500"><button type="submit" class="btn btn-outline-danger">Cancelar pago</button></form>
       {% endif %}</td>
     </tr>
   {% empty %}
-    <tr><td colspan="6">Sin pagos.</td></tr>
+    <tr><td colspan="6" class="text-center text-body-secondary">Sin pagos.</td></tr>
   {% endfor %}
   </tbody>
 </table>
 </div>
 
-{% if cobrable %}
-<h2>Registrar pago</h2>
-<form method="post" action="{% url 'operator:factura_accion' factura.pk 'pagar' %}">{% csrf_token %}{{ form_pago.as_p }}<button type="submit">Registrar</button></form>
-{% endif %}
-{% if puede_anular %}
-<h2>Anular factura</h2>
-<form method="post" action="{% url 'operator:factura_accion' factura.pk 'anular' %}">{% csrf_token %}{{ form_anulacion.as_p }}<button type="submit">Anular</button></form>
-{% endif %}
+<div class="row g-3">
+  {% if cobrable %}
+  <div class="col-md-6"><div class="card"><div class="card-body">
+    <h2 class="h6">Registrar pago</h2>
+    <form method="post" action="{% url 'operator:factura_accion' factura.pk 'pagar' %}" novalidate data-validar="pago" data-validar-url="{% url 'validar_campo' 'pago' %}" data-saldo="{{ factura.saldo_pendiente }}">
+      {% csrf_token %}{% formulario_bs form_pago %}
+      <button type="button" class="btn btn-outline-secondary btn-sm" id="usar-saldo">Usar saldo</button>
+      <button type="submit" class="btn btn-primary btn-sm">Registrar</button>
+    </form>
+  </div></div></div>
+  {% endif %}
+  {% if puede_anular %}
+  <div class="col-md-6"><div class="card"><div class="card-body">
+    <h2 class="h6">Anular factura</h2>
+    <form method="post" action="{% url 'operator:factura_accion' factura.pk 'anular' %}" novalidate data-validar="anulacion" data-validar-url="{% url 'validar_campo' 'anulacion' %}" data-confirmar="¿Anular la factura?">
+      {% csrf_token %}{% formulario_bs form_anulacion %}<button type="submit" class="btn btn-outline-danger btn-sm">Anular</button>
+    </form>
+  </div></div></div>
+  {% endif %}
+</div>
 {% endblock %}

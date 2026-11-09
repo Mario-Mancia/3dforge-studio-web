@@ -1,12 +1,21 @@
-<nav class="nav">
-  <a class="marca" href="{% url 'guest:inicio' %}">{{ negocio.nombre_negocio|default:"3DForge Studio" }}</a>
-  <a href="{% url 'customer:panel' %}">Panel</a>
-  <a href="{% url 'customer:tienda' %}">Tienda</a>
-  <a href="{% url 'customer:carrito' %}">Carrito</a>
-  <a href="{% url 'customer:cotizar' %}">Cotizar</a>
-  <a href="{% url 'customer:cotizaciones' %}">Mis cotizaciones</a>
-  <a href="{% url 'customer:pedidos' %}">Pedidos</a>
-  <a href="{% url 'customer:facturas' %}">Facturas</a>
-  <a href="{% url 'customer:cuenta' %}">Mi cuenta</a>
-  <form method="post" action="{% url 'account_logout' %}">{% csrf_token %}<button type="submit">Salir</button></form>
+<nav class="navbar navbar-expand-lg bg-body border-bottom">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'guest:inicio' %}">{{ negocio.nombre_negocio|default:"3DForge Studio" }}</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu-cliente" aria-controls="menu-cliente" aria-expanded="false" aria-label="Menú">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="menu-cliente">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="{% url 'customer:panel' %}">Panel</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'customer:tienda' %}">Tienda</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'customer:carrito' %}">Carrito</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'customer:cotizar' %}">Cotizar</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'customer:cotizaciones' %}">Cotizaciones</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'customer:pedidos' %}">Pedidos</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'customer:facturas' %}">Facturas</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'customer:cuenta' %}">Mi cuenta</a></li>
+      </ul>
+      <form method="post" action="{% url 'account_logout' %}">{% csrf_token %}<button type="submit" class="btn btn-outline-secondary btn-sm">Salir</button></form>
+    </div>
+  </div>
 </nav>
