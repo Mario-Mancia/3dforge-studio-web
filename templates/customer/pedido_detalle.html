@@ -1,0 +1,36 @@
+{% extends "layouts/customer.html" %}
+
+{% block titulo %}Pedido {{ encargo.codigo }}{% endblock %}
+
+{% block contenido %}
+<p><a href="{% url 'customer:pedidos' %}">&larr; Mis pedidos</a></p>
+<h1>Pedido {{ encargo.codigo }}</h1>
+<p>Estado: <strong>{{ encargo.get_estado_display }}</strong></p>
+<p>Solicitado: {{ encargo.fecha_solicitud|date:"d/m/Y" }} · Entrega estimada: {{ encargo.fecha_entrega_estimada|date:"d/m/Y"|default:"por definir" }}{% if encargo.fecha_entrega_real %} · Entregado: {{ encargo.fecha_entrega_real|date:"d/m/Y" }}{% endif %}</p>
+{% if encargo.empleado_responsable %}<p>Responsable: {{ encargo.empleado_responsable.usuario.nombre_completo }}</p>{% endif %}
+<p>{{ encargo.descripcion|linebreaksbr }}</p>
+<div class="tabla-scroll">
+<table>
+  <thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th><th>Archivos</th></tr></thead>
+  <tbody>
+  {% for d in encargo.detalles.all %}
+    <tr>
+      <td>{{ d.descripcion }}</td>
+      <td>{{ d.cantidad|floatformat:2 }}</td>
+      <td>${{ d.precio_unitario|floatformat:2 }}</td>
+      <td>${{ d.subtotal|floatformat:2 }}</td>
+      <td>{% for a in d.archivos.all %}<a href="{% url 'customer:pedido_archivo' encargo.pk a.pk %}">{{ a.nombre_archivo }}</a><br>{% empty %}-{% endfor %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<p><strong>Total: ${{ encargo.total|floatformat:2 }}</strong></p>
+<h2>Progreso</h2>
+<ul>
+  {% for h in encargo.historial.all %}<li>{{ h.fecha_cambio|date:"d/m/Y H:i" }} · {{ h.get_estado_nuevo_display }}{% if h.comentario %} · {{ h.comentario }}{% endif %}</li>{% endfor %}
+</ul>
+{% if encargo.estado == "PENDIENTE" %}
+<form method="post" action="{% url 'customer:pedido_cancelar' encargo.pk %}">{% csrf_token %}<button type="submit">Cancelar pedido</button></form>
+{% endif %}
+{% endblock %}

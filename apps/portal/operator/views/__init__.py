@@ -5,5 +5,11 @@ from .cotizaciones import (
     CotizacionOperadorArchivoView,
     CotizacionOperadorView,
 )
-from .encargos import EncargosView
+from .encargos import (
+    EncargoAccionView,
+    EncargoArchivoView,
+    EncargoDesdeCotizacionView,
+    EncargoOperadorView,
+    EncargosView,
+)
 from .panel import PanelView

@@ -4,4 +4,32 @@
 
 {% block contenido %}
 <h1>Encargos</h1>
+<form method="get" class="filtros">
+  <input type="search" name="q" value="{{ q }}" placeholder="Código o cliente" maxlength="100">
+  <select name="estado">
+    <option value="">Todos los estados</option>
+    {% for valor, etiqueta in estados %}<option value="{{ valor }}"{% if estado == valor %} selected{% endif %}>{{ etiqueta }}</option>{% endfor %}
+  </select>
+  <button type="submit">Filtrar</button>
+</form>
+<div class="tabla-scroll">
+<table>
+  <thead><tr><th>Código</th><th>Cliente</th><th>Solicitud</th><th>Estado</th><th>Total</th><th>Responsable</th></tr></thead>
+  <tbody>
+  {% for e in encargos %}
+    <tr>
+      <td><a href="{% url 'operator:encargo' e.pk %}">{{ e.codigo }}</a></td>
+      <td>{{ e.cliente }}</td>
+      <td>{{ e.fecha_solicitud|date:"d/m/Y" }}</td>
+      <td>{{ e.get_estado_display }}</td>
+      <td>${{ e.total|floatformat:2 }}</td>
+      <td>{% if e.empleado_responsable %}{{ e.empleado_responsable.usuario.nombre_completo }}{% else %}Sin asignar{% endif %}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="6">Sin encargos.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% include "components/paginacion.html" %}
 {% endblock %}

@@ -55,3 +55,7 @@ def sembrar_datos_iniciales(sender=None, using="default", **kwargs):
         with conexion.cursor() as cursor:
             for sentencia in sentencias:
                 cursor.execute(sentencia)
+
+# >>> fase-6
+METODOS_PAGO = ((1, "Efectivo", "Pago registrado directamente por un empleado."),)
+# <<< fase-6

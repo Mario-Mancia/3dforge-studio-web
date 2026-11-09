@@ -1,3 +1,3 @@
 from django import forms
 
-from apps.pagos.models import MetodoPago, Pago, TransaccionPasarela
+from apps.pagos.models import MetodoPago, Pago

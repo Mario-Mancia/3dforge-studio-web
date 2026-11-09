@@ -5,13 +5,10 @@ from django.db import models
 from django.db.models import Q
 from django.utils import timezone
 
+from apps.core.archivos import EXTENSIONES
 from apps.core.constraints import en_lista, restriccion
-from apps.core.validators import (
-    validar_nombre_archivo,
-    validar_ruta_relativa,
-    validar_tamano_archivo,
-)
 from apps.core.models.base import ModeloValidado
+from apps.core.validators import validar_nombre_archivo, validar_ruta_relativa, validar_tamano_archivo
 
 
 class FormatoArchivo(models.TextChoices):
@@ -22,9 +19,6 @@ class FormatoArchivo(models.TextChoices):
     PNG = "PNG", "PNG"
     JPG = "JPG", "JPG"
     PDF = "PDF", "PDF"
-
-
-EXTENSIONES_POR_FORMATO = {"JPG": ("jpg", "jpeg")}
 
 
 class ArchivoEncargo(ModeloValidado):
@@ -64,6 +58,5 @@ class ArchivoEncargo(ModeloValidado):
             self.formato = self.formato.strip().upper()
         if self.nombre_archivo and self.formato:
             extension = self.nombre_archivo.rsplit(".", 1)[-1].lower() if "." in self.nombre_archivo else ""
-            permitidas = EXTENSIONES_POR_FORMATO.get(self.formato, (self.formato.lower(),))
-            if extension not in permitidas:
+            if EXTENSIONES.get(extension) != self.formato:
                 raise ValidationError({"nombre_archivo": "La extensión no coincide con el formato indicado."})

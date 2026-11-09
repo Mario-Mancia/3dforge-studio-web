@@ -1,0 +1,45 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block titulo %}Encargo {{ encargo.codigo }}{% endblock %}
+
+{% block contenido %}
+<p><a href="{% url 'operator:encargos' %}">&larr; Encargos</a></p>
+<h1>Encargo {{ encargo.codigo }}</h1>
+<p>Estado: <strong>{{ encargo.get_estado_display }}</strong> · Cliente: {{ encargo.cliente }} ({{ encargo.cliente.correo }})</p>
+<p>Responsable: {% if encargo.empleado_responsable %}{{ encargo.empleado_responsable.usuario.nombre_completo }}{% else %}Sin asignar{% endif %}
+ · Entrega estimada: {{ encargo.fecha_entrega_estimada|date:"d/m/Y"|default:"-" }} · Entrega real: {{ encargo.fecha_entrega_real|date:"d/m/Y"|default:"-" }}</p>
+{% if encargo.cotizacion %}<p>Origen: cotización <a href="{% url 'operator:cotizacion' encargo.cotizacion.pk %}">{{ encargo.cotizacion.codigo }}</a></p>{% endif %}
+<p>{{ encargo.descripcion|linebreaksbr }}</p>
+
+<div class="tabla-scroll">
+<table>
+  <thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio unitario</th><th>Subtotal</th><th>Archivos</th></tr></thead>
+  <tbody>
+  {% for d in encargo.detalles.all %}
+    <tr>
+      <td>{{ d.descripcion }}{% if d.especificaciones %}<br><small>{% for clave, valor in d.especificaciones.items %}{{ clave|capfirst }}: {{ valor }}{% if not forloop.last %} · {% endif %}{% endfor %}</small>{% endif %}</td>
+      <td>{{ d.cantidad|floatformat:2 }}</td>
+      <td>${{ d.precio_unitario|floatformat:2 }}</td>
+      <td>${{ d.subtotal|floatformat:2 }}</td>
+      <td>{% for a in d.archivos.all %}<a href="{% url 'operator:encargo_archivo' encargo.pk a.pk %}">{{ a.nombre_archivo }}</a><br>{% empty %}-{% endfor %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<p>Subtotal: ${{ encargo.subtotal|floatformat:2 }} · Descuento: ${{ encargo.descuento|floatformat:2 }} · Impuesto: ${{ encargo.impuesto|floatformat:2 }} · <strong>Total: ${{ encargo.total|floatformat:2 }}</strong></p>
+
+{% if form_estado %}
+<h2>Cambiar estado</h2>
+<form method="post" action="{% url 'operator:encargo_accion' encargo.pk 'estado' %}">{% csrf_token %}{{ form_estado.as_p }}<button type="submit">Actualizar estado</button></form>
+{% endif %}
+<h2>Responsable</h2>
+<form method="post" action="{% url 'operator:encargo_accion' encargo.pk 'asignar' %}">{% csrf_token %}{{ form_asignar.as_p }}<button type="submit">Asignar</button></form>
+<h2>Cargar archivo</h2>
+<form method="post" enctype="multipart/form-data" action="{% url 'operator:encargo_accion' encargo.pk 'archivo' %}">{% csrf_token %}{{ form_archivo.as_p }}<button type="submit">Subir</button></form>
+
+<h2>Historial</h2>
+<ul>
+  {% for h in encargo.historial.all %}<li>{{ h.fecha_cambio|date:"d/m/Y H:i" }} · {{ h.get_estado_nuevo_display }} · {{ h.usuario.nombre_completo }}{% if h.comentario %} · {{ h.comentario }}{% endif %}</li>{% endfor %}
+</ul>
+{% endblock %}

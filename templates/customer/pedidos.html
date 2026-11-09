@@ -1,7 +1,27 @@
 {% extends "layouts/customer.html" %}
 
-{% block titulo %}Mis solicitudes y pedidos{% endblock %}
+{% block titulo %}Mis pedidos{% endblock %}
 
 {% block contenido %}
-<h1>Mis solicitudes y pedidos</h1>
+<h1>Mis pedidos</h1>
+{% if encargos %}
+<div class="tabla-scroll">
+<table>
+  <thead><tr><th>Código</th><th>Fecha</th><th>Estado</th><th>Total</th></tr></thead>
+  <tbody>
+  {% for e in encargos %}
+    <tr>
+      <td><a href="{% url 'customer:pedido' e.pk %}">{{ e.codigo }}</a></td>
+      <td>{{ e.fecha_solicitud|date:"d/m/Y" }}</td>
+      <td>{{ e.get_estado_display }}</td>
+      <td>${{ e.total|floatformat:2 }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% include "components/paginacion.html" %}
+{% else %}
+<p>Aún no tiene pedidos. Cuando una cotización aceptada pase a producción, aparecerá aquí.</p>
+{% endif %}
 {% endblock %}

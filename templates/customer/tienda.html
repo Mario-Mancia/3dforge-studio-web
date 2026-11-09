@@ -1,7 +1,35 @@
 {% extends "layouts/customer.html" %}
 
-{% block titulo %}Tienda y compras{% endblock %}
+{% block titulo %}Tienda{% endblock %}
 
 {% block contenido %}
-<h1>Tienda y compras</h1>
+<h1>Tienda</h1>
+<p><a href="{% url 'customer:carrito' %}">Ver carrito ({{ unidades }} unidades)</a></p>
+<form method="get" class="filtros">
+  <input type="search" name="q" value="{{ q }}" placeholder="Buscar por nombre o SKU" maxlength="100">
+  <button type="submit">Buscar</button>
+</form>
+{% if productos %}
+<div class="rejilla">
+  {% for producto in productos %}
+  <article class="tarjeta">
+    {% if producto.imagen %}<img src="{{ producto.imagen_url }}" alt="{{ producto.nombre }}" loading="lazy">{% else %}<div class="sin-imagen">Sin imagen</div>{% endif %}
+    <h3>{{ producto.nombre }}</h3>
+    <p class="precio">${{ producto.precio|floatformat:2 }}</p>
+    <p class="disp disp-{{ producto.disponibilidad_codigo }}">{{ producto.disponibilidad }}</p>
+    {% if producto.stock > 0 %}
+    <form method="post" action="{% url 'customer:carrito_agregar' producto.pk %}">
+      {% csrf_token %}
+      <input type="hidden" name="siguiente" value="{{ request.get_full_path }}">
+      <input type="number" name="cantidad" value="1" min="1" max="{{ producto.stock }}" style="width:5em">
+      <button type="submit">Agregar</button>
+    </form>
+    {% endif %}
+  </article>
+  {% endfor %}
+</div>
+{% include "components/paginacion.html" %}
+{% else %}
+<p>No hay productos disponibles por ahora.</p>
+{% endif %}
 {% endblock %}

@@ -58,6 +58,13 @@
 {% if cotizacion.plazo_entrega_dias %}<p>Plazo estimado: {{ cotizacion.plazo_entrega_dias }} días.</p>{% endif %}
 {% if cotizacion.fecha_vencimiento %}<p>Válida hasta: {{ cotizacion.fecha_vencimiento|date:"d/m/Y H:i" }}</p>{% endif %}
 
+{% if cotizacion.estado == "ACEPTADA" %}
+{% if cotizacion.encargo %}
+<p><a href="{% url 'operator:encargo' cotizacion.encargo.pk %}">Ver encargo {{ cotizacion.encargo.codigo }}</a></p>
+{% else %}
+<form method="post" action="{% url 'operator:cotizacion_encargo' cotizacion.pk %}">{% csrf_token %}<button type="submit">Crear encargo</button></form>
+{% endif %}
+{% endif %}
 {% if cotizacion.estado == "BORRADOR" %}
 <form method="post" action="{% url 'operator:cotizacion_accion' cotizacion.pk 'enviar' %}">{% csrf_token %}<button type="submit">Enviar al cliente</button></form>
 {% endif %}

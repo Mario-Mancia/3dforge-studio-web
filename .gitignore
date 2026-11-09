@@ -18,10 +18,11 @@ db.sqlite3
 # Archivos temporales
 .pytest_cache/
 .respaldo/
-media/
 staticfiles/
 logs/
 *.propuesta
-private_media/
 
 .respaldo/
+media/**/*
+!media/**/
+!media/**/.gitkeep

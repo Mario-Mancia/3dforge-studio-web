@@ -18,6 +18,14 @@ urlpatterns = [
         views.CotizacionOperadorArchivoView.as_view(),
         name="cotizacion_archivo",
     ),
+    path("cotizaciones/<int:pk>/encargo/", views.EncargoDesdeCotizacionView.as_view(), name="cotizacion_encargo"),
     path("encargos/", views.EncargosView.as_view(), name="encargos"),
+    path("encargos/<int:pk>/", views.EncargoOperadorView.as_view(), name="encargo"),
+    path("encargos/<int:pk>/accion/<slug:accion>/", views.EncargoAccionView.as_view(), name="encargo_accion"),
+    path(
+        "encargos/<int:pk>/archivos/<int:archivo_id>/",
+        views.EncargoArchivoView.as_view(),
+        name="encargo_archivo",
+    ),
     path("clientes/", views.ClientesView.as_view(), name="clientes"),
 ]

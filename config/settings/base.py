@@ -244,3 +244,15 @@ PRIVATE_MEDIA_ROOT = Path(os.getenv("PRIVATE_MEDIA_ROOT", str(BASE_DIR / "privat
 COTIZACION_VIGENCIA_DIAS = int(os.getenv("COTIZACION_VIGENCIA_DIAS", "15"))
 COTIZACION_MAX_ARCHIVOS = 5
 # <<< fase-4
+
+# >>> fase-5
+import sys as _sys
+
+MEDIA_ROOT = BASE_DIR / "media" / "images"
+PRIVATE_MEDIA_ROOT = Path(os.getenv("PRIVATE_MEDIA_ROOT", str(BASE_DIR / "media" / "files")))
+FILE_UPLOAD_TEMP_DIR = BASE_DIR / "media" / "temp"
+TEST_RUNNER = "apps.core.pruebas.EjecutorPruebas"
+if "test" in _sys.argv:
+    DATABASES["default"]["CONN_MAX_AGE"] = 0
+    DATABASES["default"]["CONN_HEALTH_CHECKS"] = False
+# <<< fase-5

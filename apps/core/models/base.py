@@ -20,7 +20,7 @@ class ModeloValidado(models.Model):
     def save(self, *args, **kwargs):
         update_fields = kwargs.get("update_fields")
         if update_fields is None:
-            self.full_clean()
+            self.full_clean(validate_constraints=False)
         else:
             nombres = set(update_fields)
             excluir = [

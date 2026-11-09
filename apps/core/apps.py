@@ -1,4 +1,7 @@
+from pathlib import Path
+
 from django.apps import AppConfig
+from django.conf import settings
 from django.db.models.signals import post_migrate
 
 
@@ -15,3 +18,13 @@ class CoreConfig(AppConfig):
             sender=self,
             dispatch_uid="apps.core.sembrar_datos_iniciales",
         )
+        directorios = (
+            settings.MEDIA_ROOT,
+            settings.PRIVATE_MEDIA_ROOT,
+            getattr(settings, "FILE_UPLOAD_TEMP_DIR", None),
+        )
+        for directorio in filter(None, directorios):
+            try:
+                Path(directorio).mkdir(parents=True, exist_ok=True)
+            except OSError:
+                pass
