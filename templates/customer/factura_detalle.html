@@ -1,0 +1,27 @@
+{% extends "layouts/customer.html" %}
+
+{% block titulo %}Factura {{ factura.numero_factura }}{% endblock %}
+
+{% block contenido %}
+<p><a href="{% url 'customer:facturas' %}">&larr; Mis facturas</a></p>
+<h1>Factura {{ factura.numero_factura }}</h1>
+<p>Estado: <strong>{{ factura.get_estado_display }}</strong> · Emisión: {{ factura.fecha_emision|date:"d/m/Y" }} · Vence: {{ factura.fecha_vencimiento|date:"d/m/Y"|default:"-" }}</p>
+<p>Facturado a: {{ factura.nombre_facturacion }}{% if factura.identificacion_fiscal %} · {{ factura.identificacion_fiscal }}{% endif %}</p>
+<div class="tabla-scroll">
+<table>
+  <thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th></tr></thead>
+  <tbody>
+  {% for d in factura.detalles.all %}
+    <tr><td>{{ d.descripcion }}</td><td>{{ d.cantidad|floatformat:2 }}</td><td>${{ d.precio_unitario|floatformat:2 }}</td><td>${{ d.subtotal|floatformat:2 }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<p>Subtotal: ${{ factura.subtotal|floatformat:2 }} · Descuento: ${{ factura.descuento|floatformat:2 }} · Impuesto: ${{ factura.impuesto|floatformat:2 }} · <strong>Total: ${{ factura.total|floatformat:2 }}</strong></p>
+<p><strong>Saldo pendiente: ${{ factura.saldo_pendiente|floatformat:2 }}</strong></p>
+<h2>Pagos registrados</h2>
+<ul>
+  {% for p in factura.pagos.all %}{% if p.estado == "CONFIRMADO" %}<li>{{ p.fecha_pago|date:"d/m/Y" }} · {{ p.metodo_pago.nombre }} · ${{ p.monto|floatformat:2 }}</li>{% endif %}{% empty %}<li>Sin pagos.</li>{% endfor %}
+</ul>
+<p>Los pagos en efectivo se coordinan con el equipo.</p>
+{% endblock %}

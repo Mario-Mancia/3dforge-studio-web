@@ -1,0 +1,36 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block titulo %}Facturas{% endblock %}
+
+{% block contenido %}
+<h1>Facturas</h1>
+<form method="get" class="filtros">
+  <input type="search" name="q" value="{{ q }}" placeholder="Número, cliente o correo" maxlength="100">
+  <select name="estado">
+    <option value="">Todos los estados</option>
+    {% for valor, etiqueta in estados %}<option value="{{ valor }}"{% if estado == valor %} selected{% endif %}>{{ etiqueta }}</option>{% endfor %}
+  </select>
+  <button type="submit">Filtrar</button>
+</form>
+<div class="tabla-scroll">
+<table>
+  <thead><tr><th>Número</th><th>Cliente</th><th>Emisión</th><th>Vence</th><th>Estado</th><th>Total</th><th>Saldo</th></tr></thead>
+  <tbody>
+  {% for f in facturas %}
+    <tr>
+      <td><a href="{% url 'operator:factura' f.pk %}">{{ f.numero_factura }}</a></td>
+      <td>{{ f.nombre_facturacion }}</td>
+      <td>{{ f.fecha_emision|date:"d/m/Y" }}</td>
+      <td>{{ f.fecha_vencimiento|date:"d/m/Y"|default:"-" }}</td>
+      <td>{{ f.get_estado_display }}</td>
+      <td>${{ f.total|floatformat:2 }}</td>
+      <td>${{ f.saldo_pendiente|floatformat:2 }}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="7">Sin facturas.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% include "components/paginacion.html" %}
+{% endblock %}

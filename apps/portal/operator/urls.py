@@ -27,5 +27,9 @@ urlpatterns = [
         views.EncargoArchivoView.as_view(),
         name="encargo_archivo",
     ),
+    path("encargos/<int:pk>/factura/", views.FacturaDesdeEncargoView.as_view(), name="encargo_factura"),
+    path("facturas/", views.FacturasView.as_view(), name="facturas"),
+    path("facturas/<int:pk>/", views.FacturaOperadorView.as_view(), name="factura"),
+    path("facturas/<int:pk>/accion/<slug:accion>/", views.FacturaAccionView.as_view(), name="factura_accion"),
     path("clientes/", views.ClientesView.as_view(), name="clientes"),
 ]

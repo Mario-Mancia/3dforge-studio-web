@@ -1,3 +1,5 @@
-from django.db.models import QuerySet
+from apps.pagos.models import MetodoPago
 
-from apps.pagos.models import MetodoPago, Pago
+
+def metodos_activos():
+    return MetodoPago.objects.filter(activo=True).exclude(nombre__icontains="pasarela").order_by("nombre")

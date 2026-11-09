@@ -38,6 +38,12 @@
 <h2>Cargar archivo</h2>
 <form method="post" enctype="multipart/form-data" action="{% url 'operator:encargo_accion' encargo.pk 'archivo' %}">{% csrf_token %}{{ form_archivo.as_p }}<button type="submit">Subir</button></form>
 
+<h2>Factura</h2>
+{% if encargo.factura %}
+<p><a href="{% url 'operator:factura' encargo.factura.pk %}">Ver factura {{ encargo.factura.numero_factura }}</a></p>
+{% else %}
+<form method="post" action="{% url 'operator:encargo_factura' encargo.pk %}">{% csrf_token %}<button type="submit">Crear factura</button></form>
+{% endif %}
 <h2>Historial</h2>
 <ul>
   {% for h in encargo.historial.all %}<li>{{ h.fecha_cambio|date:"d/m/Y H:i" }} · {{ h.get_estado_nuevo_display }} · {{ h.usuario.nombre_completo }}{% if h.comentario %} · {{ h.comentario }}{% endif %}</li>{% endfor %}

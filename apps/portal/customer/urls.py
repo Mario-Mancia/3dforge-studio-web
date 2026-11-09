@@ -23,5 +23,7 @@ urlpatterns = [
     path("pedidos/<int:pk>/", views.PedidoDetalleView.as_view(), name="pedido"),
     path("pedidos/<int:pk>/cancelar/", views.PedidoCancelarView.as_view(), name="pedido_cancelar"),
     path("pedidos/<int:pk>/archivos/<int:archivo_id>/", views.PedidoArchivoView.as_view(), name="pedido_archivo"),
+    path("facturas/", views.FacturasClienteView.as_view(), name="facturas"),
+    path("facturas/<int:pk>/", views.FacturaClienteView.as_view(), name="factura"),
     path("cuenta/", views.CuentaView.as_view(), name="cuenta"),
 ]

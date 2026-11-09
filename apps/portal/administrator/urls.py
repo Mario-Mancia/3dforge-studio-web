@@ -18,6 +18,8 @@ urlpatterns = [
     path("servicios/categorias/nueva/", views.CategoriaCrearView.as_view(), name="categoria_crear"),
     path("servicios/categorias/<int:pk>/editar/", views.CategoriaEditarView.as_view(), name="categoria_editar"),
     path("usuarios/", views.UsuariosView.as_view(), name="usuarios"),
+    path("usuarios/nuevo/", views.UsuarioCrearView.as_view(), name="usuario_crear"),
+    path("usuarios/<int:pk>/editar/", views.UsuarioEditarView.as_view(), name="usuario_editar"),
     path("ventas/", views.VentasView.as_view(), name="ventas"),
     path("configuracion/", views.ConfiguracionView.as_view(), name="configuracion"),
 ]

@@ -256,3 +256,7 @@ if "test" in _sys.argv:
     DATABASES["default"]["CONN_MAX_AGE"] = 0
     DATABASES["default"]["CONN_HEALTH_CHECKS"] = False
 # <<< fase-5
+
+# >>> fase-7
+FACTURA_VENCIMIENTO_DIAS = int(os.getenv("FACTURA_VENCIMIENTO_DIAS", "30"))
+# <<< fase-7

@@ -12,4 +12,5 @@ from .encargos import (
     EncargoOperadorView,
     EncargosView,
 )
+from .facturas import FacturaAccionView, FacturaDesdeEncargoView, FacturaOperadorView, FacturasView
 from .panel import PanelView

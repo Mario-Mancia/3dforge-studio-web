@@ -4,4 +4,38 @@
 
 {% block contenido %}
 <h1>Usuarios y empleados</h1>
+<p><a class="boton" href="{% url 'administrator:usuario_crear' %}">Nuevo empleado</a></p>
+<form method="get" class="filtros">
+  <input type="search" name="q" value="{{ q }}" placeholder="Correo o nombre" maxlength="100">
+  <select name="rol">
+    <option value="">Todos los roles</option>
+    {% for r in roles %}<option value="{{ r }}"{% if rol == r %} selected{% endif %}>{{ r }}</option>{% endfor %}
+    <option value="SIN_ROL"{% if rol == "SIN_ROL" %} selected{% endif %}>Sin rol</option>
+  </select>
+  <select name="estado">
+    <option value="">Todos los estados</option>
+    {% for e in estados %}<option value="{{ e.pk }}"{% if estado == e.pk|stringformat:"s" %} selected{% endif %}>{{ e.nombre }}</option>{% endfor %}
+  </select>
+  <button type="submit">Filtrar</button>
+</form>
+<div class="tabla-scroll">
+<table>
+  <thead><tr><th>Correo</th><th>Nombre</th><th>Roles</th><th>Estado</th><th>Empleado</th><th></th></tr></thead>
+  <tbody>
+  {% for u in usuarios %}
+    <tr>
+      <td>{{ u.correo }}</td>
+      <td>{{ u.nombre_completo }}</td>
+      <td>{% for g in u.groups.all %}{{ g.name }}{% if not forloop.last %}, {% endif %}{% empty %}-{% endfor %}{% if u.is_superuser %} (superusuario){% endif %}</td>
+      <td>{{ u.estado.nombre }}</td>
+      <td>{% if u.empleado %}{{ u.empleado.codigo_empleado }} - {{ u.empleado.cargo }}{% if not u.empleado.activo %} (inactivo){% endif %}{% else %}-{% endif %}</td>
+      <td><a href="{% url 'administrator:usuario_editar' u.pk %}">Editar</a></td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="6">Sin usuarios.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% include "components/paginacion.html" %}
 {% endblock %}
