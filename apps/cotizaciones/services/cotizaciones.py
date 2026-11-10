@@ -93,15 +93,27 @@ def _vigente(cotizacion):
 
 
 @transaction.atomic
-def solicitar_cotizacion(cliente, usuario, servicio, cantidad, descripcion, solicitud, especificaciones=None, archivos=()):
-    if not servicio.activo or not servicio.categoria.activo:
+def solicitar_cotizacion(
+    cliente,
+    usuario,
+    servicio,
+    cantidad,
+    descripcion,
+    solicitud,
+    especificaciones=None,
+    archivos=(),
+    precio_unitario=None,
+    verificar_servicio=True,
+):
+    if verificar_servicio and (not servicio.activo or not servicio.categoria.activo):
         raise ErrorCotizacion("El servicio seleccionado no está disponible.")
     maximo = getattr(settings, "COTIZACION_MAX_ARCHIVOS", 5)
     if len(archivos) > maximo:
         raise ErrorCotizacion(f"Puede adjuntar hasta {maximo} archivos.")
     validados = [(archivo, *validar_archivo(archivo)) for archivo in archivos]
 
-    linea = calcular_linea(cantidad, servicio.precio_base, Decimal("0"))
+    precio = servicio.precio_base if precio_unitario is None else precio_unitario
+    linea = calcular_linea(cantidad, precio, Decimal("0"))
     cotizacion = Cotizacion.objects.create(
         cliente=cliente,
         codigo=f"TMP-{uuid.uuid4().hex[:12].upper()}",
@@ -116,7 +128,7 @@ def solicitar_cotizacion(cliente, usuario, servicio, cantidad, descripcion, soli
         servicio=servicio,
         descripcion=descripcion[:250],
         cantidad=cantidad,
-        precio_unitario=servicio.precio_base,
+        precio_unitario=precio,
         descuento=linea["descuento"],
         impuesto=linea["impuesto"],
         subtotal=linea["subtotal"],

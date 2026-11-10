@@ -11,6 +11,7 @@ urlpatterns = [
     path("carrito/", views.CarritoView.as_view(), name="carrito"),
     path("carrito/agregar/<int:pk>/", views.CarritoAgregarView.as_view(), name="carrito_agregar"),
     path("carrito/confirmar/", views.CheckoutView.as_view(), name="checkout"),
+    path("cotizar/estimar/", views.CotizarEstimarView.as_view(), name="cotizar_estimar"),
     path("cotizar/", views.CotizarView.as_view(), name="cotizar"),
     path("cotizaciones/", views.CotizacionesView.as_view(), name="cotizaciones"),
     path("cotizaciones/<int:pk>/", views.CotizacionDetalleView.as_view(), name="cotizacion"),

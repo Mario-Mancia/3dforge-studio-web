@@ -7,6 +7,7 @@
 <a class="btn btn-link ps-0" href="{% url 'customer:cotizaciones' %}">&larr; Mis cotizaciones</a>
 <h1 class="h3">Cotización {{ cotizacion.codigo }} {{ cotizacion.estado|badge:cotizacion.get_estado_display }}</h1>
 {% if cotizacion.estado == "SOLICITADA" or cotizacion.estado == "BORRADOR" %}<div class="alert alert-warning">Los importes son preliminares y se confirmarán tras la revisión.</div>{% endif %}
+{% if cotizacion.estado == "SOLICITADA" or cotizacion.estado == "BORRADOR" %}{% for d in cotizacion.detalles.all %}{% if d.especificaciones.Tipo == "Cotización automática 3D" %}<div class="alert alert-info d-flex align-items-start gap-2" data-estimacion-automatica><span class="material-symbols-rounded">auto_awesome</span><div><strong>Cotización automática.</strong> Las cotizaciones automáticas son aproximadas, lo más exactas posible. Cuando un profesional revise su solicitud confirmará el precio final.</div></div>{% endif %}{% endfor %}{% endif %}
 {% if cotizacion.solicitud %}<h2 class="h5">Su solicitud</h2><p>{{ cotizacion.solicitud|linebreaksbr }}</p>{% endif %}
 <div class="table-responsive">
 <table class="table table-striped align-middle">

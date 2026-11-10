@@ -17,3 +17,7 @@ from .servicios import (
 )
 from .usuarios import UsuarioCrearView, UsuarioEditarView, UsuariosView
 from .ventas import VentasExportarView, VentasView
+
+# >>> fase-10a
+from .cotizador import CotizadorView, FilamentoActivoView, FilamentoCrearView, FilamentoEditarView
+# <<< fase-10a

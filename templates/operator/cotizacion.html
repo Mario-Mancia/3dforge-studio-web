@@ -7,6 +7,7 @@
 <a class="btn btn-link ps-0" href="{% url 'operator:cotizaciones' %}">&larr; Bandeja de cotizaciones</a>
 <h1 class="h3">Cotización {{ cotizacion.codigo }} {{ cotizacion.estado|badge:cotizacion.get_estado_display }}</h1>
 <p>Cliente: {{ cotizacion.cliente }} ({{ cotizacion.cliente.correo }}) · Responsable: {{ cotizacion.usuario_responsable|default:"Sin asignar" }}</p>
+{% if editable %}{% for d in cotizacion.detalles.all %}{% if d.especificaciones.Tipo == "Cotización automática 3D" %}<div class="alert alert-info d-flex align-items-start gap-2" data-estimacion-automatica><span class="material-symbols-rounded">auto_awesome</span><div><strong>Cotización automática 3D.</strong> Los importes los calculó el sistema (confianza {{ d.especificaciones.Confianza|lower }}). Revise el modelo adjunto y ajuste el precio antes de enviarla.</div></div>{% endif %}{% endfor %}{% endif %}
 {% if cotizacion.solicitud %}<h2 class="h5">Solicitud del cliente</h2><p>{{ cotizacion.solicitud|linebreaksbr }}</p>{% endif %}
 {% for d in cotizacion.detalles.all %}{% if d.especificaciones %}<p><small class="text-body-secondary">{{ d.descripcion }}: {% for clave, valor in d.especificaciones.items %}{{ clave|capfirst }}: {{ valor }}{% if not forloop.last %} · {% endif %}{% endfor %}</small></p>{% endif %}{% endfor %}
 {% if cotizacion.archivos.all %}

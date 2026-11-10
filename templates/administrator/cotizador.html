@@ -1,0 +1,90 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block titulo %}Cotizador 3D{% endblock %}
+
+{% block contenido %}
+<div class="encabezado-pagina">
+  <div class="d-flex align-items-center gap-3">
+    <span class="icono-encabezado"><span class="material-symbols-rounded">calculate</span></span>
+    <div><h1 class="h3 mb-0">Cotizador 3D</h1><p class="text-body-secondary mb-0">Parámetros de la fórmula y filamentos de la cotización automática.</p></div>
+  </div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-7">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="alert alert-danger">{% for e in form.non_field_errors %}<div>{{ e }}</div>{% endfor %}</div>{% endif %}
+      <div class="card seccion-formulario"><div class="card-body">
+        <div class="etiqueta-seccion">Material y tiempo</div>
+        <div class="row g-3">
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.grosor_pared_mm %}</div>
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.desperdicio_pct %}</div>
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.caudal_mm3_s %}</div>
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.seg_por_capa %}</div>
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.soporte_extra_pct %}</div>
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.umbral_voladizo_pct %}</div>
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.factor_caja_pct %}</div>
+        </div>
+      </div></div>
+      <div class="card seccion-formulario"><div class="card-body">
+        <div class="etiqueta-seccion">Precio</div>
+        <div class="row g-3">
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.tarifa_hora %}</div>
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.margen_pct %}</div>
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.cargo_fijo %}</div>
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.minimo %}</div>
+        </div>
+      </div></div>
+      <div class="card seccion-formulario"><div class="card-body">
+        <div class="etiqueta-seccion">Impresora y límites</div>
+        <div class="row g-3">
+          <div class="col-md-4">{% include "components/campo.html" with campo=form.cama_x_mm %}</div>
+          <div class="col-md-4">{% include "components/campo.html" with campo=form.cama_y_mm %}</div>
+          <div class="col-md-4">{% include "components/campo.html" with campo=form.cama_z_mm %}</div>
+        </div>
+        {% include "components/campo.html" with campo=form.max_triangulos %}
+      </div></div>
+      <div class="d-flex justify-content-end mt-3">
+        <button type="submit" class="btn btn-primary btn-lg"><span class="material-symbols-rounded">save</span>Guardar parámetros</button>
+      </div>
+    </form>
+  </div>
+  <div class="col-lg-5">
+    <div class="card"><div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="titulo-tarjeta mb-0"><span class="material-symbols-rounded">spool</span>Filamentos</h2>
+        <a class="btn btn-sm btn-primary" href="{% url 'administrator:filamento_crear' %}"><span class="material-symbols-rounded">add</span>Nuevo</a>
+      </div>
+      <div class="table-responsive">
+      <table class="table table-hover align-middle tabla-acciones mb-0">
+        <thead><tr><th>Filamento</th><th class="text-end">g/cm³</th><th class="text-end">$/kg</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody>
+        {% for f in filamentos %}
+          <tr>
+            <td>{{ f.get_material_display }} {{ f.color }}</td><td class="text-end">{{ f.densidad|floatformat:2 }}</td><td class="text-end">${{ f.precio_kg|floatformat:2 }}</td>
+            <td>{% if f.activo %}<span class="badge text-bg-success">Activo</span>{% else %}<span class="badge text-bg-secondary">Inactivo</span>{% endif %}</td>
+            <td><div class="acciones-tabla">
+              <a class="btn btn-sm btn-outline-primary" href="{% url 'administrator:filamento_editar' f.pk %}"><span class="material-symbols-rounded">edit</span>Editar</a>
+              <form method="post" action="{% url 'administrator:filamento_activo' f.pk %}" data-confirmar="¿Cambiar el estado del filamento?">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-secondary"><span class="material-symbols-rounded">{% if f.activo %}visibility_off{% else %}visibility{% endif %}</span>{% if f.activo %}Desactivar{% else %}Activar{% endif %}</button></form>
+            </div></td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="celda-vacia"><div class="estado-vacio"><span class="material-symbols-rounded">spool</span><p>Sin filamentos. Cree uno o ejecute <code>python manage.py sembrar_cotizador</code>.</p></div></td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      </div>
+    </div></div>
+    <div class="card mt-3"><div class="card-body">
+      <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">functions</span>Cómo se calcula</h2>
+      <ol class="small mb-2 ps-3">
+        <li>Se lee el modelo (volumen, área y dimensiones) y se aplican unidades y escala.</li>
+        <li>Material = paredes (área × grosor) + relleno elegido, más un extra si lleva soportes.</li>
+        <li>Tiempo = material ÷ caudal efectivo + tiempo fijo por capa.</li>
+        <li>Precio = (material × $/kg + horas × tarifa) × (1 + margen), con cargo fijo y mínimo por pedido.</li>
+      </ol>
+      <p class="small text-body-secondary mb-0">Es una estimación: el operador revisa y ajusta el precio antes de enviarlo. Para calibrarla, compare 3 o 4 piezas con su laminador y ajuste el caudal efectivo.</p>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

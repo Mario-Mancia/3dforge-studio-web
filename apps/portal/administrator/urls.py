@@ -26,5 +26,9 @@ urlpatterns = [
     path("ventas/exportar/<slug:tipo>/", views.VentasExportarView.as_view(), name="ventas_exportar"),
     path("cuenta/", CuentaPersonalView.as_view(), name="cuenta"),
     path("cuenta/foto/", FotoPerfilPersonalView.as_view(), name="cuenta_foto"),
+    path("cotizador/", views.CotizadorView.as_view(), name="cotizador"),
+    path("cotizador/filamentos/nuevo/", views.FilamentoCrearView.as_view(), name="filamento_crear"),
+    path("cotizador/filamentos/<int:pk>/editar/", views.FilamentoEditarView.as_view(), name="filamento_editar"),
+    path("cotizador/filamentos/<int:pk>/activo/", views.FilamentoActivoView.as_view(), name="filamento_activo"),
     path("configuracion/", views.ConfiguracionView.as_view(), name="configuracion"),
 ]

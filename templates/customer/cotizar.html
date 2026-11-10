@@ -1,5 +1,5 @@
 {% extends "layouts/customer.html" %}
-{% load bootstrap %}
+{% load bootstrap static %}
 
 {% block titulo %}Solicitar cotización{% endblock %}
 
@@ -7,58 +7,158 @@
 <div class="encabezado-pagina">
   <div class="d-flex align-items-center gap-3">
     <span class="icono-encabezado"><span class="material-symbols-rounded">request_quote</span></span>
-    <div><h1 class="h3 mb-0">Solicitar cotización</h1><p class="text-body-secondary mb-0">Cuéntenos qué necesita y le enviaremos una propuesta.</p></div>
+    <div><h1 class="h3 mb-0">Solicitar cotización</h1><p class="text-body-secondary mb-0">Elija cómo quiere cotizar: automática para impresión 3D o por formulario para otros servicios.</p></div>
   </div>
 </div>
-<div class="row g-4">
-  <div class="col-lg-8">
-    <form method="post" enctype="multipart/form-data" novalidate {% atributos_validacion %}>
-      {% csrf_token %}
-      {% if form.non_field_errors %}<div class="alert alert-danger">{% for e in form.non_field_errors %}<div>{{ e }}</div>{% endfor %}</div>{% endif %}
 
-      <div class="card seccion-formulario"><div class="card-body">
-        <div class="etiqueta-seccion">1 · Qué necesita</div>
-        <div class="row g-3">
-          <div class="col-md-8">{% include "components/campo.html" with campo=form.servicio %}</div>
-          <div class="col-md-4">{% include "components/campo.html" with campo=form.cantidad %}</div>
-        </div>
-        {% include "components/campo.html" with campo=form.descripcion %}
-        {% include "components/campo.html" with campo=form.solicitud %}
-      </div></div>
+<ul class="nav nav-pills nav-fill auth-pestanas mb-4" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link{% if pestana == '3d' %} active{% endif %}" id="tab-3d" data-bs-toggle="pill" data-bs-target="#panel-3d" type="button" role="tab" aria-controls="panel-3d" aria-selected="{% if pestana == '3d' %}true{% else %}false{% endif %}"><span class="material-symbols-rounded">view_in_ar</span>Impresión 3D automática</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link{% if pestana == 'manual' %} active{% endif %}" id="tab-manual" data-bs-toggle="pill" data-bs-target="#panel-manual" type="button" role="tab" aria-controls="panel-manual" aria-selected="{% if pestana == 'manual' %}true{% else %}false{% endif %}"><span class="material-symbols-rounded">edit_note</span>Otros servicios (formulario)</button>
+  </li>
+</ul>
 
-      <div class="card seccion-formulario"><div class="card-body">
-        <div class="etiqueta-seccion">2 · Especificaciones (opcional)</div>
-        <div class="row g-3">
-          <div class="col-md-4">{% include "components/campo.html" with campo=form.material %}</div>
-          <div class="col-md-4">{% include "components/campo.html" with campo=form.color %}</div>
-          <div class="col-md-4">{% include "components/campo.html" with campo=form.dimensiones %}</div>
-        </div>
-      </div></div>
+<div class="tab-content">
+  <div class="tab-pane fade{% if pestana == '3d' %} show active{% endif %}" id="panel-3d" role="tabpanel" aria-labelledby="tab-3d" tabindex="0">
+    {% if not hay_filamentos %}
+    <div class="estado-vacio"><span class="material-symbols-rounded">inventory_2</span><p>El cotizador automático aún no tiene filamentos disponibles. Use el formulario de la otra pestaña y nuestro equipo le responderá.</p></div>
+    {% else %}
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <form method="post" enctype="multipart/form-data" novalidate id="form-3d" data-estimar-url="{% url 'customer:cotizar_estimar' %}">
+          {% csrf_token %}
+          <input type="hidden" name="tipo_cotizacion" value="3d">
+          {% if form3d.non_field_errors %}<div class="alert alert-danger">{% for e in form3d.non_field_errors %}<div>{{ e }}</div>{% endfor %}</div>{% endif %}
+          <div class="alert alert-info d-flex align-items-start gap-2"><span class="material-symbols-rounded">auto_awesome</span><div>{{ aviso_estimacion }}</div></div>
 
-      <div class="card seccion-formulario"><div class="card-body">
-        <div class="etiqueta-seccion">3 · Archivos</div>
-        <div class="zona-archivos" data-campo="archivos">
-          <label class="form-label d-flex align-items-center gap-2" for="{{ form.archivos.id_for_label }}"><span class="material-symbols-rounded">upload_file</span>{{ form.archivos.label }}</label>
-          {{ form.archivos|bs }}
-          <div class="archivos-elegidos">Ningún archivo seleccionado</div>
-          <div class="form-text">{{ form.archivos.help_text }} Máximo 5 archivos de 50 MB.</div>
-          <div class="invalid-feedback{% if form.archivos.errors %} d-block{% endif %}">{{ form.archivos.errors|join:" " }}</div>
-        </div>
-      </div></div>
+          <div class="card seccion-formulario"><div class="card-body">
+            <div class="etiqueta-seccion">1 · Su modelo 3D</div>
+            <div class="zona-archivos" data-campo="archivo">
+              <label class="form-label d-flex align-items-center gap-2" for="{{ form3d.archivo.id_for_label }}"><span class="material-symbols-rounded">upload_file</span>{{ form3d.archivo.label }} <span class="text-danger">*</span></label>
+              {{ form3d.archivo|bs }}
+              <div class="archivos-elegidos">Ningún archivo seleccionado</div>
+              <div class="form-text">{{ form3d.archivo.help_text }}</div>
+              <div class="invalid-feedback{% if form3d.archivo.errors %} d-block{% endif %}">{{ form3d.archivo.errors|join:" " }}</div>
+            </div>
+            <div class="row g-3 mt-1"><div class="col-md-6">{% include "components/campo.html" with campo=form3d.unidades %}</div></div>
+          </div></div>
 
-      <div class="d-flex justify-content-end gap-2 mt-3">
-        <a class="btn btn-link" href="{% url 'customer:cotizaciones' %}">Cancelar</a>
-        <button type="submit" class="btn btn-primary btn-lg"><span class="material-symbols-rounded">send</span>Enviar solicitud</button>
+          <div class="card seccion-formulario"><div class="card-body">
+            <div class="etiqueta-seccion">2 · Opciones de impresión</div>
+            <div class="row g-3">
+              <div class="col-md-6">{% include "components/campo.html" with campo=form3d.filamento %}</div>
+              <div class="col-md-6">{% include "components/campo.html" with campo=form3d.relleno %}</div>
+              <div class="col-md-6">{% include "components/campo.html" with campo=form3d.calidad %}</div>
+              <div class="col-md-6">{% include "components/campo.html" with campo=form3d.escala %}</div>
+              <div class="col-md-6">{% include "components/campo.html" with campo=form3d.soportes %}</div>
+              <div class="col-md-6">{% include "components/campo.html" with campo=form3d.cantidad %}</div>
+            </div>
+          </div></div>
+
+          <div class="card seccion-formulario"><div class="card-body">
+            <div class="etiqueta-seccion">3 · Detalles (opcional)</div>
+            {% include "components/campo.html" with campo=form3d.descripcion %}
+            {% include "components/campo.html" with campo=form3d.comentarios %}
+          </div></div>
+
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <a class="btn btn-link" href="{% url 'customer:cotizaciones' %}">Cancelar</a>
+            <button type="submit" class="btn btn-primary btn-lg"><span class="material-symbols-rounded">send</span><span class="texto-boton">Solicitar cotización</span></button>
+          </div>
+        </form>
       </div>
-    </form>
+      <div class="col-lg-4">
+        <div class="card" id="resumen-estimacion"><div class="card-body">
+          <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">calculate</span>Estimación aproximada</h2>
+          <div data-estado="vacio" class="text-center text-body-secondary py-3"><span class="material-symbols-rounded icono-grande">view_in_ar</span><p class="mb-0">Suba un modelo 3D (STL, OBJ o 3MF) para calcular el precio.</p></div>
+          <div data-estado="calculando" class="text-center py-3" hidden><div class="spinner-border" role="status"><span class="visually-hidden">Calculando</span></div><p class="mb-0 mt-2">Analizando el modelo…</p></div>
+          <div data-estado="error" class="alert alert-danger mb-0" role="alert" hidden><span data-res="error"></span></div>
+          <div data-estado="resultado" hidden>
+            <dl class="lista-parametros mb-2">
+              <dt>Dimensiones</dt><dd data-res="dimensiones"></dd>
+              <dt>Peso de filamento</dt><dd><span data-res="gramos"></span> g</dd>
+              <dt>Tiempo de impresión</dt><dd data-res="tiempo"></dd>
+              <dt>Soportes</dt><dd data-res="soportes"></dd>
+            </dl>
+            <ul class="list-group list-group-flush mb-2">
+              <li class="list-group-item d-flex justify-content-between px-0"><span>Precio por pieza</span><span>$<span data-res="precio_unitario"></span></span></li>
+              <li class="list-group-item d-flex justify-content-between px-0"><span>Subtotal (<span data-res="cantidad"></span>)</span><span>$<span data-res="subtotal"></span></span></li>
+              <li class="list-group-item d-flex justify-content-between px-0"><span>Impuesto</span><span>$<span data-res="impuesto"></span></span></li>
+              <li class="list-group-item d-flex justify-content-between px-0 fw-bold"><span>Total estimado</span><span>$<span data-res="total"></span></span></li>
+            </ul>
+            <p class="mb-2">Confianza: <span class="badge" data-res="confianza"></span></p>
+            <ul class="small text-warning-emphasis ps-3 mb-2" data-res="advertencias" hidden></ul>
+            <p class="small text-body-secondary mb-0" data-res="aviso"></p>
+          </div>
+        </div></div>
+        <div class="card mt-3"><div class="card-body">
+          <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">lightbulb</span>Cómo funciona</h2>
+          <div class="paso-numerado"><span class="numero">1</span><div><strong>Suba su modelo</strong><div class="small text-body-secondary">Calculamos tamaño, material y tiempo al instante.</div></div></div>
+          <div class="paso-numerado"><span class="numero">2</span><div><strong>Solicite la cotización</strong><div class="small text-body-secondary">Un profesional revisa el archivo y confirma el precio.</div></div></div>
+          <div class="paso-numerado mb-0"><span class="numero">3</span><div><strong>Acepte y siga su pedido</strong><div class="small text-body-secondary">Al aceptar, creamos su pedido y puede ver el avance.</div></div></div>
+        </div></div>
+      </div>
+    </div>
+    {% endif %}
   </div>
-  <div class="col-lg-4">
-    <div class="card"><div class="card-body">
-      <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">lightbulb</span>Cómo funciona</h2>
-      <div class="paso-numerado"><span class="numero">1</span><div><strong>Envíe su solicitud</strong><div class="small text-body-secondary">Describa el trabajo y adjunte sus archivos.</div></div></div>
-      <div class="paso-numerado"><span class="numero">2</span><div><strong>Recibe una propuesta</strong><div class="small text-body-secondary">Nuestro equipo la revisa y le envía precio y plazo.</div></div></div>
-      <div class="paso-numerado mb-0"><span class="numero">3</span><div><strong>Acepte y siga su pedido</strong><div class="small text-body-secondary">Al aceptar, creamos su pedido y puede ver el avance.</div></div></div>
-    </div></div>
+
+  <div class="tab-pane fade{% if pestana == 'manual' %} show active{% endif %}" id="panel-manual" role="tabpanel" aria-labelledby="tab-manual" tabindex="0">
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <form method="post" enctype="multipart/form-data" novalidate {% atributos_validacion %}>
+          {% csrf_token %}
+          <input type="hidden" name="tipo_cotizacion" value="manual">
+          {% if form.non_field_errors %}<div class="alert alert-danger">{% for e in form.non_field_errors %}<div>{{ e }}</div>{% endfor %}</div>{% endif %}
+
+          <div class="card seccion-formulario"><div class="card-body">
+            <div class="etiqueta-seccion">1 · Qué necesita</div>
+            <div class="row g-3">
+              <div class="col-md-8">{% include "components/campo.html" with campo=form.servicio %}</div>
+              <div class="col-md-4">{% include "components/campo.html" with campo=form.cantidad %}</div>
+            </div>
+            {% include "components/campo.html" with campo=form.descripcion %}
+            {% include "components/campo.html" with campo=form.solicitud %}
+          </div></div>
+
+          <div class="card seccion-formulario"><div class="card-body">
+            <div class="etiqueta-seccion">2 · Especificaciones (opcional)</div>
+            <div class="row g-3">
+              <div class="col-md-4">{% include "components/campo.html" with campo=form.material %}</div>
+              <div class="col-md-4">{% include "components/campo.html" with campo=form.color %}</div>
+              <div class="col-md-4">{% include "components/campo.html" with campo=form.dimensiones %}</div>
+            </div>
+          </div></div>
+
+          <div class="card seccion-formulario"><div class="card-body">
+            <div class="etiqueta-seccion">3 · Archivos</div>
+            <div class="zona-archivos" data-campo="archivos">
+              <label class="form-label d-flex align-items-center gap-2" for="{{ form.archivos.id_for_label }}"><span class="material-symbols-rounded">upload_file</span>{{ form.archivos.label }}</label>
+              {{ form.archivos|bs }}
+              <div class="archivos-elegidos">Ningún archivo seleccionado</div>
+              <div class="form-text">{{ form.archivos.help_text }} Máximo 5 archivos de 50 MB.</div>
+              <div class="invalid-feedback{% if form.archivos.errors %} d-block{% endif %}">{{ form.archivos.errors|join:" " }}</div>
+            </div>
+          </div></div>
+
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <a class="btn btn-link" href="{% url 'customer:cotizaciones' %}">Cancelar</a>
+            <button type="submit" class="btn btn-primary btn-lg"><span class="material-symbols-rounded">send</span>Enviar solicitud</button>
+          </div>
+        </form>
+      </div>
+      <div class="col-lg-4">
+        <div class="card"><div class="card-body">
+          <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">lightbulb</span>Cómo funciona</h2>
+          <div class="paso-numerado"><span class="numero">1</span><div><strong>Envíe su solicitud</strong><div class="small text-body-secondary">Describa el trabajo y adjunte sus archivos.</div></div></div>
+          <div class="paso-numerado"><span class="numero">2</span><div><strong>Recibe una propuesta</strong><div class="small text-body-secondary">Nuestro equipo la revisa y le envía precio y plazo.</div></div></div>
+          <div class="paso-numerado mb-0"><span class="numero">3</span><div><strong>Acepte y siga su pedido</strong><div class="small text-body-secondary">Al aceptar, creamos su pedido y puede ver el avance.</div></div></div>
+        </div></div>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}
+
+{% block scripts %}<script src="{% static 'js/components/cotizador3d.js' %}"></script>{% endblock %}
