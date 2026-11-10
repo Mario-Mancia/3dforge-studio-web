@@ -1,6 +1,6 @@
 from django.urls import path
 
-from apps.api.vistas import auth, catalogo, compras, cotizaciones, cuenta, google, pedidos, seguimiento
+from apps.api.vistas import auth, catalogo, compras, cotizaciones, cuenta, google, pedidos, seguimiento, cotizador3d
 
 app_name = "api"
 
@@ -24,6 +24,9 @@ urlpatterns = [
     path("catalogo/servicios/<int:pk>/", catalogo.servicio_detalle, name="servicio"),
     path("carrito/validar/", compras.validar_carrito, name="carrito_validar"),
     path("compras/", compras.comprar, name="comprar"),
+    path("cotizador3d/opciones/", cotizador3d.opciones_3d, name="opciones_3d"),
+    path("cotizador3d/estimar/", cotizador3d.estimar_3d, name="estimar_3d"),
+    path("cotizaciones/3d/", cotizador3d.solicitar_3d, name="solicitar_3d"),
     path("cotizaciones/", cotizaciones.cotizaciones, name="cotizaciones"),
     path("cotizaciones/<int:pk>/", cotizaciones.cotizacion_detalle, name="cotizacion"),
     path("cotizaciones/<int:pk>/archivos/<int:archivo_id>/", cotizaciones.cotizacion_archivo, name="cotizacion_archivo"),

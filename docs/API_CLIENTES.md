@@ -29,6 +29,9 @@ con estado 400 (datos), 401 (sin sesión/credenciales), 403 (sin permiso/correo 
 | POST `carrito/validar/` | sí | `{items:[{producto_id, cantidad}]}` → líneas, totales y problemas |
 | POST `compras/` | sí | `{items, token}` (token único por compra, 8–64 caracteres; repetirlo es seguro) → 201 `{duplicado, pedido}` |
 | GET/POST `cotizaciones/` | sí | Lista · crear (**multipart**: `servicio, cantidad, descripcion, solicitud, material?, color?, dimensiones?, archivos[]`; o JSON sin archivos) |
+| GET `cotizador3d/opciones/` | sí | Opciones del cotizador automático 3D: `disponible`, `filamentos[]`, `rellenos`, `calidades[]`, `escalas`, `unidades[]`, `soportes[]`, `formatos`, `tamano_maximo_mb`, `cama_mm`, `aviso` |
+| POST `cotizador3d/estimar/` | sí | **multipart**: `filamento, relleno, calidad, escala, unidades, soportes, cantidad` + `archivo` (STL/OBJ/3MF; primera vez) o `analisis` (JSON devuelto antes, para recalcular sin volver a subir). Responde `{analisis, estimacion}`; no guarda nada. 20 análisis/min por usuario |
+| POST `cotizaciones/3d/` | sí | **multipart**: opciones + `archivo` + `descripcion?`, `comentarios?` → crea una cotización normal `SOLICITADA` (201) con importes preliminares; el precio final lo confirma un profesional |
 | GET `cotizaciones/<id>/` | sí | Detalle con `puede_responder`, `puede_cancelar`, `vencida`, archivos y pedido |
 | POST `cotizaciones/<id>/aceptar|rechazar|cancelar/` | sí | Acciones (409 si el estado no lo permite) |
 | GET `cotizaciones/<id>/archivos/<aid>/` | sí | Descarga (requiere Bearer) |
