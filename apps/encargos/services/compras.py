@@ -201,3 +201,74 @@ def confirmar_compra(cliente, usuario, sesion, token):
     sesion[CLAVE_ULTIMA] = encargo.pk
     carrito.vaciar()
     return encargo
+
+# >>> api
+# ---- Compra sin sesion web (app movil): el carrito vive en el dispositivo -------------------
+
+
+def _entero_estricto(valor):
+    if isinstance(valor, bool):
+        raise ValueError
+    if isinstance(valor, int):
+        return valor
+    if isinstance(valor, str) and valor.strip().isdigit():
+        return int(valor.strip())
+    raise ValueError
+
+
+def normalizar_items(items):
+    if not isinstance(items, (list, tuple)) or not items:
+        raise ErrorCompra("Su carrito está vacío.")
+    resultado = {}
+    for item in items:
+        if not isinstance(item, dict):
+            raise ErrorCompra("Los productos indicados no son válidos.")
+        try:
+            producto_id = _entero_estricto(item.get("producto_id"))
+            cantidad = _entero_estricto(item.get("cantidad"))
+        except ValueError:
+            raise ErrorCompra("Los productos indicados no son válidos.")
+        if not 1 <= cantidad <= MAX_POR_LINEA:
+            raise ErrorCompra(f"La cantidad debe estar entre 1 y {MAX_POR_LINEA}.")
+        resultado[producto_id] = resultado.get(producto_id, 0) + cantidad
+        if resultado[producto_id] > MAX_POR_LINEA:
+            raise ErrorCompra(f"No puede comprar más de {MAX_POR_LINEA} unidades de un mismo producto.")
+    if len(resultado) > MAX_LINEAS:
+        raise ErrorCompra("El carrito alcanzó el máximo de productos distintos.")
+    return resultado
+
+
+def lineas_de_items(items):
+    normalizados = normalizar_items(items)
+    productos = Producto.objects.in_bulk(list(normalizados))
+    resultado = []
+    for producto_id, cantidad in normalizados.items():
+        producto = productos.get(producto_id)
+        disponible = bool(producto and producto.activo and producto.stock >= cantidad)
+        calculo = calcular_linea(cantidad, producto.precio) if disponible else None
+        resultado.append(
+            {"producto_id": producto_id, "producto": producto, "cantidad": cantidad, "disponible": disponible, "calculo": calculo}
+        )
+    return resultado
+
+
+def confirmar_compra_api(cliente, usuario, items, token):
+    token = str(token or "").strip()
+    if not 8 <= len(token) <= 64:
+        raise ErrorCompra("El identificador de la compra no es válido.")
+    previo = cache.get(f"compra_resultado:{token}")
+    if previo:
+        raise CompraDuplicada(previo)
+    if not cache.add(f"compra:{token}", 1, VIGENCIA_TOKEN):
+        raise CompraDuplicada(cache.get(f"compra_resultado:{token}"))
+    try:
+        encargo = _crear_encargo(cliente, usuario, normalizar_items(items))
+    except ErrorInventario as error:
+        cache.delete(f"compra:{token}")
+        raise ErrorCompra(str(error)) from error
+    except Exception:
+        cache.delete(f"compra:{token}")
+        raise
+    cache.set(f"compra_resultado:{token}", encargo.pk, VIGENCIA_TOKEN)
+    return encargo
+# <<< api

@@ -269,3 +269,10 @@ MIDDLEWARE.insert(
 TEMPLATES[0]["OPTIONS"]["context_processors"].append("apps.notificaciones.context_processors.no_leidas")
 SESION_UNICA = os.getenv("SESION_UNICA", "True") == "True"
 # <<< fase-8
+
+# >>> api
+API_TOKEN_DIAS = int(os.getenv("API_TOKEN_DIAS") or "30")
+API_SESION_UNICA = (os.getenv("API_SESION_UNICA") or "False") == "True"
+API_MAX_JSON_BYTES = 100 * 1024
+AXES_LOCKOUT_CALLABLE = "apps.api.bloqueo.respuesta_bloqueo"
+# <<< api

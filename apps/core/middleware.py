@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.utils.cache import add_never_cache_headers
 
-PREFIJOS_PRIVADOS = ("/cliente/", "/operador/", "/administrador/", "/cuenta/", "/ir/", "/validar/")
+PREFIJOS_PRIVADOS = ("/cliente/", "/operador/", "/administrador/", "/cuenta/", "/ir/", "/validar/", "/api/")
 PREFIJOS_ESTATICOS = ("/static/", "/media/")
 
 
