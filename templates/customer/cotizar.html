@@ -7,26 +7,29 @@
 <div class="encabezado-pagina">
   <div class="d-flex align-items-center gap-3">
     <span class="icono-encabezado"><span class="material-symbols-rounded">request_quote</span></span>
-    <div><h1 class="h3 mb-0">Solicitar cotización</h1><p class="text-body-secondary mb-0">Elija cómo quiere cotizar: automática para impresión 3D o por formulario para otros servicios.</p></div>
+    <div><h1 class="h3 mb-0">Solicitar cotización</h1><p class="text-body-secondary mb-0">Cotice su impresión 3D al instante o cuéntenos qué otro servicio necesita.</p></div>
   </div>
+  <a class="btn btn-outline-primary" href="#cotizacion-general"><span class="material-symbols-rounded">south</span>Otros servicios</a>
 </div>
 
-<ul class="nav nav-pills nav-fill auth-pestanas mb-4" role="tablist">
-  <li class="nav-item" role="presentation">
-    <button class="nav-link{% if pestana == '3d' %} active{% endif %}" id="tab-3d" data-bs-toggle="pill" data-bs-target="#panel-3d" type="button" role="tab" aria-controls="panel-3d" aria-selected="{% if pestana == '3d' %}true{% else %}false{% endif %}"><span class="material-symbols-rounded">view_in_ar</span>Impresión 3D automática</button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link{% if pestana == 'manual' %} active{% endif %}" id="tab-manual" data-bs-toggle="pill" data-bs-target="#panel-manual" type="button" role="tab" aria-controls="panel-manual" aria-selected="{% if pestana == 'manual' %}true{% else %}false{% endif %}"><span class="material-symbols-rounded">edit_note</span>Otros servicios (formulario)</button>
-  </li>
-</ul>
-
-<div class="tab-content">
-  <div class="tab-pane fade{% if pestana == '3d' %} show active{% endif %}" id="panel-3d" role="tabpanel" aria-labelledby="tab-3d" tabindex="0">
-    {% if not hay_filamentos %}
-    <div class="estado-vacio"><span class="material-symbols-rounded">inventory_2</span><p>El cotizador automático aún no tiene filamentos disponibles. Use el formulario de la otra pestaña y nuestro equipo le responderá.</p></div>
-    {% else %}
-    <div class="row g-4">
-      <div class="col-lg-8">
+<section id="cotizacion-3d" class="seccion-cotizador">
+  <div class="cabecera-seccion">
+    <span class="icono-encabezado"><span class="material-symbols-rounded">view_in_ar</span></span>
+    <div>
+      <h2 class="h4 mb-1">Impresión 3D automática <span class="badge text-bg-primary align-middle ms-2">Precio al instante</span></h2>
+      <p class="text-body-secondary mb-0">Suba su modelo, elija el material y las opciones, y vea una estimación del precio de inmediato.</p>
+    </div>
+  </div>
+  <div class="pasos-cotizacion">
+    <div class="paso-numerado"><span class="numero">1</span><div><strong>Suba su modelo</strong><div class="small text-body-secondary">Calculamos tamaño, material y tiempo al instante.</div></div></div>
+    <div class="paso-numerado"><span class="numero">2</span><div><strong>Elija las opciones</strong><div class="small text-body-secondary">Filamento, relleno, calidad y escala. El precio se actualiza solo.</div></div></div>
+    <div class="paso-numerado"><span class="numero">3</span><div><strong>Solicite la cotización</strong><div class="small text-body-secondary">Un profesional revisa el archivo y confirma el precio final.</div></div></div>
+  </div>
+  {% if not hay_filamentos %}
+  <div class="estado-vacio"><span class="material-symbols-rounded">inventory_2</span><p>El cotizador automático aún no tiene filamentos disponibles. Use el formulario de más abajo y nuestro equipo le responderá.</p></div>
+  {% else %}
+  <div class="row g-5">
+    <div class="col-lg-7">
         <form method="post" enctype="multipart/form-data" novalidate id="form-3d" data-estimar-url="{% url 'customer:cotizar_estimar' %}">
           {% csrf_token %}
           <input type="hidden" name="tipo_cotizacion" value="3d">
@@ -68,8 +71,9 @@
             <button type="submit" class="btn btn-primary btn-lg"><span class="material-symbols-rounded">send</span><span class="texto-boton">Solicitar cotización</span></button>
           </div>
         </form>
-      </div>
-      <div class="col-lg-4">
+    </div>
+    <div class="col-lg-5">
+      <div class="columna-sticky">
         <div class="card" id="resumen-estimacion"><div class="card-body">
           <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">calculate</span>Estimación aproximada</h2>
           <div data-estado="vacio" class="text-center text-body-secondary py-3"><span class="material-symbols-rounded icono-grande">view_in_ar</span><p class="mb-0">Suba un modelo 3D (STL, OBJ o 3MF) para calcular el precio.</p></div>
@@ -93,20 +97,24 @@
             <p class="small text-body-secondary mb-0" data-res="aviso"></p>
           </div>
         </div></div>
-        <div class="card mt-3"><div class="card-body">
-          <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">lightbulb</span>Cómo funciona</h2>
-          <div class="paso-numerado"><span class="numero">1</span><div><strong>Suba su modelo</strong><div class="small text-body-secondary">Calculamos tamaño, material y tiempo al instante.</div></div></div>
-          <div class="paso-numerado"><span class="numero">2</span><div><strong>Solicite la cotización</strong><div class="small text-body-secondary">Un profesional revisa el archivo y confirma el precio.</div></div></div>
-          <div class="paso-numerado mb-0"><span class="numero">3</span><div><strong>Acepte y siga su pedido</strong><div class="small text-body-secondary">Al aceptar, creamos su pedido y puede ver el avance.</div></div></div>
-        </div></div>
       </div>
     </div>
-    {% endif %}
   </div>
+  {% endif %}
+</section>
 
-  <div class="tab-pane fade{% if pestana == 'manual' %} show active{% endif %}" id="panel-manual" role="tabpanel" aria-labelledby="tab-manual" tabindex="0">
-    <div class="row g-4">
-      <div class="col-lg-8">
+<hr class="separador-seccion">
+
+<section id="cotizacion-general" class="seccion-cotizador">
+  <div class="cabecera-seccion">
+    <span class="icono-encabezado"><span class="material-symbols-rounded">edit_note</span></span>
+    <div>
+      <h2 class="h4 mb-1">Otros servicios</h2>
+      <p class="text-body-secondary mb-0">¿Modelado, diseño, reparación u otro trabajo? Cuéntenos qué necesita y nuestro equipo le enviará una propuesta con precio y plazo.</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xl-9">
         <form method="post" enctype="multipart/form-data" novalidate {% atributos_validacion %}>
           {% csrf_token %}
           <input type="hidden" name="tipo_cotizacion" value="manual">
@@ -147,18 +155,9 @@
             <button type="submit" class="btn btn-primary btn-lg"><span class="material-symbols-rounded">send</span>Enviar solicitud</button>
           </div>
         </form>
-      </div>
-      <div class="col-lg-4">
-        <div class="card"><div class="card-body">
-          <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">lightbulb</span>Cómo funciona</h2>
-          <div class="paso-numerado"><span class="numero">1</span><div><strong>Envíe su solicitud</strong><div class="small text-body-secondary">Describa el trabajo y adjunte sus archivos.</div></div></div>
-          <div class="paso-numerado"><span class="numero">2</span><div><strong>Recibe una propuesta</strong><div class="small text-body-secondary">Nuestro equipo la revisa y le envía precio y plazo.</div></div></div>
-          <div class="paso-numerado mb-0"><span class="numero">3</span><div><strong>Acepte y siga su pedido</strong><div class="small text-body-secondary">Al aceptar, creamos su pedido y puede ver el avance.</div></div></div>
-        </div></div>
-      </div>
     </div>
   </div>
-</div>
+</section>
 {% endblock %}
 
 {% block scripts %}<script src="{% static 'js/components/cotizador3d.js' %}"></script>{% endblock %}

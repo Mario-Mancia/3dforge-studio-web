@@ -1,7 +1,19 @@
-Hola {{ usuario.nombres }},
+{% autoescape off %}{{ marca.nombre|upper }}
+{{ titulo }}
 
-{{ asunto }}
+{% if nombre %}Hola {{ nombre }},
 
-{{ mensaje }}
+{% endif %}{% for parrafo in parrafos %}{{ parrafo }}
 
-Ingrese a la plataforma para ver los detalles.
+{% endfor %}{% if detalles %}Detalle:
+{% for fila in detalles %}- {{ fila.etiqueta }}: {{ fila.valor }}
+{% endfor %}
+{% endif %}{% if boton %}{{ boton.texto }}: {{ boton.url }}
+
+{% endif %}{% if nota %}{{ nota }}
+
+{% endif %}--
+{{ marca.nombre }}{% if marca.telefono %} · {{ marca.telefono }}{% endif %}{% if marca.correo %} · {{ marca.correo }}{% endif %}
+
+Este mensaje se envió de forma automática; por favor no responda a este correo.
+{% endautoescape %}

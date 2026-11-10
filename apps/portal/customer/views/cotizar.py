@@ -24,23 +24,21 @@ LIMITE_ANALISIS_POR_MINUTO = 20
 
 
 class CotizarView(ClienteRequeridoMixin, View):
-    """Solicitar cotizacion: automatica de impresion 3D (por defecto) o formulario para otros servicios."""
+    """Solicitar cotizacion: automatica de impresion 3D (arriba) y formulario general para otros servicios (abajo)."""
 
     template_name = "customer/cotizar.html"
 
-    def _render(self, request, form=None, form3d=None, pestana="3d"):
-        hay_filamentos = filamentos_activos().exists()
+    def _render(self, request, form=None, form3d=None):
         contexto = {
             "form": form or SolicitudCotizacionForm(),
             "form3d": form3d or Cotizacion3DForm(),
-            "pestana": pestana if hay_filamentos else "manual",
-            "hay_filamentos": hay_filamentos,
+            "hay_filamentos": filamentos_activos().exists(),
             "aviso_estimacion": AVISO,
         }
         return render(request, self.template_name, contexto)
 
     def get(self, request):
-        return self._render(request, pestana="manual" if request.GET.get("tipo") == "manual" else "3d")
+        return self._render(request)
 
     def post(self, request):
         if request.POST.get("tipo_cotizacion") == "3d":
@@ -66,7 +64,7 @@ class CotizarView(ClienteRequeridoMixin, View):
             else:
                 messages.success(request, f"Su solicitud {cotizacion.codigo} fue recibida.")
                 return redirect("customer:cotizacion", pk=cotizacion.pk)
-        return self._render(request, form=form, pestana="manual")
+        return self._render(request, form=form)
 
     def _enviar_3d(self, request):
         form3d = Cotizacion3DForm(request.POST, request.FILES)
@@ -88,7 +86,7 @@ class CotizarView(ClienteRequeridoMixin, View):
                     f"Su solicitud {cotizacion.codigo} fue recibida. Un profesional revisará el precio estimado.",
                 )
                 return redirect("customer:cotizacion", pk=cotizacion.pk)
-        return self._render(request, form3d=form3d, pestana="3d")
+        return self._render(request, form3d=form3d)
 
 
 class CotizarEstimarView(ClienteRequeridoMixin, View):

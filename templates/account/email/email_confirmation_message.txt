@@ -1,0 +1,11 @@
+{% extends "account/email/base_message.txt" %}
+{% block content %}{% autoescape off %}Hola{% if user.nombres %} {{ user.nombres }}{% endif %},
+
+Gracias por registrarse en {{ marca.nombre|default:"nuestro sitio" }}. Para activar su cuenta necesitamos confirmar que este correo le pertenece.
+
+Abra este enlace para confirmarlo:
+{{ activate_url }}
+
+Con su cuenta podrá solicitar cotizaciones, comprar en la tienda y seguir el avance de sus pedidos.
+
+Si usted no creó esta cuenta, ignore este mensaje: no se realizará ningún cambio.{% endautoescape %}{% endblock content %}

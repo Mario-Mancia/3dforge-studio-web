@@ -32,12 +32,24 @@
             {% if es_admin %}<li class="nav-item"><a class="nav-link" href="{% url 'administrator:dashboard' %}"><span class="material-symbols-rounded">admin_panel_settings</span>Administración</a></li>{% endif %}
           {% elif ns == "administrator" %}
             {% activo "administrator:dashboard" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'administrator:dashboard' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">monitoring</span>Dashboard</a></li>
-            {% activo "administrator:inventario" "administrator:producto_crear" "administrator:producto_editar" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'administrator:inventario' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">inventory_2</span>Productos</a></li>
-            {% activo "administrator:servicios" "administrator:servicio_crear" "administrator:servicio_editar" "administrator:categoria_crear" "administrator:categoria_editar" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'administrator:servicios' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">handyman</span>Servicios</a></li>
-            {% activo "administrator:cotizador" "administrator:filamento_crear" "administrator:filamento_editar" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'administrator:cotizador' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">calculate</span>Cotizador 3D</a></li>
-            {% activo "administrator:usuarios" "administrator:usuario_crear" "administrator:usuario_editar" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'administrator:usuarios' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">manage_accounts</span>Usuarios</a></li>
+            {% activo "administrator:inventario" "administrator:producto_crear" "administrator:producto_editar" "administrator:servicios" "administrator:servicio_crear" "administrator:servicio_editar" "administrator:categoria_crear" "administrator:categoria_editar" "administrator:cotizador" "administrator:filamento_crear" "administrator:filamento_editar" as grupo_catalogos %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle {{ grupo_catalogos }}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><span class="material-symbols-rounded">category</span>Catálogos</a>
+              <ul class="dropdown-menu">
+                {% activo "administrator:inventario" "administrator:producto_crear" "administrator:producto_editar" as a %}<li><a class="dropdown-item {{ a }}" href="{% url 'administrator:inventario' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">inventory_2</span>Productos</a></li>
+                {% activo "administrator:servicios" "administrator:servicio_crear" "administrator:servicio_editar" "administrator:categoria_crear" "administrator:categoria_editar" as a %}<li><a class="dropdown-item {{ a }}" href="{% url 'administrator:servicios' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">handyman</span>Servicios</a></li>
+                {% activo "administrator:cotizador" "administrator:filamento_crear" "administrator:filamento_editar" as a %}<li><a class="dropdown-item {{ a }}" href="{% url 'administrator:cotizador' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">calculate</span>Cotizador 3D y filamentos</a></li>
+              </ul>
+            </li>
+            {% activo "administrator:usuarios" "administrator:usuario_crear" "administrator:usuario_editar" "administrator:configuracion" as grupo_gestion %}
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle {{ grupo_gestion }}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><span class="material-symbols-rounded">tune</span>Gestión</a>
+              <ul class="dropdown-menu">
+                {% activo "administrator:usuarios" "administrator:usuario_crear" "administrator:usuario_editar" as a %}<li><a class="dropdown-item {{ a }}" href="{% url 'administrator:usuarios' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">manage_accounts</span>Usuarios</a></li>
+                {% activo "administrator:configuracion" as a %}<li><a class="dropdown-item {{ a }}" href="{% url 'administrator:configuracion' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">settings</span>Configuración del negocio</a></li>
+              </ul>
+            </li>
             {% activo "administrator:ventas" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'administrator:ventas' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">payments</span>Ventas</a></li>
-            {% activo "administrator:configuracion" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'administrator:configuracion' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">settings</span>Configuración</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'operator:panel' %}"><span class="material-symbols-rounded">swap_horiz</span>Operación</a></li>
           {% else %}
             {% activo "guest:inicio" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'guest:inicio' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">home</span>Inicio</a></li>

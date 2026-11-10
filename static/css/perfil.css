@@ -10,3 +10,24 @@ main:focus { outline: none; }
 .logo-previa { max-width: 100%; max-height: 100%; object-fit: contain; }
 .lista-parametros dt { font-weight: 500; font-size: .85rem; color: var(--md-text-secondary); }
 .lista-parametros dd { margin-bottom: .75rem; }
+
+/* >>> fase-10b */
+/* Barra: sin saltos de linea en los nombres y compacta en pantallas medianas */
+.barra-superior .nav-link { white-space: nowrap; }
+.barra-superior .dropdown-toggle::after { margin-left: .15rem; }
+@media (min-width: 992px) and (max-width: 1199.98px) {
+    .barra-superior .navbar-nav .nav-link { padding-inline: .75rem; }
+    .barra-superior .navbar-nav > .nav-item > .nav-link > .material-symbols-rounded { display: none; }
+}
+/* Cotizar: una sola pagina con aire entre secciones */
+.seccion-cotizador { padding-block: 1rem 2rem; }
+.seccion-cotizador .cabecera-seccion { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.75rem; }
+.seccion-cotizador .seccion-formulario { margin-bottom: 1.75rem; }
+.seccion-cotizador .seccion-formulario .card-body { padding: 1.75rem; }
+.seccion-cotizador .etiqueta-seccion { margin-bottom: 1.25rem; }
+.pasos-cotizacion { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); margin-bottom: 2.5rem; }
+.pasos-cotizacion .paso-numerado { margin-bottom: 0; }
+.separador-seccion { margin: 3.5rem 0 2.5rem; border-color: var(--md-border); opacity: 1; }
+.seccion-cotizador .card-body .alert { margin-bottom: 0; }
+@media (min-width: 992px) { .columna-sticky { position: sticky; top: 5.5rem; } }
+/* <<< fase-10b */

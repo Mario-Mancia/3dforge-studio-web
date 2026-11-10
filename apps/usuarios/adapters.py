@@ -19,6 +19,18 @@ class CuentaAdapter(DefaultAccountAdapter):
     def is_open_for_signup(self, request):
         return True
 
+    def render_mail(self, template_prefix, email, context, headers=None):
+        """Correos de cuenta (confirmacion, restablecer contrasena) con la marca del negocio."""
+        from apps.notificaciones.correo import adjuntar_marca, preparar_marca
+
+        try:
+            marca, png = preparar_marca()
+        except Exception:
+            return super().render_mail(template_prefix, email, context, headers)
+        mensaje = super().render_mail(template_prefix, email, {**marca, **context}, headers)
+        if getattr(mensaje, "alternatives", None):
+            adjuntar_marca(mensaje, png)
+        return mensaje
     def save_user(self, request, user, form, commit=True):
         datos = form.cleaned_data
         correo = datos.get("email")

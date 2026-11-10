@@ -1,17 +1,18 @@
 import logging
 from datetime import timedelta
 
-from django.core.mail import EmailMultiAlternatives
 from django.db import transaction
-from django.template.loader import render_to_string
 from django.utils import timezone
 
+from apps.notificaciones.correo import construir_correo, sitio_url
 from apps.notificaciones.models import Notificacion
+from apps.notificaciones.selectors.notificaciones import destino
 from apps.usuarios.constants import ESTADO_ACTIVO, GRUPO_ADMINISTRADOR, GRUPO_OPERADOR
 from apps.usuarios.models import Usuario
 
 registro = logging.getLogger(__name__)
 VENTANA_DUPLICADO = 30
+NOTA_CLIENTE = "Si tiene alguna duda, puede escribirnos desde la sección Soporte de su cuenta."
 
 
 def personal_activo():
@@ -23,19 +24,30 @@ def personal_activo():
     )
 
 
-def _enviar_correo(usuario, asunto, mensaje):
+def _resolver(valor):
+    """Los parrafos y detalles pueden ser una funcion: se evalua al confirmar la transaccion, con datos ya actualizados."""
+    return valor() if callable(valor) else valor
+
+
+def _enviar_correo(usuario, asunto, mensaje, ruta=None, parrafos=None, detalles=None, boton=None):
     try:
-        contexto = {"usuario": usuario, "asunto": asunto, "mensaje": mensaje}
-        mensaje_correo = EmailMultiAlternatives(
-            asunto, render_to_string("correo/notificacion.txt", contexto), to=[usuario.correo]
+        enlace = {"texto": boton or "Ver los detalles", "url": f"{sitio_url()}{ruta}"} if ruta else None
+        correo = construir_correo(
+            usuario.correo,
+            asunto,
+            asunto,
+            nombre=usuario.nombres,
+            parrafos=_resolver(parrafos) or [mensaje],
+            detalles=_resolver(detalles) or (),
+            boton=enlace,
+            nota="" if usuario.is_staff else NOTA_CLIENTE,
         )
-        mensaje_correo.attach_alternative(render_to_string("correo/notificacion.html", contexto), "text/html")
-        mensaje_correo.send()
+        correo.send()
     except Exception:
         registro.exception("No se pudo enviar el correo a %s", usuario.correo)
 
 
-def notificar(usuario, titulo, mensaje, tipo, referencia_id=None, correo=False):
+def notificar(usuario, titulo, mensaje, tipo, referencia_id=None, correo=False, parrafos=None, detalles=None, boton=None):
     if usuario is None or not usuario.is_active:
         return None
     titulo = titulo[:120]
@@ -49,7 +61,8 @@ def notificar(usuario, titulo, mensaje, tipo, referencia_id=None, correo=False):
         usuario=usuario, titulo=titulo, mensaje=mensaje, tipo=tipo, referencia_id=referencia_id
     )
     if correo:
-        transaction.on_commit(lambda: _enviar_correo(usuario, titulo, mensaje))
+        ruta = destino(notificacion, usuario)
+        transaction.on_commit(lambda: _enviar_correo(usuario, titulo, mensaje, ruta, parrafos, detalles, boton))
     return notificacion
 
 

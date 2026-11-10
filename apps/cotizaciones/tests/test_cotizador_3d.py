@@ -205,17 +205,18 @@ class CotizadorClienteTests(AlmacenTemporalMixin, TestCase):
 
     def test_la_pantalla_ofrece_las_dos_formas_de_cotizar(self):
         respuesta = self.client.get(reverse("customer:cotizar"))
-        for texto in ('id="form-3d"', "Impresión 3D automática", "Otros servicios", 'id="panel-manual"', "aproximadas"):
+        for texto in ('id="form-3d"', "Impresión 3D automática", "Otros servicios", 'id="cotizacion-general"', 'id="cotizacion-3d"', "aproximadas"):
             self.assertContains(respuesta, texto)
-        self.assertEqual(respuesta.context["pestana"], "3d")
-        self.assertEqual(self.client.get(reverse("customer:cotizar"), {"tipo": "manual"}).context["pestana"], "manual")
+        self.assertNotContains(respuesta, 'data-bs-toggle="pill"')
+        contenido = respuesta.content.decode()
+        self.assertLess(contenido.index('id="cotizacion-3d"'), contenido.index('id="cotizacion-general"'))
 
     def test_sin_filamentos_solo_queda_el_formulario(self):
         Filamento.objects.update(activo=False)
         respuesta = self.client.get(reverse("customer:cotizar"))
         self.assertNotContains(respuesta, 'id="form-3d"')
         self.assertContains(respuesta, "aún no tiene filamentos")
-        self.assertEqual(respuesta.context["pestana"], "manual")
+        self.assertContains(respuesta, 'id="cotizacion-general"')
 
     def test_estimacion_en_vivo_con_archivo_y_luego_solo_con_el_analisis(self):
         primera = self.client.post(reverse("customer:cotizar_estimar"), {**self.opciones(), "archivo": cubo_stl()})
@@ -325,7 +326,7 @@ class CotizadorClienteTests(AlmacenTemporalMixin, TestCase):
         self.assertEqual(cotizacion.detalles.get().servicio, servicio)
         malo = self.client.post(reverse("customer:cotizar"), {"tipo_cotizacion": "manual", "cantidad": "1"})
         self.assertEqual(malo.status_code, 200)
-        self.assertEqual(malo.context["pestana"], "manual")
+        self.assertContains(malo, 'id="cotizacion-general"')
 
 
 class CotizadorAdministradorTests(TestCase):

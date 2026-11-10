@@ -276,3 +276,8 @@ API_SESION_UNICA = (os.getenv("API_SESION_UNICA") or "False") == "True"
 API_MAX_JSON_BYTES = 100 * 1024
 AXES_LOCKOUT_CALLABLE = "apps.api.bloqueo.respuesta_bloqueo"
 # <<< api
+
+# >>> fase-10b
+# Direccion publica del sitio: se usa en los enlaces de los correos (por ejemplo http://100.78.139.27:8000).
+SITIO_URL = (os.getenv("SITIO_URL") or "http://localhost:8000").rstrip("/")
+# <<< fase-10b

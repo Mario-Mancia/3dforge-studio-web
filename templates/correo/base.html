@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if asunto %}{{ asunto }}{% else %}{{ marca.nombre }}{% endif %}</title>
+</head>
+<body style="margin:0;padding:0;background:#eef3f3;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#eef3f3;">
+    <tr><td align="center" style="padding:24px 12px;">
+      <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="width:100%;max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;font-family:Roboto,'Segoe UI',Arial,sans-serif;color:#1c2b2d;">
+        <tr><td style="background:{{ marca.color }};padding:18px 24px;">
+          <table role="presentation" cellspacing="0" cellpadding="0"><tr>
+            <td valign="middle" style="padding-right:12px;">{% if marca.es_logo %}<span style="display:inline-block;background:#ffffff;border-radius:8px;padding:5px 8px;"><img src="cid:{{ cid_marca }}" alt="" height="36" style="display:block;height:36px;width:auto;border:0;"></span>{% else %}<img src="cid:{{ cid_marca }}" alt="" width="36" height="36" style="display:block;width:36px;height:36px;border:0;">{% endif %}</td>
+            <td valign="middle" style="font-size:20px;font-weight:600;color:#ffffff;line-height:1.2;">{{ marca.nombre }}</td>
+          </tr></table>
+        </td></tr>
+        <tr><td style="padding:28px 24px 12px 24px;">
+{% block contenido %}{% endblock %}
+        </td></tr>
+        <tr><td style="padding:16px 24px 24px 24px;border-top:1px solid #e3eaeb;font-size:12px;line-height:1.6;color:#6b7c7e;">
+          <strong style="color:#3b4d4f;">{{ marca.nombre }}</strong>{% if marca.telefono %} · {{ marca.telefono }}{% endif %}{% if marca.correo %} · {{ marca.correo }}{% endif %}{% if marca.direccion %}<br>{{ marca.direccion }}{% endif %}{% if marca.web %}<br>{{ marca.web }}{% endif %}<br>
+          Este mensaje se envió de forma automática; por favor no responda a este correo.
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>

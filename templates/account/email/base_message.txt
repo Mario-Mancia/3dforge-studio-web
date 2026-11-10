@@ -1,0 +1,8 @@
+{% autoescape off %}{{ marca.nombre|default:"3DForge Studio" }}
+
+{% block content %}{% endblock content %}
+
+--
+Equipo de {{ marca.nombre|default:"3DForge Studio" }}
+Este mensaje se envió de forma automática; por favor no responda a este correo.
+{% endautoescape %}

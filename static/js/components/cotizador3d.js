@@ -2,6 +2,9 @@
     "use strict";
 
     $(function () {
+        var $primerError = $(".alert-danger, .is-invalid, .invalid-feedback.d-block").filter(":visible").first();
+        if ($primerError.length) { $primerError[0].scrollIntoView({ behavior: "smooth", block: "center" }); }
+
         var $formulario = $("#form-3d");
         if (!$formulario.length) { return; }
 
