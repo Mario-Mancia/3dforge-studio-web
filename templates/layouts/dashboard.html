@@ -2,7 +2,7 @@
 
 {% block cuerpo %}
 {% include "components/barra.html" %}
-<main class="container-xxl py-4 contenido-animado">
+<main id="contenido-principal" tabindex="-1" class="container-xxl py-4 contenido-animado">
   {% block contenido %}{% endblock %}
 </main>
 {% include "components/footer.html" %}

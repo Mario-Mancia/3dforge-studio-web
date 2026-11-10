@@ -1,11 +1,12 @@
 {% load bootstrap %}
-{% with ns=request.resolver_match.namespace %}
+{% panel_actual as panel %}{% es_rol "Administrator" as es_admin %}
+{% with ns=panel %}
 <header class="barra-superior sticky-top">
   <nav class="navbar navbar-expand-lg" aria-label="Navegación principal">
     <div class="container-xxl">
       <div class="barra-izquierda d-flex align-items-center">
         <a class="navbar-brand me-0" href="{% if user.is_authenticated %}{% url 'redirigir' %}{% else %}{% url 'guest:inicio' %}{% endif %}">
-          <span class="material-symbols-rounded icono-marca" aria-hidden="true">deployed_code</span>
+          {% if negocio.logo_url %}<img class="logo-marca" src="{{ negocio.logo_url }}" alt="">{% else %}<span class="material-symbols-rounded icono-marca" aria-hidden="true">deployed_code</span>{% endif %}
           <span>{{ negocio.nombre_negocio|default:"3DForge Studio" }}</span>
         </a>
       </div>
@@ -28,6 +29,7 @@
             {% activo "operator:facturas" "operator:factura" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'operator:facturas' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">receipt_long</span>Facturas</a></li>
             {% activo "operator:clientes" "operator:cliente" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'operator:clientes' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">groups</span>Clientes</a></li>
             {% activo "operator:soporte" "operator:soporte_detalle" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'operator:soporte' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">support_agent</span>Soporte</a></li>
+            {% if es_admin %}<li class="nav-item"><a class="nav-link" href="{% url 'administrator:dashboard' %}"><span class="material-symbols-rounded">admin_panel_settings</span>Administración</a></li>{% endif %}
           {% elif ns == "administrator" %}
             {% activo "administrator:dashboard" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'administrator:dashboard' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">monitoring</span>Dashboard</a></li>
             {% activo "administrator:inventario" "administrator:producto_crear" "administrator:producto_editar" as a %}<li class="nav-item"><a class="nav-link {{ a }}" href="{% url 'administrator:inventario' %}"{% if a %} aria-current="page"{% endif %}><span class="material-symbols-rounded">inventory_2</span>Productos</a></li>
@@ -55,13 +57,19 @@
           {% if user.is_authenticated %}
           <div class="dropdown">
             <button class="btn btn-tonal dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <span class="avatar-inicial">{{ user.nombres|slice:":1"|upper }}</span>
+              {% if user.foto_url %}<img class="avatar-img" src="{{ user.foto_url }}" alt="">{% else %}<span class="avatar-inicial">{{ user.nombres|slice:":1"|upper }}</span>{% endif %}
               <span class="d-none d-sm-inline">{{ user.nombres }}</span>
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
               <li class="px-3 py-2"><div class="fw-medium">{{ user.nombre_completo }}</div><small class="text-body-secondary">{{ user.correo }}</small></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="{% if user.is_staff %}{% url 'account_change_password' %}{% else %}{% url 'customer:cuenta' %}{% endif %}"><span class="material-symbols-rounded">person</span>{% if user.is_staff %}Mi cuenta{% else %}Mi perfil{% endif %}</a></li>
+              <li><a class="dropdown-item" href="{% if ns == 'administrator' %}{% url 'administrator:cuenta' %}{% elif user.is_staff %}{% url 'operator:cuenta' %}{% else %}{% url 'customer:cuenta' %}{% endif %}"><span class="material-symbols-rounded">person</span>Mi perfil</a></li>
+              <li><a class="dropdown-item" href="{% url 'account_change_password' %}"><span class="material-symbols-rounded">lock_reset</span>Cambiar contraseña</a></li>
+              {% if es_admin %}
+              <li><hr class="dropdown-divider"></li>
+              {% if ns != 'administrator' %}<li><a class="dropdown-item" href="{% url 'administrator:dashboard' %}"><span class="material-symbols-rounded">admin_panel_settings</span>Panel de administración</a></li>{% endif %}
+              {% if ns != 'operator' %}<li><a class="dropdown-item" href="{% url 'operator:panel' %}"><span class="material-symbols-rounded">swap_horiz</span>Vista de operador</a></li>{% endif %}
+              {% endif %}
               <li><hr class="dropdown-divider"></li>
               <li>
                 <form method="post" action="{% url 'account_logout' %}">{% csrf_token %}

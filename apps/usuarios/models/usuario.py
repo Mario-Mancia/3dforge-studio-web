@@ -3,7 +3,7 @@ from django.db import models
 from django.utils import timezone
 
 from apps.core.models.base import ModeloValidado
-from apps.core.validators import validar_nombre_persona, validar_telefono
+from apps.core.validators import validar_nombre_persona, validar_ruta_relativa, validar_telefono
 from apps.usuarios.constants import (
     ESTADO_ACTIVO,
     ESTADO_INACTIVO,
@@ -21,6 +21,7 @@ class Usuario(ModeloValidado, AbstractBaseUser, PermissionsMixin):
     apellidos = models.CharField(max_length=100, validators=[validar_nombre_persona])
     correo = models.EmailField(max_length=150, unique=True)
     telefono = models.CharField(max_length=25, null=True, blank=True, validators=[validar_telefono])
+    foto = models.TextField(null=True, blank=True, validators=[validar_ruta_relativa])
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
@@ -37,7 +38,7 @@ class Usuario(ModeloValidado, AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "correo"
     EMAIL_FIELD = "correo"
     REQUIRED_FIELDS = ["nombres", "apellidos"]
-    campos_texto_opcional = ("telefono",)
+    campos_texto_opcional = ("telefono", "foto")
 
     class Meta:
         db_table = "usuarios"
@@ -55,6 +56,13 @@ class Usuario(ModeloValidado, AbstractBaseUser, PermissionsMixin):
     def nombre_completo(self):
         return f"{self.nombres} {self.apellidos}".strip()
 
+    @property
+    def foto_url(self):
+        if not self.foto:
+            return None
+        from django.core.files.storage import default_storage
+
+        return default_storage.url(self.foto)
     def get_full_name(self):
         return self.nombre_completo
 

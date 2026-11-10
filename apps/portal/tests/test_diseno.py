@@ -57,7 +57,8 @@ class BarraTests(TestCase):
     def test_menu_de_usuario_del_personal(self):
         iniciar_sesion(self.client, crear_usuario("op@example.com", GRUPO_OPERADOR, is_staff=True))
         respuesta = self.client.get(reverse("operator:panel"))
-        self.assertContains(respuesta, "Mi cuenta")
+        self.assertContains(respuesta, "Mi perfil")
+        self.assertContains(respuesta, reverse("operator:cuenta"))
         self.assertContains(respuesta, reverse("account_change_password"))
 
     def test_ruta_activa_resaltada(self):

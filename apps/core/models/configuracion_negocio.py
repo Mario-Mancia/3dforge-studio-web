@@ -30,6 +30,13 @@ class ConfiguracionNegocio(ModeloValidado):
     def __str__(self):
         return self.nombre_negocio
 
+    @property
+    def logo_url(self):
+        if not self.logo:
+            return None
+        from django.core.files.storage import default_storage
+
+        return default_storage.url(self.logo)
     def clean(self):
         super().clean()
         if self._state.adding and ConfiguracionNegocio.objects.exists():

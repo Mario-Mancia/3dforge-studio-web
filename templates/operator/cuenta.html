@@ -1,0 +1,69 @@
+{% extends "layouts/dashboard.html" %}
+{% load bootstrap %}
+
+{% block titulo %}Mi perfil{% endblock %}
+
+{% block contenido %}
+{% with espacio=request.resolver_match.namespace %}
+<div class="encabezado-pagina">
+  <div class="d-flex align-items-center gap-3">
+    <span class="icono-encabezado"><span class="material-symbols-rounded">person</span></span>
+    <div><h1 class="h3 mb-0">Mi perfil</h1><p class="text-body-secondary mb-0">Sus datos de contacto y su ficha en el equipo.</p></div>
+  </div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card"><div class="card-body text-center" data-foto-contenedor>
+      {% if perfil.foto_url %}<img class="avatar-grande-img mb-3" src="{{ perfil.foto_url }}" alt="Foto de perfil" data-foto-vista>{% else %}<span class="avatar-grande mb-3" data-foto-inicial data-foto-clase="avatar-grande-img mb-3">{{ perfil.nombres|slice:":1"|upper }}</span>{% endif %}
+      <h2 class="h5 mb-0">{{ perfil.nombre_completo }}</h2>
+      <p class="text-body-secondary mb-2">{{ perfil.correo }}</p>
+      <p class="mb-3">{% for rol in roles %}<span class="badge text-bg-primary me-1">{{ rol }}</span>{% endfor %}</p>
+      {% if espacio == "administrator" %}{% include "components/foto_formulario.html" with accion_nombre="administrator:cuenta_foto" %}{% else %}{% include "components/foto_formulario.html" with accion_nombre="operator:cuenta_foto" %}{% endif %}
+      <a class="btn btn-outline-secondary w-100" href="{% url 'account_change_password' %}"><span class="material-symbols-rounded">lock_reset</span>Cambiar contraseña</a>
+    </div></div>
+    <div class="card mt-3"><div class="card-body">
+      <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">badge</span>Ficha del equipo</h2>
+      {% if empleado %}
+      <dl class="lista-parametros mb-0">
+        <dt>Código de empleado</dt><dd>{{ empleado.codigo_empleado }}</dd>
+        <dt>Cargo</dt><dd>{{ empleado.cargo }}</dd>
+        <dt>Contratación</dt><dd>{{ empleado.fecha_contratacion|date:"d/m/Y"|default:"-" }}</dd>
+        <dt>Estado</dt><dd>{% if empleado.activo %}Activo{% else %}Inactivo{% endif %}</dd>
+      </dl>
+      {% else %}
+      <p class="text-body-secondary mb-0">Su cuenta no tiene ficha de empleado. El administrador puede crearla desde Usuarios.</p>
+      {% endif %}
+    </div></div>
+    <div class="card mt-3"><div class="card-body">
+      <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">history</span>Cuenta</h2>
+      <dl class="lista-parametros mb-0">
+        <dt>Miembro desde</dt><dd>{{ perfil.date_joined|date:"d/m/Y" }}</dd>
+        <dt>Último acceso</dt><dd>{{ perfil.last_login|date:"d/m/Y H:i"|default:"-" }}</dd>
+      </dl>
+    </div></div>
+  </div>
+  <div class="col-lg-8">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="alert alert-danger">{% for e in form.non_field_errors %}<div>{{ e }}</div>{% endfor %}</div>{% endif %}
+      <div class="card seccion-formulario"><div class="card-body">
+        <div class="etiqueta-seccion">Datos de contacto</div>
+        <div class="row g-3">
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.nombres %}</div>
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.apellidos %}</div>
+        </div>
+        {% include "components/campo.html" with campo=form.telefono %}
+        <div class="mb-0">
+          <label class="form-label" for="perfil-correo">Correo (inicio de sesión)</label>
+          <input type="email" class="form-control" id="perfil-correo" value="{{ perfil.correo }}" readonly>
+          <div class="form-text">El correo solo puede cambiarlo un administrador.</div>
+        </div>
+      </div></div>
+      <div class="d-flex justify-content-end mt-3">
+        <button type="submit" class="btn btn-primary btn-lg"><span class="material-symbols-rounded">save</span>Guardar cambios</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endwith %}
+{% endblock %}

@@ -1,5 +1,7 @@
 from django.urls import path
 
+from apps.portal.cuenta_personal import CuentaPersonalView
+from apps.portal.fotos import FotoPerfilPersonalView
 from . import views
 
 app_name = "administrator"
@@ -22,5 +24,7 @@ urlpatterns = [
     path("usuarios/<int:pk>/editar/", views.UsuarioEditarView.as_view(), name="usuario_editar"),
     path("ventas/", views.VentasView.as_view(), name="ventas"),
     path("ventas/exportar/<slug:tipo>/", views.VentasExportarView.as_view(), name="ventas_exportar"),
+    path("cuenta/", CuentaPersonalView.as_view(), name="cuenta"),
+    path("cuenta/foto/", FotoPerfilPersonalView.as_view(), name="cuenta_foto"),
     path("configuracion/", views.ConfiguracionView.as_view(), name="configuracion"),
 ]

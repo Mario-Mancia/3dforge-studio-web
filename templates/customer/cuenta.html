@@ -13,9 +13,12 @@
 <div class="row g-4">
   <div class="col-lg-4">
     <div class="card"><div class="card-body text-center">
-      <span class="avatar-grande mb-3">{{ user.nombres|slice:":1"|upper }}</span>
-      <h2 class="h5 mb-0">{{ user.nombre_completo }}</h2>
-      <p class="text-body-secondary mb-3">{{ cliente.correo }}</p>
+      <div data-foto-contenedor>
+        {% if user.foto_url %}<img class="avatar-grande-img mb-3" src="{{ user.foto_url }}" alt="Foto de perfil" data-foto-vista>{% else %}<span class="avatar-grande mb-3" data-foto-inicial data-foto-clase="avatar-grande-img mb-3">{{ user.nombres|slice:":1"|upper }}</span>{% endif %}
+        <h2 class="h5 mb-0">{{ user.nombre_completo }}</h2>
+        <p class="text-body-secondary mb-3">{{ cliente.correo }}</p>
+        {% include "components/foto_formulario.html" with accion_nombre='customer:cuenta_foto' %}
+      </div>
       <a class="btn btn-outline-secondary w-100" href="{% url 'account_change_password' %}"><span class="material-symbols-rounded">lock_reset</span>Cambiar contraseña</a>
     </div></div>
     {% if actividad.cotizaciones or actividad.encargos %}

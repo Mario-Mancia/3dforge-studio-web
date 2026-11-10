@@ -1,0 +1,12 @@
+/* Fase 9C: perfiles, logo y accesibilidad */
+.saltar-contenido { position: absolute; z-index: 2000; padding: .5rem 1rem; background: var(--md-surface); color: var(--md-primary); border-radius: var(--md-radio-xl); box-shadow: var(--md-shadow-2); }
+.saltar-contenido:focus { top: .5rem; left: .5rem; }
+main:focus { outline: none; }
+.btn:focus-within { outline: 2px solid var(--md-primary); outline-offset: 2px; }
+.logo-marca { height: 1.75rem; width: auto; max-width: 9rem; object-fit: contain; }
+.avatar-img { width: 2rem; height: 2rem; border-radius: 50%; object-fit: cover; }
+.avatar-grande-img { width: 4.5rem; height: 4.5rem; border-radius: 50%; object-fit: cover; display: inline-block; border: 2px solid var(--md-border); }
+.logo-vista { width: 5.5rem; height: 5.5rem; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--md-border); border-radius: var(--md-radio-xl); background: var(--md-surface); flex: none; overflow: hidden; }
+.logo-previa { max-width: 100%; max-height: 100%; object-fit: contain; }
+.lista-parametros dt { font-weight: 500; font-size: .85rem; color: var(--md-text-secondary); }
+.lista-parametros dd { margin-bottom: .75rem; }

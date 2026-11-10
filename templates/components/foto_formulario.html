@@ -1,0 +1,14 @@
+{% load bootstrap %}
+<form method="post" action="{% url accion_nombre %}" enctype="multipart/form-data" class="mb-3" data-foto-formulario>
+  {% csrf_token %}
+  <div class="d-flex flex-wrap justify-content-center gap-2">
+    <label class="btn btn-outline-primary btn-sm mb-0">
+      <span class="material-symbols-rounded">photo_camera</span>{% if user.foto %}Cambiar foto{% else %}Subir foto{% endif %}
+      <input type="file" name="foto" accept="image/jpeg,image/png,image/webp" class="visually-hidden" data-foto-entrada data-max-bytes="{% imagen_max_bytes %}">
+    </label>
+    <button type="submit" class="btn btn-primary btn-sm" data-foto-guardar hidden><span class="material-symbols-rounded">save</span>Guardar foto</button>
+    {% if user.foto %}<button type="submit" name="quitar" value="1" class="btn btn-outline-danger btn-sm"><span class="material-symbols-rounded">delete</span>Quitar</button>{% endif %}
+  </div>
+  <div class="form-text">JPG, PNG o WEBP · máx. {% imagen_max_mb %} MB</div>
+  <div class="text-danger small" role="alert" data-foto-error hidden></div>
+</form>

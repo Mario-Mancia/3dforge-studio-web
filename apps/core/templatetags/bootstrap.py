@@ -172,3 +172,40 @@ def icono_kpi(titulo):
             return icono
     return "analytics"
 # <<< ui-2
+
+# >>> fase-9c
+from django.conf import settings as _ajustes
+
+
+@register.simple_tag(takes_context=True)
+def panel_actual(context):
+    """Panel cuya barra se muestra: el del espacio de nombres, o el del rol en paginas de cuenta."""
+    request = context.get("request")
+    usuario = getattr(request, "user", None)
+    coincidencia = getattr(request, "resolver_match", None)
+    espacio = coincidencia.namespace if coincidencia else ""
+    if espacio in ("customer", "operator", "administrator"):
+        return espacio
+    if espacio == "guest" or usuario is None or not usuario.is_authenticated:
+        return "guest"
+    from apps.usuarios.selectors.usuarios import destino_por_rol
+
+    destino = destino_por_rol(usuario)
+    return destino.split(":")[0] if destino else "guest"
+
+
+@register.simple_tag(takes_context=True)
+def es_rol(context, *roles):
+    usuario = getattr(context.get("request"), "user", None)
+    return bool(usuario is not None and usuario.is_authenticated and usuario.tiene_algun_rol(roles))
+
+
+@register.simple_tag
+def imagen_max_bytes():
+    return getattr(_ajustes, "IMAGEN_MAX_BYTES", 2097152)
+
+
+@register.simple_tag
+def imagen_max_mb():
+    return f"{getattr(_ajustes, 'IMAGEN_MAX_BYTES', 2097152) / 1048576:g}"
+# <<< fase-9c

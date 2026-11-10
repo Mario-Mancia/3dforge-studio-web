@@ -1,5 +1,7 @@
 from django.urls import path
 
+from apps.portal.cuenta_personal import CuentaPersonalView
+from apps.portal.fotos import FotoPerfilPersonalView
 from . import views
 
 app_name = "operator"
@@ -37,6 +39,8 @@ urlpatterns = [
     path("soporte/", views.SoporteOperadorView.as_view(), name="soporte"),
     path("soporte/<int:pk>/", views.SoporteOperadorDetalleView.as_view(), name="soporte_detalle"),
     path("soporte/<int:pk>/accion/<slug:accion>/", views.SoporteAccionView.as_view(), name="soporte_accion"),
+    path("cuenta/", CuentaPersonalView.as_view(), name="cuenta"),
+    path("cuenta/foto/", FotoPerfilPersonalView.as_view(), name="cuenta_foto"),
     path("notificaciones/", views.NotificacionesOperadorView.as_view(), name="notificaciones"),
     path("notificaciones/accion/<slug:accion>/", views.NotificacionAccionOperadorView.as_view(), name="notificacion_accion"),
 ]

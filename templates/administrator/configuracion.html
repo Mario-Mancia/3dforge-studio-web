@@ -1,8 +1,67 @@
 {% extends "layouts/dashboard.html" %}
+{% load bootstrap %}
 
-{% block titulo %}Configuración y reportes{% endblock %}
+{% block titulo %}Configuración{% endblock %}
 
 {% block contenido %}
-<h1 class="h3">Configuración y reportes</h1>
-<p class="text-body-secondary">Ruta: <code>{{ request.path }}</code> (pendiente de implementar)</p>
+<div class="encabezado-pagina">
+  <div class="d-flex align-items-center gap-3">
+    <span class="icono-encabezado"><span class="material-symbols-rounded">settings</span></span>
+    <div><h1 class="h3 mb-0">Configuración</h1><p class="text-body-secondary mb-0">Datos del negocio que ven sus clientes en el sitio y en la app.</p></div>
+  </div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-7">
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="alert alert-danger">{% for e in form.non_field_errors %}<div>{{ e }}</div>{% endfor %}</div>{% endif %}
+      <div class="card seccion-formulario"><div class="card-body" data-foto-contenedor>
+        <div class="etiqueta-seccion">Identidad</div>
+        <div class="d-flex align-items-start gap-3 mb-3">
+          <div class="logo-vista">{% if configuracion.logo_url %}<img class="logo-previa" src="{{ configuracion.logo_url }}" alt="Logo actual" data-foto-vista>{% else %}<span class="material-symbols-rounded icono-grande" data-foto-inicial data-foto-clase="logo-previa">deployed_code</span>{% endif %}</div>
+          <div class="flex-grow-1">
+            {% include "components/campo.html" with campo=form.logo_archivo %}
+            <div class="text-danger small mb-2" role="alert" data-foto-error hidden></div>
+            {% if configuracion.logo %}{% include "components/campo.html" with campo=form.quitar_logo %}{% endif %}
+          </div>
+        </div>
+        {% include "components/campo.html" with campo=form.nombre_negocio %}
+      </div></div>
+      <div class="card seccion-formulario"><div class="card-body">
+        <div class="etiqueta-seccion">Contacto y facturación</div>
+        <div class="row g-3">
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.correo %}</div>
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.telefono %}</div>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.sitio_web %}</div>
+          <div class="col-md-6">{% include "components/campo.html" with campo=form.identificacion_fiscal %}</div>
+        </div>
+        {% include "components/campo.html" with campo=form.direccion %}
+      </div></div>
+      <div class="d-flex justify-content-end mt-3">
+        <button type="submit" class="btn btn-primary btn-lg"><span class="material-symbols-rounded">save</span>Guardar configuración</button>
+      </div>
+    </form>
+  </div>
+  <div class="col-lg-5">
+    <div class="card"><div class="card-body">
+      <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">tune</span>Parámetros del sistema</h2>
+      <p class="text-body-secondary small">Solo lectura. Se cambian en el archivo <code>.env</code> del servidor.</p>
+      <dl class="lista-parametros mb-0">
+        {% for p in parametros %}
+        <dt>{{ p.etiqueta }}</dt><dd>{{ p.valor }}<div class="small text-body-secondary"><code>{{ p.variable }}</code></div></dd>
+        {% endfor %}
+      </dl>
+    </div></div>
+    <div class="card mt-3"><div class="card-body">
+      <h2 class="titulo-tarjeta"><span class="material-symbols-rounded">payments</span>Métodos de pago</h2>
+      <ul class="list-group list-group-flush">
+        {% for m in metodos_pago %}<li class="list-group-item d-flex justify-content-between align-items-center">{{ m.nombre }}{% if m.activo %}<span class="badge text-bg-success">Activo</span>{% else %}<span class="badge text-bg-secondary">Inactivo</span>{% endif %}</li>
+        {% empty %}<li class="list-group-item text-body-secondary">No hay métodos de pago registrados.</li>{% endfor %}
+      </ul>
+      <p class="small text-body-secondary mt-2 mb-0">Los pagos son en efectivo y los registra el equipo.</p>
+    </div></div>
+  </div>
+</div>
 {% endblock %}

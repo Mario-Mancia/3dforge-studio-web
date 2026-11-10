@@ -1,5 +1,6 @@
 from django.urls import path
 
+from apps.portal.fotos import FotoPerfilClienteView
 from . import views
 
 app_name = "customer"
@@ -30,5 +31,6 @@ urlpatterns = [
     path("soporte/", views.SoporteView.as_view(), name="soporte"),
     path("soporte/<int:pk>/", views.SoporteDetalleView.as_view(), name="soporte_detalle"),
     path("soporte/<int:pk>/cerrar/", views.SoporteCerrarView.as_view(), name="soporte_cerrar"),
+    path("cuenta/foto/", FotoPerfilClienteView.as_view(), name="cuenta_foto"),
     path("cuenta/", views.CuentaView.as_view(), name="cuenta"),
 ]
