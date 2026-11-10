@@ -19,6 +19,7 @@ con estado 400 (datos), 401 (sin sesión/credenciales), 403 (sin permiso/correo 
 | POST `auth/registro/` | no | `{nombres, apellidos, correo, telefono?, password, password2?}` → 201; envía correo de confirmación |
 | POST `auth/reenviar-confirmacion/` | no | `{correo}` |
 | POST `auth/login/` | no | `{correo, password}` → `{token, expira_en, usuario, cliente}` |
+| POST `auth/google/` | no | `{id_token, nonce?}` (credencial de Google de la app) → misma respuesta que `auth/login/`; crea la cuenta si no existe |
 | POST `auth/refrescar/` · `auth/logout/` | sí | Renueva/cierra el token |
 | POST `auth/recuperar/` | no | `{correo}` → correo con enlace web de restablecimiento |
 | POST `auth/cambiar-password/` | sí | `{password_actual, password_nueva}` |

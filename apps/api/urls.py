@@ -1,6 +1,6 @@
 from django.urls import path
 
-from apps.api.vistas import auth, catalogo, compras, cotizaciones, cuenta, pedidos, seguimiento
+from apps.api.vistas import auth, catalogo, compras, cotizaciones, cuenta, google, pedidos, seguimiento
 
 app_name = "api"
 
@@ -10,6 +10,7 @@ urlpatterns = [
     path("auth/registro/", auth.registro_cuenta, name="registro"),
     path("auth/reenviar-confirmacion/", auth.reenviar_confirmacion, name="reenviar_confirmacion"),
     path("auth/login/", auth.login, name="login"),
+    path("auth/google/", google.login_google, name="login_google"),
     path("auth/refrescar/", auth.refrescar, name="refrescar"),
     path("auth/logout/", auth.cerrar_sesion, name="logout"),
     path("auth/recuperar/", auth.recuperar_password, name="recuperar"),
