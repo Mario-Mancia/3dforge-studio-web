@@ -1,6 +1,6 @@
+import email.policy
 import io
 import logging
-from email.mime.image import MIMEImage
 
 from django.conf import settings
 from django.core.files.storage import default_storage
@@ -97,20 +97,43 @@ def preparar_marca():
     return contexto, png
 
 
+class CorreoConMarca(EmailMultiAlternatives):
+    """Correo multiparte cuyo HTML incluye el logo como imagen incrustada (multipart/related).
+
+    Django 6 usa la API moderna de correo: ya no existe mixed_subtype. Se arma la parte "related"
+    sobre el HTML al generar el mensaje.
+    """
+
+    imagen_png = None
+
+    def message(self, *, policy=email.policy.default):
+        mensaje = super().message(policy=policy)
+        if self.imagen_png:
+            try:
+                html = mensaje.get_body(preferencelist=("html",))
+                if html is not None:
+                    html.add_related(
+                        self.imagen_png, "image", "png", cid=f"<{CID_MARCA}>", filename="marca.png", disposition="inline"
+                    )
+            except Exception:
+                registro.warning("No se pudo incrustar el logo en el correo", exc_info=True)
+        return mensaje
+
+
 def adjuntar_marca(mensaje, png):
-    """Adjunta el logo como imagen incrustada (cid): se ve sin depender de URLs ni de formatos como WebP."""
+    """Convierte un correo multiparte existente (p. ej. el de allauth) para incrustar el logo."""
     try:
-        imagen = MIMEImage(png, _subtype="png")
-        imagen.add_header("Content-ID", f"<{CID_MARCA}>")
-        imagen.add_header("Content-Disposition", "inline", filename="marca.png")
-        mensaje.mixed_subtype = "related"
-        mensaje.attach(imagen)
+        if isinstance(mensaje, EmailMultiAlternatives):
+            mensaje.__class__ = CorreoConMarca
+            mensaje.imagen_png = png
     except Exception:
-        registro.warning("No se pudo adjuntar el logo al correo", exc_info=True)
+        registro.warning("No se pudo preparar el logo del correo", exc_info=True)
 
 
-def construir_correo(destinatario, asunto, titulo, nombre="", parrafos=(), detalles=(), boton=None, nota=""):
+def construir_correo(destinatario, asunto, titulo, nombre="", parrafos=(), detalles=(), boton=None, nota="", con_imagen=True):
     contexto, png = preparar_marca()
+    if not con_imagen:
+        contexto["cid_marca"] = ""
     contexto.update(
         {
             "asunto": asunto,
@@ -122,7 +145,8 @@ def construir_correo(destinatario, asunto, titulo, nombre="", parrafos=(), detal
             "nota": nota,
         }
     )
-    mensaje = EmailMultiAlternatives(asunto, render_to_string("correo/notificacion.txt", contexto), to=[destinatario])
+    mensaje = CorreoConMarca(asunto, render_to_string("correo/notificacion.txt", contexto), to=[destinatario])
     mensaje.attach_alternative(render_to_string("correo/notificacion.html", contexto), "text/html")
-    adjuntar_marca(mensaje, png)
+    if con_imagen:
+        mensaje.imagen_png = png
     return mensaje

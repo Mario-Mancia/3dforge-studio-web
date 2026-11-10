@@ -11,7 +11,7 @@
       <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="width:100%;max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;font-family:Roboto,'Segoe UI',Arial,sans-serif;color:#1c2b2d;">
         <tr><td style="background:{{ marca.color }};padding:18px 24px;">
           <table role="presentation" cellspacing="0" cellpadding="0"><tr>
-            <td valign="middle" style="padding-right:12px;">{% if marca.es_logo %}<span style="display:inline-block;background:#ffffff;border-radius:8px;padding:5px 8px;"><img src="cid:{{ cid_marca }}" alt="" height="36" style="display:block;height:36px;width:auto;border:0;"></span>{% else %}<img src="cid:{{ cid_marca }}" alt="" width="36" height="36" style="display:block;width:36px;height:36px;border:0;">{% endif %}</td>
+            {% if cid_marca %}<td valign="middle" style="padding-right:12px;">{% if marca.es_logo %}<span style="display:inline-block;background:#ffffff;border-radius:8px;padding:5px 8px;"><img src="cid:{{ cid_marca }}" alt="" height="36" style="display:block;height:36px;width:auto;border:0;"></span>{% else %}<img src="cid:{{ cid_marca }}" alt="" width="36" height="36" style="display:block;width:36px;height:36px;border:0;">{% endif %}</td>{% endif %}
             <td valign="middle" style="font-size:20px;font-weight:600;color:#ffffff;line-height:1.2;">{{ marca.nombre }}</td>
           </tr></table>
         </td></tr>

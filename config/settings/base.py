@@ -281,3 +281,17 @@ AXES_LOCKOUT_CALLABLE = "apps.api.bloqueo.respuesta_bloqueo"
 # Direccion publica del sitio: se usa en los enlaces de los correos (por ejemplo http://100.78.139.27:8000).
 SITIO_URL = (os.getenv("SITIO_URL") or "http://localhost:8000").rstrip("/")
 # <<< fase-10b
+
+# >>> fase-10c
+# Opciones para limitar las conexiones a Supabase (ver la seccion T de TASKLIST_USUARIO.txt):
+#   DB_POOLER_TRANSACCION=True  -> usar con el pooler en modo transaccion (puerto 6543)
+#   DB_POOL_MAX=4               -> pool de conexiones por proceso (requiere: pip install "psycopg[pool]")
+if os.getenv("DB_POOLER_TRANSACCION", "False") == "True":
+    DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
+    DATABASES["default"].setdefault("OPTIONS", {})["prepare_threshold"] = None
+_pool_max = (os.getenv("DB_POOL_MAX") or "").strip()
+if _pool_max.isdigit() and int(_pool_max) > 0:
+    DATABASES["default"].setdefault("OPTIONS", {})["pool"] = {"min_size": 1, "max_size": int(_pool_max), "timeout": 15}
+    DATABASES["default"]["CONN_MAX_AGE"] = 0
+    DATABASES["default"]["CONN_HEALTH_CHECKS"] = False
+# <<< fase-10c

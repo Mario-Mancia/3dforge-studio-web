@@ -40,6 +40,9 @@
   <script src="{% static ruta %}"></script>
   {% endwith %}
   {% endif %}
+  {% if request.resolver_match.url_name == "account_login" or request.resolver_match.url_name == "account_signup" %}
+  <script src="{% static 'js/vistas/guest/acceso.js' %}"></script>
+  {% endif %}
   {% block scripts %}{% endblock %}
 </body>
 </html>

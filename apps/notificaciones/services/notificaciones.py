@@ -30,21 +30,26 @@ def _resolver(valor):
 
 
 def _enviar_correo(usuario, asunto, mensaje, ruta=None, parrafos=None, detalles=None, boton=None):
-    try:
-        enlace = {"texto": boton or "Ver los detalles", "url": f"{sitio_url()}{ruta}"} if ruta else None
-        correo = construir_correo(
-            usuario.correo,
-            asunto,
-            asunto,
-            nombre=usuario.nombres,
-            parrafos=_resolver(parrafos) or [mensaje],
-            detalles=_resolver(detalles) or (),
-            boton=enlace,
-            nota="" if usuario.is_staff else NOTA_CLIENTE,
-        )
-        correo.send()
-    except Exception:
-        registro.exception("No se pudo enviar el correo a %s", usuario.correo)
+    enlace = {"texto": boton or "Ver los detalles", "url": f"{sitio_url()}{ruta}"} if ruta else None
+    for con_imagen in (True, False):
+        try:
+            correo = construir_correo(
+                usuario.correo,
+                asunto,
+                asunto,
+                nombre=usuario.nombres,
+                parrafos=_resolver(parrafos) or [mensaje],
+                detalles=_resolver(detalles) or (),
+                boton=enlace,
+                nota="" if usuario.is_staff else NOTA_CLIENTE,
+                con_imagen=con_imagen,
+            )
+            correo.send()
+            return
+        except Exception:
+            registro.exception(
+                "No se pudo enviar el correo a %s%s", usuario.correo, " (se reintenta sin el logo)" if con_imagen else ""
+            )
 
 
 def notificar(usuario, titulo, mensaje, tipo, referencia_id=None, correo=False, parrafos=None, detalles=None, boton=None):

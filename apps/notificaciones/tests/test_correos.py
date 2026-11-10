@@ -3,6 +3,8 @@ import shutil
 import tempfile
 from decimal import Decimal
 
+from unittest.mock import patch
+
 from django.core import mail
 from django.core.cache import cache
 from django.core.files.base import ContentFile
@@ -17,7 +19,9 @@ from apps.cotizaciones.services import cotizaciones as servicios_cot
 from apps.cotizaciones.tests.utiles import AlmacenTemporalMixin, crear_cliente, crear_personal, crear_servicio
 from apps.encargos.services import compras, encargos
 from apps.facturacion.models import Factura
+from apps.notificaciones import correo as modulo_correo
 from apps.notificaciones.correo import CID_MARCA, COLOR_MARCA, construir_correo, icono_cubo
+from apps.notificaciones.services.notificaciones import notificar
 from apps.pagos.models import EstadoPago, MetodoPago, Pago
 from apps.usuarios.constants import GRUPO_ADMINISTRADOR, GRUPO_OPERADOR
 from apps.usuarios.tests.utiles import crear_usuario, iniciar_sesion
@@ -30,10 +34,15 @@ def html_de(correo):
 
 
 def logo_adjunto(correo):
-    for parte in correo.attachments:
+    """Bytes del logo incrustado (Content-ID) en el mensaje ya armado, o None."""
+    for parte in correo.message().walk():
         if parte.get("Content-ID") == f"<{CID_MARCA}>":
             return parte.get_payload(decode=True)
     return None
+
+
+def tiene_parte_related(correo):
+    return any(parte.get_content_type() == "multipart/related" for parte in correo.message().walk())
 
 
 class MarcaEnCorreosTests(TestCase):
@@ -60,7 +69,7 @@ class MarcaEnCorreosTests(TestCase):
         for texto in (COLOR_MARCA, "3DForge Studio", f"cid:{CID_MARCA}", "Titulo de prueba", "Hola Ana", "Primer párrafo.", "Total", "$10.00", "Ver mi cotización"):
             self.assertIn(texto, html)
         self.assertNotIn("background:#ffffff;border-radius:8px;padding:5px 8px", html)
-        self.assertEqual(correo.mixed_subtype, "related")
+        self.assertTrue(tiene_parte_related(correo))
         icono = Image.open(io.BytesIO(logo_adjunto(correo)))
         self.assertEqual(icono.size, (96, 96))
         self.assertIsNotNone(icono.getchannel("A").getbbox())
@@ -94,6 +103,23 @@ class MarcaEnCorreosTests(TestCase):
         self.assertEqual(Image.open(io.BytesIO(logo_adjunto(correo))).size, (96, 96))
         self.assertNotIn("padding:5px 8px", html_de(correo))
 
+    def test_sin_imagen_el_correo_no_referencia_el_logo(self):
+        correo = construir_correo("ana@example.com", "Asunto", "Titulo", con_imagen=False)
+        self.assertNotIn("cid:", html_de(correo))
+        self.assertIsNone(logo_adjunto(correo))
+
+    def test_el_mensaje_se_arma_con_la_api_moderna_de_django(self):
+        correo = self.correo()
+        mensaje = correo.message()
+        tipos = [parte.get_content_type() for parte in mensaje.walk()]
+        for esperado in ("multipart/alternative", "text/plain", "multipart/related", "text/html", "image/png"):
+            self.assertIn(esperado, tipos)
+        self.assertFalse(hasattr(correo, "mixed_subtype"))
+        imagenes = [parte for parte in mensaje.walk() if parte.get_content_type() == "image/png"]
+        self.assertEqual(len(imagenes), 1)
+        self.assertEqual(imagenes[0].get_content_disposition(), "inline")
+        self.assertEqual(imagenes[0]["Content-ID"], f"<{CID_MARCA}>")
+
     def test_el_icono_por_defecto_es_blanco_sobre_transparente(self):
         icono = icono_cubo(96)
         self.assertEqual(icono.mode, "RGBA")
@@ -126,7 +152,7 @@ class CorreosDeEventosTests(AlmacenTemporalMixin, TestCase):
             self.assertIn(texto, html)
         self.assertIn("Total: $33.90", correo.body)
         self.assertIn(f"{SITIO}{reverse('customer:cotizacion', args=[cotizacion.pk])}", correo.body)
-        self.assertEqual(correo.mixed_subtype, "related")
+        self.assertTrue(tiene_parte_related(correo))
         self.assertIsNotNone(logo_adjunto(correo))
 
     def test_pedido_cancelado_explica_que_paso(self):
@@ -161,6 +187,40 @@ class CorreosDeEventosTests(AlmacenTemporalMixin, TestCase):
 
 
 @override_settings(SITIO_URL=SITIO)
+class ReintentoSinImagenTests(TestCase):
+    def test_si_falla_el_envio_con_logo_se_reintenta_sin_el(self):
+        usuario, _ = crear_cliente("ana@example.com")
+        original = modulo_correo.construir_correo
+        llamadas = []
+
+        def con_fallo(*args, **kwargs):
+            llamadas.append(kwargs.get("con_imagen", True))
+            if kwargs.get("con_imagen", True):
+                raise RuntimeError("fallo simulado")
+            return original(*args, **kwargs)
+
+        with patch("apps.notificaciones.services.notificaciones.construir_correo", side_effect=con_fallo):
+            with self.captureOnCommitCallbacks(execute=True):
+                notificar(usuario, "Aviso con correo", "Mensaje", "cotizacion", 1, correo=True)
+        self.assertEqual(llamadas, [True, False])
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertNotIn("cid:", html_de(mail.outbox[0]))
+
+
+class LoginConScriptTests(TestCase):
+    def test_el_login_con_error_carga_el_script_de_acceso(self):
+        crear_cliente("ana@example.com")
+        respuesta = self.client.post(reverse("account_login"), {"login": "ana@example.com", "password": "clave-mala-1"})
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertContains(respuesta, "js/vistas/guest/acceso.js")
+        self.assertContains(respuesta, "toggle-password")
+
+    def test_el_script_de_acceso_no_se_carga_dos_veces(self):
+        contenido = self.client.get(reverse("guest:acceso")).content.decode()
+        self.assertEqual(contenido.count("js/vistas/guest/acceso.js"), 1)
+
+
+@override_settings(SITIO_URL=SITIO)
 class CorreosDeCuentaTests(TestCase):
     def setUp(self):
         super().setUp()
@@ -179,7 +239,7 @@ class CorreosDeCuentaTests(TestCase):
             self.assertIn(texto, html)
         self.assertIn(prefijo, correo.body)
         self.assertIn("Hola Luis", correo.body)
-        self.assertEqual(correo.mixed_subtype, "related")
+        self.assertTrue(tiene_parte_related(correo))
         self.assertIsNotNone(logo_adjunto(correo))
 
     def test_el_correo_de_restablecer_contrasena_lleva_la_marca_y_el_enlace(self):
